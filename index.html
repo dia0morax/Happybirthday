@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sky's Celestial Universe | SOMY</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cinzel+Decorative:wght@700&family=Outfit:wght@300;400;600;700&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #03030c;
+      --accent-cyan: #38bdf8;
+      --accent-pink: #f472b6;
+      --accent-gold: #fbbf24;
+      --glass-bg: rgba(15, 23, 42, 0.72);
+      --glass-border: rgba(255, 255, 255, 0.14);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg-dark);
+      font-family: 'Tajawal', sans-serif;
+      color: var(--text-main);
+    }
+
+    /* خلفية الكانفاس للنجوم */
+    #universeCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      display: block;
+    }
+
+    /* طبقة المحتوى التفاعلي للنجوم */
+    #interactiveLayer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      pointer-events: auto;
+    }
+
+    /* عناصر النجوم التفاعلية */
+    .star-node {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 10;
+    }
+
+    .star-node:hover {
+      transform: translate(-50%, -50%) scale(1.22);
+    }
+
+    .star-pulse-core {
+      width: 22px;
+      height: 22px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .star-pulse-core::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fff 20%, var(--accent-cyan) 65%, transparent 85%);
+      box-shadow: 0 0 16px var(--accent-cyan), 0 0 32px var(--accent-cyan);
+      animation: pulseStar 2.6s infinite ease-in-out;
+    }
+
+    .star-node.has-special-song .star-pulse-core::before {
+      background: radial-gradient(circle, #fff 20%, var(--accent-pink) 65%, transparent 85%);
+      box-shadow: 0 0 18px var(--accent-pink), 0 0 36px var(--accent-pink);
+    }
+
+    .star-label {
+      margin-top: 8px;
+      padding: 3px 10px;
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 14px;
+      font-size: 11px;
+      color: #e2e8f0;
+      letter-spacing: 0.4px;
+      white-space: nowrap;
+      pointer-events: none;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+    /* شعار المركز المتألق SOMY */
+    #centerConstellation {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 3;
+      pointer-events: none;
+      animation: floatCenter 6s ease-in-out infinite alternate;
+    }
+
+    .glow-title {
+      font-family: 'Cinzel Decorative', cursive, sans-serif;
+      font-size: clamp(3.2rem, 9vw, 6.5rem);
+      letter-spacing: 8px;
+      font-weight: 700;
+      color: #ffffff;
+      text-shadow: 
+        0 0 10px #ffffff,
+        0 0 20px var(--accent-cyan),
+        0 0 40px var(--accent-cyan),
+        0 0 80px rgba(56, 189, 248, 0.6);
+      margin: 0;
+      line-height: 1;
+    }
+
+    .glow-subtitle {
+      font-family: 'Amiri', serif;
+      font-size: clamp(1.1rem, 2.8vw, 1.8rem);
+      color: rgba(248, 250, 252, 0.9);
+      margin-top: 14px;
+      text-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
+      letter-spacing: 1px;
+    }
+
+    .glow-date {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      color: var(--accent-gold);
+      letter-spacing: 2px;
+      margin-top: 6px;
+      opacity: 0.9;
+    }
+
+    /* وحدة التحكم بالصوت العائمة في الزاوية */
+    #audioWidget {
+      position: absolute;
+      bottom: 24px;
+      right: 24px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      padding: 8px 16px;
+      border-radius: 30px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    #audioWidget button {
+      background: transparent;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+    }
+
+    #audioWidget button:hover {
+      transform: scale(1.15);
+      color: var(--accent-cyan);
+    }
+
+    .audio-status-text {
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 0.3px;
+    }
+
+    /* النوافذ المنبثقة (Glass Modal) */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 3, 12, 0.78);
+      backdrop-filter: blur(16px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+      padding: 16px;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .glass-card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%), rgba(10, 15, 30, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 24px;
+      width: 100%;
+      max-width: 480px;
+      padding: 32px 28px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 40px rgba(56, 189, 248, 0.15);
+      position: relative;
+      transform: translateY(20px) scale(0.96);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      color: #fff;
+    }
+
+    .modal-overlay.active .glass-card {
+      transform: translateY(0) scale(1);
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 18px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .modal-close-btn:hover {
+      background: rgba(239, 68, 68, 0.8);
+      transform: rotate(90deg);
+    }
+
+    /* بطاقة الذكرى */
+    .memory-img {
+      width: 100%;
+      max-height: 220px;
+      object-fit: cover;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    }
+
+    .memory-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .memory-message {
+      font-family: 'Amiri', serif;
+      font-size: 1.15rem;
+      line-height: 1.8;
+      color: #e2e8f0;
+      white-space: pre-wrap;
+    }
+
+    .song-playing-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(244, 114, 182, 0.2);
+      border: 1px solid rgba(244, 114, 182, 0.4);
+      color: var(--accent-pink);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      margin-top: 16px;
+    }
+
+    /* نافذة تسجيل الدخول */
+    .login-title {
+      text-align: center;
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+
+    .login-sub {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 24px;
+    }
+
+    .custom-input {
+      width: 100%;
+      padding: 14px 18px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      color: white;
+      font-size: 1.05rem;
+      margin-bottom: 16px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      text-align: center;
+      font-family: inherit;
+    }
+
+    .custom-input:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+    }
+
+    .btn-glow {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(56, 189, 248, 0.4);
+    }
+
+    .btn-glow:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(56, 189, 248, 0.6);
+    }
+
+    /* استوديو التعديل والمطور (Admin Studio) */
+    #adminStudioDrawer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 380px;
+      height: 100%;
+      background: rgba(11, 17, 33, 0.94);
+      border-right: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(20px);
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(-100%);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 10px 0 40px rgba(0, 0, 0, 0.7);
+    }
+
+    #adminStudioDrawer.open {
+      transform: translateX(0);
+    }
+
+    .drawer-header {
+      padding: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .drawer-header h3 {
+      color: var(--accent-gold);
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .drawer-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+      text-align: right;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 12px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      color: white;
+      font-size: 0.95rem;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .form-control:focus {
+      border-color: var(--accent-gold);
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .admin-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-success {
+      background: #10b981;
+      color: white;
+      border: none;
+      padding: 11px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: all 0.2s;
+    }
+
+    .btn-success:hover {
+      background: #059669;
+    }
+
+    .btn-export {
+      background: linear-gradient(135deg, #d97706 0%, #fbbf24 100%);
+      color: #000;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+    }
+
+    .admin-floating-toggle {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 600;
+      background: var(--glass-bg);
+      border: 1px solid var(--accent-gold);
+      color: var(--accent-gold);
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      display: none;
+      font-weight: bold;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+
+    .drag-hint {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(251, 191, 36, 0.2);
+      border: 1px solid var(--accent-gold);
+      color: #fef08a;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      z-index: 400;
+      display: none;
+      pointer-events: none;
+      backdrop-filter: blur(6px);
+    }
+
+    /* قائمة النجوم في الاستوديو */
+    .star-list-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+
+    .star-list-item span {
+      font-size: 0.9rem;
+      color: #cbd5e1;
+    }
+
+    .item-btns {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn-xs {
+      padding: 4px 8px;
+      font-size: 11px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-edit { background: #3b82f6; color: white; }
+    .btn-delete { background: #ef4444; color: white; }
+
+    /* أنيميشن */
+    @keyframes pulseStar {
+      0%, 100% { transform: scale(1); opacity: 0.85; }
+      50% { transform: scale(1.45); opacity: 1; }
+    }
+
+    @keyframes floatCenter {
+      0% { transform: translate(-50%, -50%) translateY(0); }
+      100% { transform: translate(-50%, -50%) translateY(-12px); }
+    }
+
+    /* إشعار منبثق (Toast) */
+    #toastNotification {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1e293b;
+      color: white;
+      border: 1px solid var(--accent-cyan);
+      padding: 10px 24px;
+      border-radius: 30px;
+      font-size: 14px;
+      z-index: 2000;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      opacity: 0;
+      pointer-events: none;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    #toastNotification.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- كانفاس السماء والشهب -->
+  <canvas id="universeCanvas"></canvas>
+
+  <!-- طبقة النجوم التفاعلية -->
+  <div id="interactiveLayer"></div>
+
+  <!-- الاسم المشع في المنتصف -->
+  <div id="centerConstellation">
+    <h1 class="glow-title" id="displayCenterTitle">SOMY</h1>
+    <div class="glow-subtitle" id="displaySubtitle">The Stars Align For You, Sky</div>
+    <div class="glow-date" id="displayDate">Happy Birthday!</div>
+  </div>
+
+  <!-- تحكم الصوت -->
+  <div id="audioWidget">
+    <button id="audioToggleBtn" title="تشغيل / كتم الصوت">🔊</button>
+    <span class="audio-status-text" id="audioTrackName">Cosmic Serenade</span>
+  </div>
+
+  <!-- زر فتح الاستوديو (يظهر لك فقط عند تسجيل الدخول كـ diajb0) -->
+  <button class="admin-floating-toggle" id="adminToggleBtn">⚙️ لوحة التعديل والتحكم</button>
+  <div class="drag-hint" id="dragHint">✨ يمكنك الآن سحب أي نجمة بالماوس لتغيير موقعها على الشاشة!</div>
+
+  <!-- مشغلات الصوت الخفية -->
+  <audio id="ambientAudio" loop preload="auto"></audio>
+  <audio id="specialAudio" preload="auto"></audio>
+
+  <!-- نافذة تسجيل الدخول الأولية -->
+  <div class="modal-overlay active" id="loginModal">
+    <div class="glass-card" style="text-align: center;">
+      <div style="font-size: 3rem; margin-bottom: 12px;">🌌</div>
+      <h2 class="login-title">سماء النجوم الأبدية</h2>
+      <p class="login-sub">اكتبي اسمكِ للدخول إلى عالمكِ الخاص</p>
+      
+      <input type="text" id="usernameInput" class="custom-input" placeholder="اسم الدخول..." autocomplete="off">
+      <button class="btn-glow" id="loginSubmitBtn">دخول إلى المجرة ✨</button>
+      <div id="loginFeedback" style="color: #f87171; font-size: 0.85rem; margin-top: 12px; display: none;"></div>
+    </div>
+  </div>
+
+  <!-- نافذة عرض تفاصيل النجمة والذكرى (Modal) -->
+  <div class="modal-overlay" id="memoryModal">
+    <div class="glass-card">
+      <button class="modal-close-btn" id="closeMemoryBtn">✕</button>
+      <img id="memoryModalImg" src="" alt="Memory Image" class="memory-img" style="display: none;">
+      <h3 class="memory-title" id="memoryModalTitle">✨ عنوان النجمة</h3>
+      <p class="memory-message" id="memoryModalMessage">هنا الرسالة الخاصة...</p>
+      
+      <div id="memorySongBadge" class="song-playing-pill" style="display: none;">
+        <span>🎵</span> <span id="memorySongText">أغنيتكِ المفضلة تعمل الآن بصوت هادئ...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- لوحة تحكم واستوديو المطور (Admin Drawer) -->
+  <div id="adminStudioDrawer">
+    <div class="drawer-header">
+      <h3><span>🛠️</span> استوديو النجوم (diajb0)</h3>
+      <button class="modal-close-btn" id="closeAdminBtn" style="position: static;">✕</button>
+    </div>
+    
+    <div class="drawer-body">
+      <div style="margin-bottom: 16px; padding: 10px; background: rgba(56, 189, 248, 0.1); border-radius: 8px; font-size: 0.85rem; color: #bae6fd;">
+        💡 <b>ملاحظة:</b> يمكنك سحب النجوم على الشاشة لتغيير أماكنها مباشرة، ثم الضغط على "نسخ كود الإعدادات" لمشاركتها مع Gemini لتثبيتها بالكود!
+      </div>
+
+      <div class="form-group">
+        <label>الاسم المتوهج بالمنتصف:</label>
+        <input type="text" id="cfgGlowName" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label>العنوان الفرعي:</label>
+        <input type="text" id="cfgSubtitle" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label>رابط صوت الفضاء المحيط (Ambient Audio):</label>
+        <input type="text" id="cfgAmbientAudio" class="form-control" placeholder="ambient.mp3 أو رابط مباشر">
+      </div>
+
+      <div class="form-group">
+        <label>رابط أغنيتها المفضلة (Special Song):</label>
+        <input type="text" id="cfgSpecialSong" class="form-control" placeholder="her-song.mp3 أو رابط مباشر">
+      </div>
+
+      <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+      <h4 style="color: var(--accent-cyan); margin-bottom: 12px;">✨ إدارة النجوم والرسائل</h4>
+      
+      <!-- قائمة النجوم الحالية -->
+      <div id="adminStarsList"></div>
+
+      <!-- نموذج إضافة / تعديل نجمة -->
+      <div style="background: rgba(0,0,0,0.3); padding: 14px; border-radius: 10px; margin-top: 15px; border: 1px dashed rgba(255,255,255,0.2);">
+        <h5 id="formModeTitle" style="color: var(--accent-gold); margin-bottom: 10px;">إضافة نجمة جديدة:</h5>
+        
+        <input type="hidden" id="starEditId">
+
+        <div class="form-group">
+          <label>عنوان النجمة (يظهر بجانبها):</label>
+          <input type="text" id="newStarTitle" class="form-control" placeholder="مثال: أول لقاء">
+        </div>
+
+        <div class="form-group">
+          <label>رابط الصورة (اختياري):</label>
+          <input type="text" id="newStarImg" class="form-control" placeholder="photo.jpg أو رابط صورة">
+        </div>
+
+        <div class="form-group">
+          <label>الرسالة والتهنئة:</label>
+          <textarea id="newStarMsg" class="form-control" placeholder="اكتب ما بقلبك هنا..."></textarea>
+        </div>
+
+        <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+          <input type="checkbox" id="newStarPlayMusic" style="width: 18px; height: 18px;">
+          <label for="newStarPlayMusic" style="margin: 0; cursor: pointer; color: var(--accent-pink);">
+            تشغيل أغنيتها المفضلة عند فتح هذه النجمة 🎵
+          </label>
+        </div>
+
+        <div class="admin-actions">
+          <button class="btn-success" id="saveStarItemBtn">حفظ النجمة في الشاشة</button>
+          <button class="btn-secondary" id="cancelEditStarBtn" style="display: none;">إلغاء التعديل</button>
+        </div>
+      </div>
+
+      <div class="admin-actions" style="margin-top: 24px;">
+        <button class="btn-export" id="exportConfigBtn">📋 نسخ كود الإعدادات (لإرساله لـ Gemini)</button>
+        <button class="btn-secondary" id="previewAsSkyBtn">👁️ معاينة الموقع كما ستراه هي</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastNotification">تم النسخ بنجاح!</div>
+
+  <script>
+    /* =========================================================================
+       قاعدة البيانات الافتراضية (تتحدث تلقائياً من لوحة التحكم)
+       ========================================================================= */
+    const DEFAULT_CONFIG = {
+      glowName: "SOMY",
+      subtitle: "The Stars Align For You, Sky",
+      dateText: "Happy Birthday!",
+      ambientAudioUrl: "https://actions.google.com/sounds/v1/ambiences/deep_space_wind.ogg",
+      specialSongUrl: "https://actions.google.com/sounds/v1/weather/gentle_rain_on_leaves.ogg",
+      stars: [
+        {
+          id: 1,
+          title: "نجمة البداية",
+          x: 24,
+          y: 28,
+          image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80",
+          message: "كل عام وأنتِ النور الذي يضيء عتمة هذه المجرة.. أسعد أيام عمري هي التي بدأت بوجودكِ.",
+          playMusic: false
+        },
+        {
+          id: 2,
+          title: "أغنيتكِ الساحرة",
+          x: 76,
+          y: 32,
+          image: "",
+          message: "عندما تلمعين في السماء، تعزف الألحان بهدوء لتليق بجمال روحكِ وعينيكِ.",
+          playMusic: true
+        },
+        {
+          id: 3,
+          title: "سرّ السماء",
+          x: 48,
+          y: 78,
+          image: "",
+          message: "اسمكِ سماء، ولكِ من اسمكِ كل الاتساع والنقاء والرفعة.. عيد ميلاد سعيد يا أغلى ما أملك.",
+          playMusic: false
+        }
+      ]
+    };
+
+    let appConfig = JSON.parse(localStorage.getItem('sky_celestial_cfg')) || DEFAULT_CONFIG;
+
+    function saveAppConfig() {
+      localStorage.setItem('sky_celestial_cfg', JSON.stringify(appConfig));
+      renderStars();
+      updateCenterDisplay();
+      setupAudioSources();
+    }
+
+    /* =========================================================================
+       نظام الصوتيات الذكي (Audio Ducking)
+       ========================================================================= */
+    const ambientAudio = document.getElementById('ambientAudio');
+    const specialAudio = document.getElementById('specialAudio');
+    const audioToggleBtn = document.getElementById('audioToggleBtn');
+    let isMuted = false;
+    let isSpecialPlaying = false;
+
+    function setupAudioSources() {
+      if (appConfig.ambientAudioUrl) ambientAudio.src = appConfig.ambientAudioUrl;
+      if (appConfig.specialSongUrl) specialAudio.src = appConfig.specialSongUrl;
+      ambientAudio.volume = 0.45;
+      specialAudio.volume = 0.7;
+    }
+
+    function startMusicExperience() {
+      ambientAudio.play().then(() => {
+        audioToggleBtn.textContent = '🔊';
+      }).catch(err => console.log('Audio autoplay prevented:', err));
+    }
+
+    audioToggleBtn.addEventListener('click', () => {
+      isMuted = !isMuted;
+      ambientAudio.muted = isMuted;
+      specialAudio.muted = isMuted;
+      audioToggleBtn.textContent = isMuted ? '🔇' : '🔊';
+    });
+
+    function fadeAudio(audioElement, targetVol, duration = 800) {
+      const stepTime = 50;
+      const steps = duration / stepTime;
+      const volStep = (targetVol - audioElement.volume) / steps;
+
+      let counter = 0;
+      const interval = setInterval(() => {
+        counter++;
+        let newVol = audioElement.volume + volStep;
+        if (newVol > 1) newVol = 1;
+        if (newVol < 0) newVol = 0;
+        audioElement.volume = newVol;
+
+        if (counter >= steps) {
+          audioElement.volume = targetVol;
+          clearInterval(interval);
+        }
+      }, stepTime);
+    }
+
+    /* =========================================================================
+       محرك الفضاء والنجوم (HTML5 Canvas Particles & Meteors)
+       ========================================================================= */
+    const canvas = document.getElementById('universeCanvas');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+    let meteors = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      createStars(Math.floor((canvas.width * canvas.height) / 3200));
+    }
+
+    function createStars(count) {
+      stars = [];
+      for (let i = 0; i < count; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          radius: Math.random() * 1.5 + 0.3,
+          color: Math.random() > 0.3 ? '#ffffff' : (Math.random() > 0.5 ? '#7dd3fc' : '#f472b6'),
+          alpha: Math.random() * 0.8 + 0.2,
+          speed: Math.random() * 0.02 + 0.005,
+          angle: Math.random() * Math.PI * 2
+        });
+      }
+    }
+
+    function spawnMeteor() {
+      if (Math.random() < 0.02 && meteors.length < 3) {
+        meteors.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * (canvas.height / 2),
+          length: Math.random() * 90 + 50,
+          speed: Math.random() * 7 + 6,
+          angle: (Math.PI / 4) + (Math.random() * 0.2 - 0.1),
+          alpha: 1
+        });
+      }
+    }
+
+    function animateUniverse() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let s of stars) {
+        s.alpha += Math.sin(s.angle) * 0.008;
+        s.angle += s.speed;
+        let finalAlpha = Math.max(0.1, Math.min(1, s.alpha));
+
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+        ctx.fillStyle = s.color;
+        ctx.globalAlpha = finalAlpha;
+        ctx.shadowBlur = s.radius > 1.2 ? 8 : 0;
+        ctx.shadowColor = s.color;
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      ctx.shadowBlur = 0;
+
+      spawnMeteor();
+      for (let i = meteors.length - 1; i >= 0; i--) {
+        let m = meteors[i];
+        let endX = m.x - Math.cos(m.angle) * m.length;
+        let endY = m.y - Math.sin(m.angle) * m.length;
+
+        let grad = ctx.createLinearGradient(m.x, m.y, endX, endY);
+        grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+        grad.addColorStop(0.3, 'rgba(56, 189, 248, 0.6)');
+        grad.addColorStop(1, 'transparent');
+
+        ctx.beginPath();
+        ctx.moveTo(m.x, m.y);
+        ctx.lineTo(endX, endY);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 2.2;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+
+        m.x += Math.cos(m.angle) * m.speed;
+        m.y += Math.sin(m.angle) * m.speed;
+        m.alpha -= 0.015;
+
+        if (m.alpha <= 0 || m.x > canvas.width + 100 || m.y > canvas.height + 100) {
+          meteors.splice(i, 1);
+        }
+      }
+
+      requestAnimationFrame(animateUniverse);
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    animateUniverse();
+
+    /* =========================================================================
+       عرض وتحديث النجوم التفاعلية
+       ========================================================================= */
+    const interactiveLayer = document.getElementById('interactiveLayer');
+    let isEditModeActive = false;
+
+    function renderStars() {
+      interactiveLayer.innerHTML = '';
+      appConfig.stars.forEach(star => {
+        const starEl = document.createElement('div');
+        starEl.className = 'star-node' + (star.playMusic ? ' has-special-song' : '');
+        starEl.style.left = star.x + '%';
+        starEl.style.top = star.y + '%';
+        starEl.dataset.id = star.id;
+
+        starEl.innerHTML = `
+          <div class="star-pulse-core"></div>
+          <div class="star-label">${star.title}</div>
+        `;
+
+        starEl.addEventListener('click', (e) => {
+          if (starEl.dataset.dragging === 'true') return;
+          openMemoryModal(star);
+        });
+
+        makeDraggable(starEl, star);
+        interactiveLayer.appendChild(starEl);
+      });
+    }
+
+    function updateCenterDisplay() {
+      document.getElementById('displayCenterTitle').textContent = appConfig.glowName || 'SOMY';
+      document.getElementById('displaySubtitle').textContent = appConfig.subtitle || '';
+      document.getElementById('displayDate').textContent = appConfig.dateText || '';
+    }
+
+    /* نظام السحب والإفلات للنجوم */
+    function makeDraggable(el, starData) {
+      let isDragging = false;
+      let startX, startY;
+
+      const onMouseDown = (e) => {
+        if (!isEditModeActive) return;
+        isDragging = true;
+        el.dataset.dragging = 'false';
+        startX = e.clientX || (e.touches && e.touches[0].clientX);
+        startY = e.clientY || (e.touches && e.touches[0].clientY);
+        e.stopPropagation();
+      };
+
+      const onMouseMove = (e) => {
+        if (!isDragging) return;
+        el.dataset.dragging = 'true';
+        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+        const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+
+        let newXPercent = (clientX / window.innerWidth) * 100;
+        let newYPercent = (clientY / window.innerHeight) * 100;
+
+        newXPercent = Math.max(4, Math.min(96, newXPercent));
+        newYPercent = Math.max(6, Math.min(94, newYPercent));
+
+        el.style.left = newXPercent.toFixed(2) + '%';
+        el.style.top = newYPercent.toFixed(2) + '%';
+
+        starData.x = parseFloat(newXPercent.toFixed(1));
+        starData.y = parseFloat(newYPercent.toFixed(1));
+      };
+
+      const onMouseUp = () => {
+        if (isDragging) {
+          isDragging = false;
+          saveAppConfig();
+          setTimeout(() => el.dataset.dragging = 'false', 80);
+        }
+      };
+
+      el.addEventListener('mousedown', onMouseDown);
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseup', onMouseUp);
+
+      el.addEventListener('touchstart', onMouseDown, {passive: false});
+      window.addEventListener('touchmove', onMouseMove, {passive: false});
+      window.addEventListener('touchend', onMouseUp);
+    }
+
+    /* =========================================================================
+       نظام النوافذ المنبثقة (Memory Modal)
+       ========================================================================= */
+    const memoryModal = document.getElementById('memoryModal');
+    const memoryModalTitle = document.getElementById('memoryModalTitle');
+    const memoryModalMessage = document.getElementById('memoryModalMessage');
+    const memoryModalImg = document.getElementById('memoryModalImg');
+    const memorySongBadge = document.getElementById('memorySongBadge');
+    const closeMemoryBtn = document.getElementById('closeMemoryBtn');
+
+    function openMemoryModal(star) {
+      memoryModalTitle.textContent = star.title;
+      memoryModalMessage.textContent = star.message;
+
+      if (star.image && star.image.trim() !== "") {
+        memoryModalImg.src = star.image;
+        memoryModalImg.style.display = 'block';
+      } else {
+        memoryModalImg.style.display = 'none';
+      }
+
+      if (star.playMusic && appConfig.specialSongUrl) {
+        memorySongBadge.style.display = 'inline-flex';
+        fadeAudio(ambientAudio, 0.12, 600);
+        specialAudio.currentTime = 0;
+        specialAudio.volume = 0.65;
+        specialAudio.play().catch(e => console.log(e));
+        isSpecialPlaying = true;
+      } else {
+        memorySongBadge.style.display = 'none';
+      }
+
+      memoryModal.classList.add('active');
+    }
+
+    function closeMemory() {
+      memoryModal.classList.remove('active');
+      if (isSpecialPlaying) {
+        fadeAudio(specialAudio, 0, 600);
+        setTimeout(() => {
+          specialAudio.pause();
+          specialAudio.currentTime = 0;
+        }, 650);
+        fadeAudio(ambientAudio, 0.45, 600);
+        isSpecialPlaying = false;
+      }
+    }
+
+    closeMemoryBtn.addEventListener('click', closeMemory);
+    memoryModal.addEventListener('click', (e) => {
+      if (e.target === memoryModal) closeMemory();
+    });
+
+    /* =========================================================================
+       شاشة الدخول الذكية (Login Logic)
+       ========================================================================= */
+    const loginModal = document.getElementById('loginModal');
+    const usernameInput = document.getElementById('usernameInput');
+    const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+    const loginFeedback = document.getElementById('loginFeedback');
+    const adminToggleBtn = document.getElementById('adminToggleBtn');
+    const dragHint = document.getElementById('dragHint');
+
+    function handleLogin() {
+      const val = usernameInput.value.trim().toLowerCase();
+
+      if (!val) {
+        showLoginError("يرجى كتابة الاسم أولاً ✨");
+        return;
+      }
+
+      if (val === 'diajb0') {
+        loginModal.classList.remove('active');
+        enableAdminStudio();
+        startMusicExperience();
+        showToast("مرحباً بك diajb0! فُتح لك استوديو التعديل الآن ✨");
+        return;
+      }
+
+      loginModal.classList.remove('active');
+      startMusicExperience();
+      showToast("مرحباً بكِ في سمائكِ الخاصة.. استمتعي بالرحلة 🌌");
+    }
+
+    function showLoginError(msg) {
+      loginFeedback.textContent = msg;
+      loginFeedback.style.display = 'block';
+    }
+
+    loginSubmitBtn.addEventListener('click', handleLogin);
+    usernameInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleLogin();
+    });
+
+    /* =========================================================================
+       لوحة تحكم واستوديو المطور (diajb0 Studio)
+       ========================================================================= */
+    const adminStudioDrawer = document.getElementById('adminStudioDrawer');
+    const closeAdminBtn = document.getElementById('closeAdminBtn');
+    const exportConfigBtn = document.getElementById('exportConfigBtn');
+    const previewAsSkyBtn = document.getElementById('previewAsSkyBtn');
+    const adminStarsList = document.getElementById('adminStarsList');
+    const saveStarItemBtn = document.getElementById('saveStarItemBtn');
+    const cancelEditStarBtn = document.getElementById('cancelEditStarBtn');
+
+    const cfgGlowName = document.getElementById('cfgGlowName');
+    const cfgSubtitle = document.getElementById('cfgSubtitle');
+    const cfgAmbientAudio = document.getElementById('cfgAmbientAudio');
+    const cfgSpecialSong = document.getElementById('cfgSpecialSong');
+
+    const starEditId = document.getElementById('starEditId');
+    const newStarTitle = document.getElementById('newStarTitle');
+    const newStarImg = document.getElementById('newStarImg');
+    const newStarMsg = document.getElementById('newStarMsg');
+    const newStarPlayMusic = document.getElementById('newStarPlayMusic');
+    const formModeTitle = document.getElementById('formModeTitle');
+
+    function enableAdminStudio() {
+      isEditModeActive = true;
+      adminToggleBtn.style.display = 'block';
+      dragHint.style.display = 'block';
+      populateAdminFields();
+    }
+
+    function populateAdminFields() {
+      cfgGlowName.value = appConfig.glowName || '';
+      cfgSubtitle.value = appConfig.subtitle || '';
+      cfgAmbientAudio.value = appConfig.ambientAudioUrl || '';
+      cfgSpecialSong.value = appConfig.specialSongUrl || '';
+      renderAdminStarsList();
+    }
+
+    function renderAdminStarsList() {
+      adminStarsList.innerHTML = '';
+      appConfig.stars.forEach(star => {
+        const item = document.createElement('div');
+        item.className = 'star-list-item';
+        item.innerHTML = `
+          <span>⭐ ${star.title} (${star.x}%, ${star.y}%)</span>
+          <div class="item-btns">
+            <button class="btn-xs btn-edit" onclick="editStar(${star.id})">تعديل</button>
+            <button class="btn-xs btn-delete" onclick="deleteStar(${star.id})">حذف</button>
+          </div>
+        `;
+        adminStarsList.appendChild(item);
+      });
+    }
+
+    cfgGlowName.addEventListener('input', () => { appConfig.glowName = cfgGlowName.value; saveAppConfig(); });
+    cfgSubtitle.addEventListener('input', () => { appConfig.subtitle = cfgSubtitle.value; saveAppConfig(); });
+    cfgAmbientAudio.addEventListener('change', () => { appConfig.ambientAudioUrl = cfgAmbientAudio.value; saveAppConfig(); });
+    cfgSpecialSong.addEventListener('change', () => { appConfig.specialSongUrl = cfgSpecialSong.value; saveAppConfig(); });
+
+    saveStarItemBtn.addEventListener('click', () => {
+      const title = newStarTitle.value.trim();
+      const msg = newStarMsg.value.trim();
+      if (!title) {
+        alert("يرجى إدخال عنوان للنجمة!");
+        return;
+      }
+
+      const editId = starEditId.value;
+      if (editId) {
+        const target = appConfig.stars.find(s => s.id == editId);
+        if (target) {
+          target.title = title;
+          target.message = msg;
+          target.image = newStarImg.value.trim();
+          target.playMusic = newStarPlayMusic.checked;
+        }
+      } else {
+        const newStar = {
+          id: Date.now(),
+          title: title,
+          x: Math.floor(Math.random() * 60 + 20),
+          y: Math.floor(Math.random() * 60 + 20),
+          image: newStarImg.value.trim(),
+          message: msg,
+          playMusic: newStarPlayMusic.checked
+        };
+        appConfig.stars.push(newStar);
+      }
+
+      saveAppConfig();
+      renderAdminStarsList();
+      resetStarForm();
+      showToast("تم حفظ النجمة بنجاح!");
+    });
+
+    window.editStar = function(id) {
+      const star = appConfig.stars.find(s => s.id === id);
+      if (!star) return;
+
+      starEditId.value = star.id;
+      newStarTitle.value = star.title;
+      newStarImg.value = star.image || '';
+      newStarMsg.value = star.message || '';
+      newStarPlayMusic.checked = !!star.playMusic;
+
+      formModeTitle.textContent = "تعديل النجمة: " + star.title;
+      cancelEditStarBtn.style.display = 'block';
+      adminStudioDrawer.scrollTop = adminStudioDrawer.scrollHeight;
+    };
+
+    window.deleteStar = function(id) {
+      if (!confirm("هل أنت متأكد من حذف هذه النجمة؟")) return;
+      appConfig.stars = appConfig.stars.filter(s => s.id !== id);
+      saveAppConfig();
+      renderAdminStarsList();
+      showToast("تم حذف النجمة.");
+    };
+
+    function resetStarForm() {
+      starEditId.value = '';
+      newStarTitle.value = '';
+      newStarImg.value = '';
+      newStarMsg.value = '';
+      newStarPlayMusic.checked = false;
+      formModeTitle.textContent = "إضافة نجمة جديدة:";
+      cancelEditStarBtn.style.display = 'none';
+    }
+
+    cancelEditStarBtn.addEventListener('click', resetStarForm);
+
+    adminToggleBtn.addEventListener('click', () => {
+      adminStudioDrawer.classList.toggle('open');
+    });
+
+    closeAdminBtn.addEventListener('click', () => {
+      adminStudioDrawer.classList.remove('open');
+    });
+
+    previewAsSkyBtn.addEventListener('click', () => {
+      adminStudioDrawer.classList.remove('open');
+      dragHint.style.display = 'none';
+      adminToggleBtn.style.display = 'none';
+      isEditModeActive = false;
+      showToast("أنت الآن في وضع المعاينة كما ستشاهده هي!");
+    });
+
+    exportConfigBtn.addEventListener('click', () => {
+      const jsonStr = JSON.stringify(appConfig, null, 2);
+      navigator.clipboard.writeText(jsonStr).then(() => {
+        showToast("📋 تم نسخ الإعدادات بنجاح! الصقها لـ Gemini في المحادثة.");
+      }).catch(() => {
+        prompt("انسخ الإعدادات التالية وأرسلها لـ Gemini:", jsonStr);
+      });
+    });
+
+    function showToast(text) {
+      const toast = document.getElementById('toastNotification');
+      toast.textContent = text;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3500);
+    }
+
+    setupAudioSources();
+    renderStars();
+    updateCenterDisplay();
+  </script>
+</body>
+</html>
