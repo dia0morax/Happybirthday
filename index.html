@@ -36,15 +36,59 @@
       color: var(--text-main);
     }
 
-    /* خلفية الكانفاس للنجوم */
+    /* تأثير الانطلاق من الأرض بمنظور الشخص الأول */
+    #earthIntro {
+      position: fixed;
+      inset: 0;
+      background: #020308;
+      z-index: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 1.5s ease-in-out;
+    }
+    .earth-sphere {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #38bdf8, #0369a1, #000000);
+      box-shadow: 0 0 120px rgba(56, 189, 248, 0.4), inset -25px -25px 50px rgba(0,0,0,0.9);
+      transform: scale(1) translateZ(0);
+      transition: transform 2.5s cubic-bezier(0.5, 0, 0.1, 1);
+    }
+    #earthIntro.zoom-out .earth-sphere {
+      transform: scale(60) translateZ(0);
+    }
+    #earthIntro.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* خلفية الكانفاس للنجوم 3D */
     #universeCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      display: block;
+    }
+
+    /* حاوية الفضاء القابلة للتحريك (يمين ويسار وفوق وتحت) */
+    #spaceScene {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      z-index: 1;
-      display: block;
+      z-index: 2;
+      transform-origin: center;
+      will-change: transform;
+      cursor: grab;
+    }
+    #spaceScene:active {
+      cursor: grabbing;
     }
 
     /* طبقة المحتوى التفاعلي للنجوم */
@@ -54,9 +98,9 @@
       left: 0;
       width: 100%;
       height: 100%;
-      z-index: 2;
       pointer-events: auto;
     }
+
 
     /* عناصر النجوم التفاعلية */
     .star-node {
@@ -74,30 +118,87 @@
       transform: translate(-50%, -50%) scale(1.22);
     }
 
+    /* شكل النجمة الحقيقية ذات الأشعة المتوهجة */
     .star-pulse-core {
-      width: 22px;
-      height: 22px;
+      width: 32px;
+      height: 32px;
       position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .star-pulse-core::before {
-      content: '';
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      background: radial-gradient(circle, #fff 20%, var(--accent-cyan) 65%, transparent 85%);
-      box-shadow: 0 0 16px var(--accent-cyan), 0 0 32px var(--accent-cyan);
-      animation: pulseStar 2.6s infinite ease-in-out;
+    .star-shape-diamond {
+      width: 16px;
+      height: 16px;
+      background: #ffffff;
+      transform: rotate(45deg);
+      border-radius: 2px;
+      box-shadow: 0 0 12px currentColor, 0 0 24px currentColor;
+      animation: pulseStar 2.8s infinite ease-in-out;
+      position: relative;
+      z-index: 2;
     }
 
-    .star-node.has-special-song .star-pulse-core::before {
-      background: radial-gradient(circle, #fff 20%, var(--accent-pink) 65%, transparent 85%);
-      box-shadow: 0 0 18px var(--accent-pink), 0 0 36px var(--accent-pink);
+    /* أشعة النجمة الممتدة أفقياً وعمودياً */
+    .star-shape-diamond::before,
+    .star-shape-diamond::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(to right, transparent, #ffffff, transparent);
+      box-shadow: 0 0 8px currentColor;
+      pointer-events: none;
     }
+
+    .star-shape-diamond::before {
+      width: 36px;
+      height: 2.5px;
+    }
+
+    .star-shape-diamond::after {
+      width: 2.5px;
+      height: 36px;
+      background: linear-gradient(to bottom, transparent, #ffffff, transparent);
+    }
+
+    /* نافذة الكوكبة العابرة */
+    #constellationOverlay {
+      position: fixed;
+      inset: 0;
+      z-index: 800;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+    }
+
+    #constellationOverlay.active {
+      opacity: 1;
+    }
+
+    #constellationSvg {
+      width: 380px;
+      height: 380px;
+      max-width: 85vw;
+      max-height: 85vh;
+      filter: drop-shadow(0 0 16px rgba(56, 189, 248, 0.7));
+    }
+
+    .constellation-name {
+      font-family: 'Amiri', serif;
+      font-size: 1.5rem;
+      color: #f8fafc;
+      text-shadow: 0 0 12px var(--accent-cyan);
+      margin-top: 14px;
+      letter-spacing: 2px;
+    }
+
 
     .star-label {
       margin-top: 8px;
@@ -591,21 +692,30 @@
 </head>
 <body>
 
-  <!-- كانفاس السماء والشهب -->
+  <!-- تأثير الانطلاق من الأرض للسماء بمنظور الشخص الأول -->
+  <div id="earthIntro">
+    <div class="earth-sphere"></div>
+  </div>
+
+  <!-- كانفاس السماء والشهب (الخلفية 3D البارالاكس) -->
   <canvas id="universeCanvas"></canvas>
 
-  <!-- طبقة النجوم التفاعلية -->
-  <div id="interactiveLayer"></div>
+  <!-- الحاوية المتحركة للفضاء (قابلة للسحب) -->
+  <div id="spaceScene">
+    <!-- طبقة النجوم التفاعلية -->
+    <div id="interactiveLayer"></div>
 
-  <!-- الاسم المشع في المنتصف -->
-  <div id="centerConstellation">
-    <h1 class="glow-title" id="displayCenterTitle">SOMY</h1>
-    <div class="glow-subtitle" id="displaySubtitle">The Stars Align For You, Sky</div>
-    <div class="glow-date" id="displayDate">Happy Birthday!</div>
+    <!-- الاسم المشع في المنتصف -->
+    <div id="centerConstellation">
+      <h1 class="glow-title" id="displayCenterTitle">SOMY</h1>
+      <div class="glow-subtitle" id="displaySubtitle">The Stars Align For You, Sky</div>
+      <div class="glow-date" id="displayDate">Happy Birthday!</div>
+    </div>
   </div>
 
   <!-- تحكم الصوت -->
   <div id="audioWidget">
+
     <button id="audioToggleBtn" title="تشغيل / كتم الصوت">🔊</button>
     <span class="audio-status-text" id="audioTrackName">Cosmic Serenade</span>
   </div>
@@ -618,8 +728,17 @@
   <audio id="ambientAudio" loop preload="auto"></audio>
   <audio id="specialAudio" preload="auto"></audio>
 
+
+
+  <!-- طبقة ظهور الكوكبة العشوائية السريعة -->
+  <div id="constellationOverlay">
+    <svg id="constellationSvg" viewBox="0 0 300 300"></svg>
+    <div class="constellation-name" id="constellationTitle">كوكبة القيصر</div>
+  </div>
+
   <!-- نافذة تسجيل الدخول الأولية -->
   <div class="modal-overlay active" id="loginModal">
+
     <div class="glass-card" style="text-align: center;">
       <div style="font-size: 3rem; margin-bottom: 12px;">🌌</div>
       <h2 class="login-title">سماء النجوم الأبدية</h2>
@@ -672,11 +791,6 @@
         <input type="text" id="cfgAmbientAudio" class="form-control" placeholder="ambient.mp3 أو رابط مباشر">
       </div>
 
-      <div class="form-group">
-        <label>رابط أغنيتها المفضلة (Special Song):</label>
-        <input type="text" id="cfgSpecialSong" class="form-control" placeholder="her-song.mp3 أو رابط مباشر">
-      </div>
-
       <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
 
       <h4 style="color: var(--accent-cyan); margin-bottom: 12px;">✨ إدارة النجوم والرسائل</h4>
@@ -697,7 +811,12 @@
 
         <div class="form-group">
           <label>رابط الصورة (اختياري):</label>
-          <input type="text" id="newStarImg" class="form-control" placeholder="photo.jpg أو رابط صورة">
+          <input type="text" id="newStarImg" class="form-control" placeholder="photo.jpg أو رابط صورة مباشر">
+        </div>
+
+        <div class="form-group">
+          <label>رابط الأغنية لهذه النجمة (mp3 اختياري):</label>
+          <input type="text" id="newStarSong" class="form-control" placeholder="song.mp3 أو رابط مباشر لصوت النجمة">
         </div>
 
         <div class="form-group">
@@ -705,12 +824,6 @@
           <textarea id="newStarMsg" class="form-control" placeholder="اكتب ما بقلبك هنا..."></textarea>
         </div>
 
-        <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
-          <input type="checkbox" id="newStarPlayMusic" style="width: 18px; height: 18px;">
-          <label for="newStarPlayMusic" style="margin: 0; cursor: pointer; color: var(--accent-pink);">
-            تشغيل أغنيتها المفضلة عند فتح هذه النجمة 🎵
-          </label>
-        </div>
 
         <div class="admin-actions">
           <button class="btn-success" id="saveStarItemBtn">حفظ النجمة في الشاشة</button>
@@ -735,9 +848,10 @@
       glowName: "SOMY",
       subtitle: "The Stars Align For You, Sky",
       dateText: "Happy Birthday!",
-      ambientAudioUrl: "https://actions.google.com/sounds/v1/ambiences/deep_space_wind.ogg",
-      specialSongUrl: "https://actions.google.com/sounds/v1/weather/gentle_rain_on_leaves.ogg",
+      ambientAudioUrl: "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/space.mp3",
       stars: [
+
+
         {
           id: 1,
           title: "نجمة البداية",
@@ -745,7 +859,7 @@
           y: 28,
           image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80",
           message: "كل عام وأنتِ النور الذي يضيء عتمة هذه المجرة.. أسعد أيام عمري هي التي بدأت بوجودكِ.",
-          playMusic: false
+          songUrl: ""
         },
         {
           id: 2,
@@ -754,7 +868,7 @@
           y: 32,
           image: "",
           message: "عندما تلمعين في السماء، تعزف الألحان بهدوء لتليق بجمال روحكِ وعينيكِ.",
-          playMusic: true
+          songUrl: "https://actions.google.com/sounds/v1/weather/gentle_rain_on_leaves.ogg"
         },
         {
           id: 3,
@@ -763,10 +877,11 @@
           y: 78,
           image: "",
           message: "اسمكِ سماء، ولكِ من اسمكِ كل الاتساع والنقاء والرفعة.. عيد ميلاد سعيد يا أغلى ما أملك.",
-          playMusic: false
+          songUrl: ""
         }
       ]
     };
+
 
     let appConfig = JSON.parse(localStorage.getItem('sky_celestial_cfg')) || DEFAULT_CONFIG;
 
@@ -778,26 +893,186 @@
     }
 
     /* =========================================================================
-       نظام الصوتيات الذكي (Audio Ducking)
+       نظام السحب والتحريك 3D في الفضاء
+       ========================================================================= */
+    let sceneX = 0;
+    let sceneY = 0;
+    let isDraggingScene = false;
+    let startDragX, startDragY;
+    const spaceScene = document.getElementById('spaceScene');
+
+    window.addEventListener('mousedown', (e) => {
+      // نمنع سحب الشاشة فقط إذا ضغطت على نجمة أو داخل درج التحكم
+      if (e.target.closest('.star-node') || e.target.closest('#adminStudioDrawer') || e.target.closest('.admin-floating-toggle')) return;
+      isDraggingScene = true;
+      startDragX = e.clientX - sceneX;
+      startDragY = e.clientY - sceneY;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDraggingScene) return;
+      playDriftSound();
+      sceneX = e.clientX - startDragX;
+      sceneY = e.clientY - startDragY;
+      spaceScene.style.transform = `translate(${sceneX}px, ${sceneY}px)`;
+    });
+
+
+    window.addEventListener('mouseup', () => {
+      isDraggingScene = false;
+    });
+
+    // للموبايل والأجهزة اللوحية
+    window.addEventListener('touchstart', (e) => {
+      if (e.target.closest('.star-node') || e.target.closest('#adminStudioDrawer') || e.target.closest('.admin-floating-toggle')) return;
+      isDraggingScene = true;
+      startDragX = e.touches[0].clientX - sceneX;
+      startDragY = e.touches[0].clientY - sceneY;
+    }, {passive: true});
+
+    window.addEventListener('touchmove', (e) => {
+      if (!isDraggingScene) return;
+      playDriftSound();
+      sceneX = e.touches[0].clientX - startDragX;
+      sceneY = e.touches[0].clientY - startDragY;
+      spaceScene.style.transform = `translate(${sceneX}px, ${sceneY}px)`;
+    }, {passive: true});
+
+
+    window.addEventListener('touchend', () => {
+      isDraggingScene = false;
+    });
+
+
+    /* =========================================================================
+       نظام الصوتيات الذكي والمؤثرات التفاعلية (خفيف وسلس للغاية)
        ========================================================================= */
     const ambientAudio = document.getElementById('ambientAudio');
     const specialAudio = document.getElementById('specialAudio');
     const audioToggleBtn = document.getElementById('audioToggleBtn');
     let isMuted = false;
     let isSpecialPlaying = false;
+    
+    let sfxCtx = null;
+
+    function initWebAudio() {
+      if (!sfxCtx) {
+        const AudioClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioClass) sfxCtx = new AudioClass();
+      }
+      if (sfxCtx && sfxCtx.state === 'suspended') {
+        sfxCtx.resume();
+      }
+    }
+
+    /* صوت فتح النجمة: رنين بلوري مخملي هادئ جداً وفلكي */
+    function playStarChime() {
+      if (isMuted) return;
+      initWebAudio();
+      if (!sfxCtx) return;
+
+      try {
+        const t = sfxCtx.currentTime;
+        // نغمتان متناغمتان فقط دافئتان وخافتتان (A4 و E5) مع خفض التردد ليكون ناعماً للأذن
+        const mellowNotes = [440.0, 659.25];
+        
+        mellowNotes.forEach((freq, idx) => {
+          const osc = sfxCtx.createOscillator();
+          const gain = sfxCtx.createGain();
+          const filter = sfxCtx.createBiquadFilter();
+
+          // فلتر لعزل الحدة وجعل الصوت دافئاً ومخملياً
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(900, t);
+
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, t + idx * 0.08);
+
+          // دخول ناعم جداً وخروج متلاشٍ ببطء
+          gain.gain.setValueAtTime(0.0001, t + idx * 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.035, t + idx * 0.08 + 0.05);
+          gain.gain.exponentialRampToValueAtTime(0.00001, t + idx * 0.08 + 1.4);
+
+          osc.connect(filter);
+          filter.connect(gain);
+          gain.connect(sfxCtx.destination);
+
+          osc.start(t + idx * 0.08);
+          osc.stop(t + idx * 0.08 + 1.45);
+        });
+      } catch (e) {}
+    }
+
+    /* صوت سحب الفضاء: نسيم كوني خافت وهادئ يتفاعل مع السحب */
+    let lastDriftSoundTime = 0;
+    function playDriftSound() {
+      if (isMuted) return;
+      const now = performance.now();
+      if (now - lastDriftSoundTime < 280) return;
+      lastDriftSoundTime = now;
+
+      initWebAudio();
+      if (!sfxCtx) return;
+
+      try {
+        const t = sfxCtx.currentTime;
+        // توليد عينة صوتية خفيفة تحاكي تيار الهواء الكوني
+        const bufferSize = sfxCtx.sampleRate * 0.25;
+        const buffer = sfxCtx.createBuffer(1, bufferSize, sfxCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+
+        const noise = sfxCtx.createBufferSource();
+        noise.buffer = buffer;
+
+        // فلترة النسيم ليكون خافتاً وعميقاً بدون أي خشونة
+        const filter = sfxCtx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(160, t);
+        filter.Q.setValueAtTime(1.5, t);
+
+        const gain = sfxCtx.createGain();
+        gain.gain.setValueAtTime(0.0001, t);
+        gain.gain.linearRampToValueAtTime(0.04, t + 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.00001, t + 0.24);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(sfxCtx.destination);
+
+        noise.start(t);
+      } catch (e) {}
+    }
+
 
     function setupAudioSources() {
-      if (appConfig.ambientAudioUrl) ambientAudio.src = appConfig.ambientAudioUrl;
-      if (appConfig.specialSongUrl) specialAudio.src = appConfig.specialSongUrl;
-      ambientAudio.volume = 0.45;
-      specialAudio.volume = 0.7;
+      const r2Url = "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/space.mp3";
+      appConfig.ambientAudioUrl = r2Url;
+      ambientAudio.src = r2Url;
+      ambientAudio.volume = 0.6;
+      specialAudio.volume = 0.9;
     }
 
     function startMusicExperience() {
+      initWebAudio();
+      const r2Url = "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/space.mp3";
+      if (!ambientAudio.src || ambientAudio.src === "" || ambientAudio.src.indexOf("pub-") === -1) {
+        ambientAudio.src = r2Url;
+      }
+      ambientAudio.load();
       ambientAudio.play().then(() => {
         audioToggleBtn.textContent = '🔊';
-      }).catch(err => console.log('Audio autoplay prevented:', err));
+      }).catch(err => {
+        console.log('Audio play failed:', err);
+      });
     }
+
+    window.addEventListener('pointerdown', () => initWebAudio(), { once: true });
+
+
+
 
     audioToggleBtn.addEventListener('click', () => {
       isMuted = !isMuted;
@@ -810,7 +1085,6 @@
       const stepTime = 50;
       const steps = duration / stepTime;
       const volStep = (targetVol - audioElement.volume) / steps;
-
       let counter = 0;
       const interval = setInterval(() => {
         counter++;
@@ -818,7 +1092,6 @@
         if (newVol > 1) newVol = 1;
         if (newVol < 0) newVol = 0;
         audioElement.volume = newVol;
-
         if (counter >= steps) {
           audioElement.volume = targetVol;
           clearInterval(interval);
@@ -827,7 +1100,7 @@
     }
 
     /* =========================================================================
-       محرك الفضاء والنجوم (HTML5 Canvas Particles & Meteors)
+       محرك الفضاء والنجوم (بارالاكس وواقعية أكثر)
        ========================================================================= */
     const canvas = document.getElementById('universeCanvas');
     const ctx = canvas.getContext('2d');
@@ -837,32 +1110,34 @@
     function resizeCanvas() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-      createStars(Math.floor((canvas.width * canvas.height) / 3200));
+      createStars(Math.floor((canvas.width * canvas.height) / 1600)); 
     }
 
     function createStars(count) {
       stars = [];
       for (let i = 0; i < count; i++) {
+        let depth = Math.random() * 3 + 0.8; 
         stars.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          radius: Math.random() * 1.5 + 0.3,
-          color: Math.random() > 0.3 ? '#ffffff' : (Math.random() > 0.5 ? '#7dd3fc' : '#f472b6'),
+          x: Math.random() * canvas.width * 2 - canvas.width/2,
+          y: Math.random() * canvas.height * 2 - canvas.height/2,
+          z: depth, 
+          radius: (Math.random() * 1.8 + 0.3) / (depth * 0.6),
+          color: Math.random() > 0.35 ? '#ffffff' : (Math.random() > 0.65 ? '#bae6fd' : '#fbcfe8'),
           alpha: Math.random() * 0.8 + 0.2,
-          speed: Math.random() * 0.02 + 0.005,
+          speed: Math.random() * 0.015 + 0.005,
           angle: Math.random() * Math.PI * 2
         });
       }
     }
 
     function spawnMeteor() {
-      if (Math.random() < 0.02 && meteors.length < 3) {
+      if (Math.random() < 0.015 && meteors.length < 2) {
         meteors.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * (canvas.height / 2),
-          length: Math.random() * 90 + 50,
-          speed: Math.random() * 7 + 6,
-          angle: (Math.PI / 4) + (Math.random() * 0.2 - 0.1),
+          x: Math.random() * canvas.width * 1.5,
+          y: Math.random() * canvas.height,
+          length: Math.random() * 140 + 70,
+          speed: Math.random() * 9 + 7,
+          angle: (Math.PI / 4) + (Math.random() * 0.15 - 0.1),
           alpha: 1
         });
       }
@@ -872,16 +1147,30 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       for (let s of stars) {
-        s.alpha += Math.sin(s.angle) * 0.008;
+        s.alpha += Math.sin(s.angle) * 0.01;
         s.angle += s.speed;
-        let finalAlpha = Math.max(0.1, Math.min(1, s.alpha));
+        let finalAlpha = Math.max(0.08, Math.min(1, s.alpha));
+
+        // حساب مكان النجمة مع السحب للحصول على بارالاكس (النجوم البعيدة تتحرك أبطأ)
+        let drawX = s.x + (sceneX / s.z);
+        let drawY = s.y + (sceneY / s.z);
+
+        // جعل النجوم تلتف وتستمر بالظهور
+        drawX = ((drawX % (canvas.width * 2)) + canvas.width * 2) % (canvas.width * 2) - canvas.width/2;
+        drawY = ((drawY % (canvas.height * 2)) + canvas.height * 2) % (canvas.height * 2) - canvas.height/2;
 
         ctx.beginPath();
-        ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+        ctx.arc(drawX, drawY, s.radius, 0, Math.PI * 2);
         ctx.fillStyle = s.color;
         ctx.globalAlpha = finalAlpha;
-        ctx.shadowBlur = s.radius > 1.2 ? 8 : 0;
-        ctx.shadowColor = s.color;
+        
+        // إعطاء توهج واقعي للنجوم
+        if(s.radius > 1.2) {
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = s.color;
+        } else {
+            ctx.shadowBlur = 0;
+        }
         ctx.fill();
       }
       ctx.globalAlpha = 1;
@@ -890,27 +1179,31 @@
       spawnMeteor();
       for (let i = meteors.length - 1; i >= 0; i--) {
         let m = meteors[i];
-        let endX = m.x - Math.cos(m.angle) * m.length;
-        let endY = m.y - Math.sin(m.angle) * m.length;
+        
+        let drawX = m.x + (sceneX * 0.6);
+        let drawY = m.y + (sceneY * 0.6);
 
-        let grad = ctx.createLinearGradient(m.x, m.y, endX, endY);
+        let endX = drawX - Math.cos(m.angle) * m.length;
+        let endY = drawY - Math.sin(m.angle) * m.length;
+
+        let grad = ctx.createLinearGradient(drawX, drawY, endX, endY);
         grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
-        grad.addColorStop(0.3, 'rgba(56, 189, 248, 0.6)');
+        grad.addColorStop(0.2, 'rgba(56, 189, 248, 0.7)');
         grad.addColorStop(1, 'transparent');
 
         ctx.beginPath();
-        ctx.moveTo(m.x, m.y);
+        ctx.moveTo(drawX, drawY);
         ctx.lineTo(endX, endY);
         ctx.strokeStyle = grad;
-        ctx.lineWidth = 2.2;
+        ctx.lineWidth = 2.5;
         ctx.lineCap = 'round';
         ctx.stroke();
 
         m.x += Math.cos(m.angle) * m.speed;
         m.y += Math.sin(m.angle) * m.speed;
-        m.alpha -= 0.015;
+        m.alpha -= 0.02;
 
-        if (m.alpha <= 0 || m.x > canvas.width + 100 || m.y > canvas.height + 100) {
+        if (m.alpha <= 0) {
           meteors.splice(i, 1);
         }
       }
@@ -922,35 +1215,115 @@
     resizeCanvas();
     animateUniverse();
 
+
     /* =========================================================================
        عرض وتحديث النجوم التفاعلية
        ========================================================================= */
     const interactiveLayer = document.getElementById('interactiveLayer');
     let isEditModeActive = false;
 
+    // باقة ألوان المجرة العشوائية
+    const STAR_COLOR_PALETTES = [
+      '#38bdf8', // سماوي جليدي
+      '#f472b6', // وردي أورورا
+      '#fbbf24', // ذهبي كوني
+      '#c084fc', // بنفسجي سديمي
+      '#34d399', // زمردي فلكي
+      '#60a5fa'  // أزرق نيزكي
+    ];
+
     function renderStars() {
       interactiveLayer.innerHTML = '';
-      appConfig.stars.forEach(star => {
+      appConfig.stars.forEach((star, index) => {
         const starEl = document.createElement('div');
-        starEl.className = 'star-node' + (star.playMusic ? ' has-special-song' : '');
-        starEl.style.left = star.x + '%';
-        starEl.style.top = star.y + '%';
+        const hasSong = star.songUrl && star.songUrl.trim() !== "";
+        starEl.className = 'star-node' + (hasSong ? ' has-special-song' : '');
+        starEl.style.left = (typeof star.x === 'number' && star.x > 100 ? star.x + 'px' : star.x + '%');
+        starEl.style.top = (typeof star.y === 'number' && star.y > 100 ? star.y + 'px' : star.y + '%');
         starEl.dataset.id = star.id;
 
+        // اختيار لون عشوائي مميز لكل نجمة بناءً على معرفها
+        const color = STAR_COLOR_PALETTES[(star.id || index) % STAR_COLOR_PALETTES.length];
+
         starEl.innerHTML = `
-          <div class="star-pulse-core"></div>
-          <div class="star-label">${star.title}</div>
+          <div class="star-pulse-core" style="color: ${color}">
+            <div class="star-shape-diamond" style="color: ${color}; box-shadow: 0 0 14px ${color}, 0 0 28px ${color}"></div>
+          </div>
+          <div class="star-label" style="border-color: ${color}44">${star.title}</div>
         `;
 
         starEl.addEventListener('click', (e) => {
           if (starEl.dataset.dragging === 'true') return;
+          playStarChime();
           openMemoryModal(star);
         });
+
 
         makeDraggable(starEl, star);
         interactiveLayer.appendChild(starEl);
       });
     }
+
+    /* =========================================================================
+       نظام الكوكبات العشوائية العابرة بعد قراءة 3-4 نجوم
+       ========================================================================= */
+    let starsOpenedCount = 0;
+    let nextConstellationTarget = Math.floor(Math.random() * 2) + 3; // كل 3 أو 4 نجوم
+    let isShowingConstellation = false;
+
+    const CONSTELLATIONS = [
+      {
+        name: "كوكبة الدب الأكبر",
+        lines: [[40,190, 80,180], [80,180, 120,195], [120,195, 170,170], [170,170, 240,160], [240,160, 260,110], [260,110, 190,115], [190,115, 170,170]],
+        nodes: [[40,190], [80,180], [120,195], [170,170], [240,160], [260,110], [190,115]]
+      },
+      {
+        name: "كوكبة قسورة (الأسد)",
+        lines: [[60,200, 130,220], [130,220, 200,180], [200,180, 240,120], [240,120, 220,70], [220,70, 180,60], [180,60, 150,110], [150,110, 200,180], [60,200, 100,140], [100,140, 150,110]],
+        nodes: [[60,200], [130,220], [200,180], [240,120], [220,70], [180,60], [150,110], [100,140]]
+      },
+      {
+        name: "كوكبة الجبار (أوريون)",
+        lines: [[80,70, 220,60], [80,70, 110,150], [220,60, 190,150], [110,150, 150,150], [150,150, 190,150], [110,150, 70,240], [190,150, 230,230], [70,240, 230,230]],
+        nodes: [[80,70], [220,60], [110,150], [150,150], [190,150], [70,240], [230,230]]
+      },
+      {
+        name: "كوكبة ذات الكرسي (سماء كاسيوبيا)",
+        lines: [[50,180, 100,100], [100,100, 160,150], [160,150, 220,70], [220,70, 260,130]],
+        nodes: [[50,180], [100,100], [160,150], [220,70], [260,130]]
+      }
+    ];
+
+    function triggerConstellationMystery() {
+      if (isShowingConstellation) return;
+      isShowingConstellation = true;
+
+      const overlay = document.getElementById('constellationOverlay');
+      const svg = document.getElementById('constellationSvg');
+      const title = document.getElementById('constellationTitle');
+
+      const data = CONSTELLATIONS[Math.floor(Math.random() * CONSTELLATIONS.length)];
+      title.textContent = `✨ ${data.name} تلتمع لأجلكِ ✨`;
+
+      let svgContent = '';
+      data.lines.forEach(([x1, y1, x2, y2]) => {
+        svgContent += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="rgba(56, 189, 248, 0.75)" stroke-width="2.5" stroke-dasharray="6,4" />`;
+      });
+      data.nodes.forEach(([x, y]) => {
+        svgContent += `<circle cx="${x}" cy="${y}" r="4.5" fill="#ffffff" filter="drop-shadow(0 0 6px #38bdf8)" />`;
+      });
+
+      svg.innerHTML = svgContent;
+      overlay.classList.add('active');
+
+      // تبقى واضحة لـ 3.2 ثانية ثم تختفي بسلاسة
+      setTimeout(() => {
+        overlay.classList.remove('active');
+        setTimeout(() => { isShowingConstellation = false; }, 1000);
+      }, 3200);
+    }
+
+
 
     function updateCenterDisplay() {
       document.getElementById('displayCenterTitle').textContent = appConfig.glowName || 'SOMY';
@@ -961,52 +1334,54 @@
     /* نظام السحب والإفلات للنجوم */
     function makeDraggable(el, starData) {
       let isDragging = false;
-      let startX, startY;
 
-      const onMouseDown = (e) => {
+      const getClientPos = (e) => {
+        if (e.touches && e.touches.length > 0) {
+          return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }
+        return { x: e.clientX, y: e.clientY };
+      };
+
+      const onStart = (e) => {
         if (!isEditModeActive) return;
         isDragging = true;
         el.dataset.dragging = 'false';
-        startX = e.clientX || (e.touches && e.touches[0].clientX);
-        startY = e.clientY || (e.touches && e.touches[0].clientY);
         e.stopPropagation();
       };
 
-      const onMouseMove = (e) => {
+      const onMove = (e) => {
         if (!isDragging) return;
         el.dataset.dragging = 'true';
-        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-        const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+        const pos = getClientPos(e);
+        
+        // حساب الإحداثيات الحقيقية مع خصم إزاحة الفضاء (sceneX, sceneY)
+        const currentSpaceX = pos.x - sceneX;
+        const currentSpaceY = pos.y - sceneY;
 
-        let newXPercent = (clientX / window.innerWidth) * 100;
-        let newYPercent = (clientY / window.innerHeight) * 100;
+        el.style.left = currentSpaceX + 'px';
+        el.style.top = currentSpaceY + 'px';
 
-        newXPercent = Math.max(4, Math.min(96, newXPercent));
-        newYPercent = Math.max(6, Math.min(94, newYPercent));
-
-        el.style.left = newXPercent.toFixed(2) + '%';
-        el.style.top = newYPercent.toFixed(2) + '%';
-
-        starData.x = parseFloat(newXPercent.toFixed(1));
-        starData.y = parseFloat(newYPercent.toFixed(1));
+        starData.x = Math.round(currentSpaceX);
+        starData.y = Math.round(currentSpaceY);
       };
 
-      const onMouseUp = () => {
+      const onEnd = () => {
         if (isDragging) {
           isDragging = false;
           saveAppConfig();
-          setTimeout(() => el.dataset.dragging = 'false', 80);
+          setTimeout(() => el.dataset.dragging = 'false', 100);
         }
       };
 
-      el.addEventListener('mousedown', onMouseDown);
-      window.addEventListener('mousemove', onMouseMove);
-      window.addEventListener('mouseup', onMouseUp);
+      el.addEventListener('mousedown', onStart);
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onEnd);
 
-      el.addEventListener('touchstart', onMouseDown, {passive: false});
-      window.addEventListener('touchmove', onMouseMove, {passive: false});
-      window.addEventListener('touchend', onMouseUp);
+      el.addEventListener('touchstart', onStart, {passive: false});
+      window.addEventListener('touchmove', onMove, {passive: false});
+      window.addEventListener('touchend', onEnd);
     }
+
 
     /* =========================================================================
        نظام النوافذ المنبثقة (Memory Modal)
@@ -1019,8 +1394,10 @@
     const closeMemoryBtn = document.getElementById('closeMemoryBtn');
 
     function openMemoryModal(star) {
+      playStarChime();
       memoryModalTitle.textContent = star.title;
       memoryModalMessage.textContent = star.message;
+
 
       if (star.image && star.image.trim() !== "") {
         memoryModalImg.src = star.image;
@@ -1029,9 +1406,10 @@
         memoryModalImg.style.display = 'none';
       }
 
-      if (star.playMusic && appConfig.specialSongUrl) {
+      if (star.songUrl && star.songUrl.trim() !== "") {
         memorySongBadge.style.display = 'inline-flex';
         fadeAudio(ambientAudio, 0.12, 600);
+        specialAudio.src = star.songUrl.trim();
         specialAudio.currentTime = 0;
         specialAudio.volume = 0.65;
         specialAudio.play().catch(e => console.log(e));
@@ -1039,6 +1417,7 @@
       } else {
         memorySongBadge.style.display = 'none';
       }
+
 
       memoryModal.classList.add('active');
     }
@@ -1054,7 +1433,18 @@
         fadeAudio(ambientAudio, 0.45, 600);
         isSpecialPlaying = false;
       }
+
+      // زيادة عداد النجوم التي تمت رؤيتها
+      starsOpenedCount++;
+      if (starsOpenedCount >= nextConstellationTarget) {
+        starsOpenedCount = 0;
+        nextConstellationTarget = Math.floor(Math.random() * 2) + 3; // تجهيز الهدف القادم (3 أو 4)
+        setTimeout(() => {
+          triggerConstellationMystery();
+        }, 400);
+      }
     }
+
 
     closeMemoryBtn.addEventListener('click', closeMemory);
     memoryModal.addEventListener('click', (e) => {
@@ -1079,18 +1469,29 @@
         return;
       }
 
-      if (val === 'diajb0') {
-        loginModal.classList.remove('active');
-        enableAdminStudio();
-        startMusicExperience();
-        showToast("مرحباً بك diajb0! فُتح لك استوديو التعديل الآن ✨");
-        return;
-      }
-
+      // إخفاء نافذة الدخول
       loginModal.classList.remove('active');
-      startMusicExperience();
-      showToast("مرحباً بكِ في سمائكِ الخاصة.. استمتعي بالرحلة 🌌");
+      
+      // تشغيل أنيميشن الانطلاق من الأرض (منظور الشخص الأول)
+      const earthIntro = document.getElementById('earthIntro');
+      setTimeout(() => {
+        earthIntro.classList.add('zoom-out');
+        startMusicExperience(); // تشغيل جميع الصوتيات بفضل تفاعل المستخدم هنا
+      }, 100);
+
+      // بعد انتهاء الانطلاق نظهر الفضاء والنجوم
+      setTimeout(() => {
+        earthIntro.classList.add('hidden');
+        
+        if (val === 'diajb0') {
+          enableAdminStudio();
+          showToast("مرحباً بك diajb0! فُتح لك استوديو التعديل الآن ✨");
+        } else {
+          showToast("مرحباً بكِ في سمائكِ الخاصة.. استمتعي بالرحلة 🌌");
+        }
+      }, 2500); 
     }
+
 
     function showLoginError(msg) {
       loginFeedback.textContent = msg;
@@ -1116,13 +1517,12 @@
     const cfgGlowName = document.getElementById('cfgGlowName');
     const cfgSubtitle = document.getElementById('cfgSubtitle');
     const cfgAmbientAudio = document.getElementById('cfgAmbientAudio');
-    const cfgSpecialSong = document.getElementById('cfgSpecialSong');
 
     const starEditId = document.getElementById('starEditId');
     const newStarTitle = document.getElementById('newStarTitle');
     const newStarImg = document.getElementById('newStarImg');
+    const newStarSong = document.getElementById('newStarSong');
     const newStarMsg = document.getElementById('newStarMsg');
-    const newStarPlayMusic = document.getElementById('newStarPlayMusic');
     const formModeTitle = document.getElementById('formModeTitle');
 
     function enableAdminStudio() {
@@ -1136,9 +1536,9 @@
       cfgGlowName.value = appConfig.glowName || '';
       cfgSubtitle.value = appConfig.subtitle || '';
       cfgAmbientAudio.value = appConfig.ambientAudioUrl || '';
-      cfgSpecialSong.value = appConfig.specialSongUrl || '';
       renderAdminStarsList();
     }
+
 
     function renderAdminStarsList() {
       adminStarsList.innerHTML = '';
@@ -1159,7 +1559,6 @@
     cfgGlowName.addEventListener('input', () => { appConfig.glowName = cfgGlowName.value; saveAppConfig(); });
     cfgSubtitle.addEventListener('input', () => { appConfig.subtitle = cfgSubtitle.value; saveAppConfig(); });
     cfgAmbientAudio.addEventListener('change', () => { appConfig.ambientAudioUrl = cfgAmbientAudio.value; saveAppConfig(); });
-    cfgSpecialSong.addEventListener('change', () => { appConfig.specialSongUrl = cfgSpecialSong.value; saveAppConfig(); });
 
     saveStarItemBtn.addEventListener('click', () => {
       const title = newStarTitle.value.trim();
@@ -1176,18 +1575,23 @@
           target.title = title;
           target.message = msg;
           target.image = newStarImg.value.trim();
-          target.playMusic = newStarPlayMusic.checked;
+          target.songUrl = newStarSong.value.trim();
         }
       } else {
+        // توليد النجمة الجديدة في منتصف الشاشة الظاهرة أمامك حالياً
+        const spawnX = Math.round((window.innerWidth / 2) - sceneX);
+        const spawnY = Math.round((window.innerHeight / 2) - sceneY);
+
         const newStar = {
           id: Date.now(),
           title: title,
-          x: Math.floor(Math.random() * 60 + 20),
-          y: Math.floor(Math.random() * 60 + 20),
+          x: spawnX,
+          y: spawnY,
           image: newStarImg.value.trim(),
-          message: msg,
-          playMusic: newStarPlayMusic.checked
+          songUrl: newStarSong.value.trim(),
+          message: msg
         };
+
         appConfig.stars.push(newStar);
       }
 
@@ -1204,8 +1608,8 @@
       starEditId.value = star.id;
       newStarTitle.value = star.title;
       newStarImg.value = star.image || '';
+      newStarSong.value = star.songUrl || '';
       newStarMsg.value = star.message || '';
-      newStarPlayMusic.checked = !!star.playMusic;
 
       formModeTitle.textContent = "تعديل النجمة: " + star.title;
       cancelEditStarBtn.style.display = 'block';
@@ -1224,11 +1628,12 @@
       starEditId.value = '';
       newStarTitle.value = '';
       newStarImg.value = '';
+      newStarSong.value = '';
       newStarMsg.value = '';
-      newStarPlayMusic.checked = false;
       formModeTitle.textContent = "إضافة نجمة جديدة:";
       cancelEditStarBtn.style.display = 'none';
     }
+
 
     cancelEditStarBtn.addEventListener('click', resetStarForm);
 
