@@ -430,15 +430,16 @@
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%), rgba(10, 15, 30, 0.88);
       border: 1px solid rgba(255, 255, 255, 0.16);
       border-radius: 24px;
-      width: 100%;
-      max-width: 480px;
-      padding: 32px 28px;
+      width: 92%;
+      max-width: 580px;
+      padding: 36px 30px;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 40px rgba(56, 189, 248, 0.15);
       position: relative;
       transform: translateY(20px) scale(0.96);
       transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
       color: #fff;
     }
+
 
     .modal-overlay.active .glass-card {
       transform: translateY(0) scale(1);
@@ -472,7 +473,9 @@
       background: radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.16) 0%, rgba(15, 23, 42, 0.82) 65%, rgba(3, 7, 18, 0.94) 100%);
       border: 1px solid rgba(56, 189, 248, 0.35);
       border-radius: 32px;
-      padding: 34px 28px 28px;
+      width: 95%;
+      max-width: 680px;
+      padding: 40px 32px 30px;
       backdrop-filter: blur(28px);
       -webkit-backdrop-filter: blur(28px);
       box-shadow: 0 30px 80px rgba(0, 0, 0, 0.85), 0 0 50px rgba(56, 189, 248, 0.22), inset 0 1px 2px rgba(255, 255, 255, 0.35);
@@ -494,55 +497,56 @@
 
     .memory-img {
       width: 100%;
-      max-height: 200px;
+      max-height: 260px;
       object-fit: cover;
       border-radius: 20px;
-      margin-bottom: 20px;
+      margin-bottom: 22px;
       border: 1px solid rgba(56, 189, 248, 0.3);
       box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65), 0 0 20px rgba(56, 189, 248, 0.2);
     }
 
     .memory-title {
       font-family: 'Cinzel Decorative', 'Tajawal', sans-serif;
-      font-size: 1.55rem;
+      font-size: clamp(1.6rem, 3.2vw, 2.1rem);
       font-weight: 700;
       letter-spacing: 0.8px;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 12px;
       background: linear-gradient(135deg, #ffffff 40%, var(--accent-cyan) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       text-shadow: 0 0 20px rgba(56, 189, 248, 0.45);
     }
 
-    /* حاوية الرسالة الزجاجية الفاخرة */
+    /* حاوية الرسالة الزجاجية الفاخرة المريحة للايباد */
     .memory-message-container {
       position: relative;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
       background: rgba(15, 23, 42, 0.65);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 20px;
-      padding: 16px 18px;
+      border-radius: 22px;
+      padding: 22px 24px;
       box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.45), 0 8px 24px rgba(0, 0, 0, 0.25);
       backdrop-filter: blur(14px);
     }
 
     .memory-message {
       font-family: 'Amiri', serif;
-      font-size: 1.22rem;
-      line-height: 1.85;
+      font-size: clamp(1.35rem, 2.8vw, 1.65rem);
+      line-height: 2.1;
       color: #f1f5f9;
       white-space: pre-wrap;
-      max-height: 145px;
+      max-height: 340px;
       overflow-y: auto;
-      padding-left: 6px;
+      padding-left: 10px;
       scrollbar-width: thin;
       scrollbar-color: var(--accent-cyan) rgba(255, 255, 255, 0.04);
       text-align: right;
     }
+
 
     .memory-message::-webkit-scrollbar {
       width: 4px;
@@ -1301,7 +1305,8 @@
     /* =========================================================================
        قاعدة البيانات الافتراضية
        ========================================================================= */
-    const R2_AMBIENT_URL = "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/space.mp3";
+    const R2_AMBIENT_URL = "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/background.mp3";
+
 
     const DEFAULT_CONFIG = {
       glowName: "SOMY",
