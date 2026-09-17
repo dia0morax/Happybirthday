@@ -382,6 +382,75 @@
       background: rgba(251, 191, 36, 0.2);
     }
 
+    .zoom-btn.progress-btn {
+      position: relative;
+      border-color: rgba(56, 189, 248, 0.4);
+      color: var(--accent-cyan);
+    }
+    .zoom-btn.progress-btn:hover {
+      border-color: var(--accent-cyan);
+      color: #fff;
+      background: rgba(56, 189, 248, 0.2);
+    }
+
+    /* شريط تقدم الإنجاز */
+    .progress-bar-container {
+      width: 100%;
+      height: 14px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 12px;
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #38bdf8 0%, #f472b6 50%, #fbbf24 100%);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.6);
+      transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .progress-percent-label {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 1px;
+      margin-bottom: 18px;
+      text-shadow: 0 0 16px var(--accent-cyan);
+    }
+
+    .progress-details-box {
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .progress-detail-item {
+      display: flex;
+      justify-content: space-between;
+      color: #cbd5e1;
+      font-size: 0.95rem;
+    }
+
+    .progress-hint-note {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: var(--accent-gold);
+      background: rgba(251, 191, 36, 0.08);
+      border: 1px solid rgba(251, 191, 36, 0.25);
+      padding: 10px 14px;
+      border-radius: 14px;
+    }
+
+
     .btn-label-tooltip {
       position: absolute;
       right: calc(100% + 12px);
@@ -1117,8 +1186,12 @@
     <div class="constellation-name" id="constellationTitle">كوكبة القيصر</div>
   </div>
 
-  <!-- أزرار التحكم بالملاحة والزوم -->
+  <!-- أزرار التحكم بالملاحة والزوم ونسبة الإنجاز -->
   <div id="zoomControls">
+    <button class="zoom-btn progress-btn" id="progressToggleBtn" title="نسبة الإنجاز">
+      <i class="fa-solid fa-chart-pie"></i>
+      <span class="btn-label-tooltip">نسبة الإنجاز الفلكي</span>
+    </button>
     <button class="zoom-btn center-btn" id="recenterBtn" title="العودة إلى المركز">
       <i class="fa-solid fa-crosshairs"></i>
       <span class="btn-label-tooltip">العودة إلى المركز</span>
@@ -1126,6 +1199,7 @@
     <button class="zoom-btn" id="zoomInBtn" title="تقريب المجرة"><i class="fa-solid fa-plus"></i></button>
     <button class="zoom-btn" id="zoomOutBtn" title="تبعيد المجرة"><i class="fa-solid fa-minus"></i></button>
   </div>
+
 
 
   <!-- تحكم الصوت -->
@@ -1224,8 +1298,57 @@
     </div>
   </div>
 
+  <!-- نافذة نسبة إنجاز التجربة -->
+  <div class="modal-overlay" id="progressModal">
+    <div class="glass-card" style="text-align: center; max-width: 460px;">
+      <button class="modal-close-btn" id="closeProgressBtn">✕</button>
+      <div style="font-size: 2.8rem; color: var(--accent-gold); margin-bottom: 12px; filter: drop-shadow(0 0 16px rgba(251, 191, 36, 0.5));">
+        <i class="fa-solid fa-trophy"></i>
+      </div>
+      <h3 style="font-size: 1.6rem; color: #fff; margin-bottom: 8px;">نسبة إكمال التجربة</h3>
+      <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;">استكشاف المجرة وأسرارها الفلكية</p>
+      
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" id="progressBarFill"></div>
+      </div>
+      <div class="progress-percent-label" id="progressPercentLabel">0%</div>
+
+      <div class="progress-details-box">
+        <div class="progress-detail-item">
+          <span>النجوم المقروءة:</span>
+          <b id="starsProgressText">0 / 0</b>
+        </div>
+        <div class="progress-detail-item">
+          <span>الأسرار المستكشفة:</span>
+          <b id="secretsProgressText">0 / 1</b>
+        </div>
+      </div>
+
+      <div class="progress-hint-note">
+        ✨ هذه نسبة إنهائكِ للتجربة.. هناك أشياء وأجرام سرية مخفية في الفضاء بانتظار اكتشافكِ!
+      </div>
+    </div>
+  </div>
+
+  <!-- نافذة كوكب زحل التفاعلي الاستكشافية -->
+  <div class="modal-overlay" id="saturnModal">
+    <div class="glass-card" style="text-align: center; max-width: 500px;">
+      <button class="modal-close-btn" id="closeSaturnBtn">✕</button>
+      <div style="font-size: 3.2rem; color: var(--accent-gold); margin-bottom: 10px; filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.6));">
+        🪐
+      </div>
+      <h3 style="font-size: 1.7rem; color: var(--accent-gold); margin-bottom: 12px;">سيد الحلقات: كوكب زحل</h3>
+      <p style="font-family: 'Amiri', serif; font-size: 1.25rem; line-height: 1.9; color: #e2e8f0; margin-bottom: 18px;">
+        جوهرة المنظومة الفضائية وأجمل كواكب المجرة.. تدور حوله حلقات ساحرة من الجليد والغبار الذهبي، تماماً كجمالكِ الذي تلتف حوله كل مجرات الكون.
+      </p>
+      <div style="background: rgba(251, 191, 36, 0.12); border: 1px solid rgba(251, 191, 36, 0.35); border-radius: 16px; padding: 12px; font-size: 0.95rem; color: #fde68a;">
+        ✨ تم اكتشاف سر كوكب زحل واحتسابه ضمن نسبة إنجازكِ!
+      </div>
+    </div>
+  </div>
 
   <!-- لوحة تحكم واستوديو المطور (Admin Drawer) -->
+
   <div id="adminStudioDrawer">
     <div class="drawer-header">
       <h3><span>🛠️</span> استوديو النجوم (diajb0)</h3>
@@ -1495,11 +1618,19 @@
     let initialPinchScale = 1.0;
     const spaceScene = document.getElementById('spaceScene');
 
+    // حدود السحب القصوى لمنع الفضاء اللانهائي
+    const MAX_PAN_LIMIT = 1350;
+
     function applySceneTransform() {
+      // قفل أطراف الشاشة لتبقى دائماً داخل حدود الفضاء المعقولة
+      const clampBound = MAX_PAN_LIMIT * sceneScale;
+      sceneX = Math.max(-clampBound, Math.min(clampBound, sceneX));
+      sceneY = Math.max(-clampBound, Math.min(clampBound, sceneY));
+
       spaceScene.style.transform = `translate(${sceneX}px, ${sceneY}px) scale(${sceneScale})`;
     }
 
-    // أزرار الزوم والعودة إلى المركز
+    // أزرار الزوم مع إمكانية زوم أووت واسعة وشاملة لكامل الفضاء
     const zoomInBtn = document.getElementById('zoomInBtn');
     const zoomOutBtn = document.getElementById('zoomOutBtn');
     const recenterBtn = document.getElementById('recenterBtn');
@@ -1510,10 +1641,12 @@
         applySceneTransform();
       });
       zoomOutBtn.addEventListener('click', () => {
-        sceneScale = Math.max(0.45, sceneScale - 0.15);
+        // إمكانية الزوم للخارج حتى 0.18 لرؤية كامل أرجاء الفضاء بلمحة واحدة
+        sceneScale = Math.max(0.18, sceneScale - 0.15);
         applySceneTransform();
       });
     }
+
 
     // زر العودة إلى المركز بسلاسة
     if (recenterBtn) {
@@ -1527,15 +1660,83 @@
     }
 
 
-    // زوم عجلة الماوس
+    // رصد النقر على كوكب زحل التفاعلي عبر الشاشة
+    window.addEventListener('click', (e) => {
+      if (isDraggingScene || e.target.closest('.star-node') || e.target.closest('#adminStudioDrawer') || e.target.closest('.modal-overlay') || e.target.closest('#zoomControls')) return;
+      if (typeof celestialObjects === 'undefined') return;
+      const saturn = celestialObjects.find(o => o.type === 'saturn_interactive');
+      if (saturn && saturn._screenX) {
+        const dist = Math.hypot(e.clientX - saturn._screenX, e.clientY - saturn._screenY);
+        if (dist <= saturn._screenR) {
+          discoveredSecrets.saturn = true;
+          playStarChime();
+          document.getElementById('saturnModal').classList.add('active');
+          updateProgressStats();
+        }
+      }
+    });
+
+
+    const saturnModal = document.getElementById('saturnModal');
+    const closeSaturnBtn = document.getElementById('closeSaturnBtn');
+    if (closeSaturnBtn) {
+      closeSaturnBtn.addEventListener('click', () => saturnModal.classList.remove('active'));
+    }
+    saturnModal.addEventListener('click', (e) => {
+      if (e.target === saturnModal) saturnModal.classList.remove('active');
+    });
+
+    // حساب نسبة الإنجاز المئوية وتحديث القائمة
+    function updateProgressStats() {
+      const totalStars = appConfig.stars.length;
+      const readStars = document.querySelectorAll('.star-node.is-read').length;
+      const totalSecrets = 1; // كوكب زحل (وستضاف غيرها)
+      const secretsFound = discoveredSecrets.saturn ? 1 : 0;
+
+      const totalItems = totalStars + totalSecrets;
+      const completedItems = readStars + secretsFound;
+      const percent = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+
+      const barFill = document.getElementById('progressBarFill');
+      const label = document.getElementById('progressPercentLabel');
+      const starsText = document.getElementById('starsProgressText');
+      const secretsText = document.getElementById('secretsProgressText');
+
+      if (barFill) barFill.style.width = percent + '%';
+      if (label) label.textContent = percent + '%';
+      if (starsText) starsText.textContent = `${readStars} / ${totalStars}`;
+      if (secretsText) secretsText.textContent = `${secretsFound} / ${totalSecrets}`;
+    }
+
+    const progressModal = document.getElementById('progressModal');
+    const progressToggleBtn = document.getElementById('progressToggleBtn');
+    const closeProgressBtn = document.getElementById('closeProgressBtn');
+
+    if (progressToggleBtn) {
+      progressToggleBtn.addEventListener('click', () => {
+        updateProgressStats();
+        progressModal.classList.add('active');
+      });
+    }
+    if (closeProgressBtn) {
+      closeProgressBtn.addEventListener('click', () => progressModal.classList.remove('active'));
+    }
+    progressModal.addEventListener('click', (e) => {
+      if (e.target === progressModal) progressModal.classList.remove('active');
+    });
+
+    // زوم عجلة الماوس حتى 0.18
     window.addEventListener('wheel', (e) => {
-      if (e.target.closest('#adminStudioDrawer') || e.target.closest('#memoryModal')) return;
+      if (e.target.closest('#adminStudioDrawer') || e.target.closest('#memoryModal') || e.target.closest('#progressModal') || e.target.closest('#saturnModal')) return;
       e.preventDefault();
       const delta = e.deltaY < 0 ? 0.08 : -0.08;
-      sceneScale = Math.max(0.45, Math.min(2.4, sceneScale + delta));
+      sceneScale = Math.max(0.18, Math.min(2.4, sceneScale + delta));
       applySceneTransform();
     }, { passive: false });
 
+
+
+    // نظام السحب بالماوس (للكمبيوتر)
     window.addEventListener('mousedown', (e) => {
       if (e.target.closest('.star-node') || e.target.closest('#starJoystickWrapper') || e.target.closest('#adminStudioDrawer') || e.target.closest('.admin-floating-toggle') || e.target.closest('.modal-overlay') || e.target.closest('#zoomControls')) return;
       isDraggingScene = true;
@@ -1553,134 +1754,149 @@
 
     window.addEventListener('mouseup', () => { isDraggingScene = false; });
 
-    // اللمس التفاعلي المزدوج: تكبير وسحب في جميع الاتجاهات سوياً (Pinch Zoom & Pan Simultaneously)
-    let lastPinchMidX = 0;
-    let lastPinchMidY = 0;
+    // نظام اللمس والسحب والتكبير المزدوج (للأجهزة اللوحية والهواتف)
+    let touchStartDist = 0;
+    let touchStartScale = 1.0;
+    let lastTouchMidX = 0;
+    let lastTouchMidY = 0;
 
     window.addEventListener('touchstart', (e) => {
       if (e.target.closest('.star-node') || e.target.closest('#starJoystickWrapper') || e.target.closest('#adminStudioDrawer') || e.target.closest('.admin-floating-toggle') || e.target.closest('.modal-overlay') || e.target.closest('#zoomControls')) return;
 
-      if (e.touches.length === 2) {
-        isDraggingScene = false;
-        initialPinchDistance = Math.hypot(
-          e.touches[0].clientX - e.touches[1].clientX,
-          e.touches[0].clientY - e.touches[1].clientY
-        );
-        initialPinchScale = sceneScale;
-        lastPinchMidX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-        lastPinchMidY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-      } else if (e.touches.length === 1) {
+      if (e.touches.length === 1) {
         isDraggingScene = true;
         startDragX = e.touches[0].clientX - sceneX;
         startDragY = e.touches[0].clientY - sceneY;
+      } else if (e.touches.length === 2) {
+        isDraggingScene = false;
+        touchStartDist = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        touchStartScale = sceneScale;
+        lastTouchMidX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        lastTouchMidY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
       }
     }, { passive: true });
 
     window.addEventListener('touchmove', (e) => {
-      if (e.touches.length === 2 && initialPinchDistance) {
+      if (isDraggingScene && e.touches.length === 1) {
+        playDriftSound();
+        sceneX = e.touches[0].clientX - startDragX;
+        sceneY = e.touches[0].clientY - startDragY;
+        applySceneTransform();
+      } else if (e.touches.length === 2 && touchStartDist > 0) {
         playDriftSound();
 
         const currentDist = Math.hypot(
           e.touches[0].clientX - e.touches[1].clientX,
           e.touches[0].clientY - e.touches[1].clientY
         );
-        const factor = currentDist / initialPinchDistance;
-        const newScale = Math.max(0.45, Math.min(2.4, initialPinchScale * factor));
-        
-        const currentMidX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-        const currentMidY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+        const factor = currentDist / touchStartDist;
+        const newScale = Math.max(0.18, Math.min(2.4, touchStartScale * factor));
 
-        // حساب حركة وسحب الإصبعين أفقياً وعمودياً مع التكبير دون أي قفل للمحاور
-        const panDeltaX = currentMidX - lastPinchMidX;
-        const panDeltaY = currentMidY - lastPinchMidY;
 
-        // دمج الزوم البؤري مع إزاحة السحب المباشرة
-        const scaleChange = newScale / sceneScale;
-        sceneX = currentMidX - (currentMidX - sceneX) * scaleChange + panDeltaX;
-        sceneY = currentMidY - (currentMidY - sceneY) * scaleChange + panDeltaY;
+        const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+
+        const panX = midX - lastTouchMidX;
+        const panY = midY - lastTouchMidY;
+
+        const scaleDiff = newScale / sceneScale;
+        sceneX = midX - (midX - sceneX) * scaleDiff + panX;
+        sceneY = midY - (midY - sceneY) * scaleDiff + panY;
         sceneScale = newScale;
 
-        lastPinchMidX = currentMidX;
-        lastPinchMidY = currentMidY;
+        lastTouchMidX = midX;
+        lastTouchMidY = midY;
 
-        applySceneTransform();
-      } else if (isDraggingScene && e.touches.length === 1) {
-        playDriftSound();
-        sceneX = e.touches[0].clientX - startDragX;
-        sceneY = e.touches[0].clientY - startDragY;
         applySceneTransform();
       }
     }, { passive: true });
 
     window.addEventListener('touchend', (e) => {
-      if (e.touches.length === 2) {
-        initialPinchDistance = Math.hypot(
-          e.touches[0].clientX - e.touches[1].clientX,
-          e.touches[0].clientY - e.touches[1].clientY
-        );
-        initialPinchScale = sceneScale;
-        lastPinchMidX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-        lastPinchMidY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-      } else if (e.touches.length === 1) {
-        initialPinchDistance = null;
+      if (e.touches.length === 1) {
         isDraggingScene = true;
+        touchStartDist = 0;
         startDragX = e.touches[0].clientX - sceneX;
         startDragY = e.touches[0].clientY - sceneY;
-      } else {
-        initialPinchDistance = null;
+      } else if (e.touches.length === 0) {
         isDraggingScene = false;
+        touchStartDist = 0;
       }
     });
-
-
-
 
     /* =========================================================================
        محرك الأجرام والظواهر الفلكية العميقة (Deep Cosmic Engine)
        ========================================================================= */
+
+
     const canvas = document.getElementById('universeCanvas');
     const ctx = canvas.getContext('2d');
 
-    const SPACE_BOUND = 4500; // نطاق فلكي شاسع
+    const SPACE_BOUND = 2200; // مساحة محددة ومحكومة لمنع الفراغ اللانهائي
     let bgStars = [];
     let cosmicDust = [];
     let meteors = [];
     let comets = [];
     let pulsarAngle = 0;
 
-    // مصفوفة أجرام بألوان خافتة وعميقة للحفاظ على سواد الفضاء
-    const celestialObjects = [
-      // 1. ضوء بروجي هادئ وشديد الخفوت
-      { type: 'zodiacal_light', x: 0, y: 0 },
+    // تتبع استكشاف الأسرار (زحل وأسرار أخرى)
+    let discoveredSecrets = { saturn: false };
 
-      // 2. سديم الحجاب / شريط الدجاجة خافت وشفاف
+    // مصفوفة الأجرام: قريبة من المركز وموزعة بنسق مداري متناسق يسهل رؤيته واستكشافه
+    const celestialObjects = [
+      // 1. الضوء البروجي وشريط الدجاجة
+      { type: 'zodiacal_light', x: 0, y: 0 },
       { type: 'cygnus_ribbon', x: 190, y: -130 },
 
-      // 3. سدم فضائية بألوان شفافة لا تطغى على السواد
-      { type: 'nebula', x: -210, y: -180, radius: 380, color: 'rgba(56, 189, 248, 0.07)' },
-      { type: 'nebula', x: 260, y: 210, radius: 400, color: 'rgba(244, 114, 182, 0.06)' },
-      { type: 'nebula', x: -240, y: 230, radius: 340, color: 'rgba(168, 85, 247, 0.06)' },
-      { type: 'nebula', x: 0, y: -480, radius: 440, color: 'rgba(14, 165, 233, 0.05)' },
+      // 2. كواكب المنظومة الشمسية
+      { type: 'planet_simple', name: 'عطارد', x: -130, y: -90, radius: 9, color: '#94a3b8' },
+      { type: 'planet_simple', name: 'الزهرة', x: 140, y: 110, radius: 14, color: '#fde047' },
+      { type: 'planet_simple', name: 'المريخ', x: -260, y: 90, radius: 11, color: '#ef4444' },
+      { type: 'planet_simple', name: 'المشتري', x: 310, y: -180, radius: 24, color: '#d97706', bands: true },
+      { type: 'planet_simple', name: 'أورانوس', x: -330, y: -210, radius: 16, color: '#67e8f9' },
+      { type: 'planet_simple', name: 'نبتون', x: 270, y: 260, radius: 15, color: '#3b82f6' },
 
-      // 4. بقايا مستعر أعظم هادئة
-      { type: 'supernova', x: -480, y: -90, radius: 75 },
+      // 3. كوكب زحل التفاعلي الكبير الواضح
+      { type: 'saturn_interactive', x: -240, y: -180, radius: 34 },
 
-      // 5. مجرات بعيدة وشاحبة
-      { type: 'galaxy', x: 460, y: -270, radius: 180, angle: 0.58, color: '#38bdf8' },
-      { type: 'galaxy', x: -520, y: 390, radius: 160, angle: -0.65, color: '#f472b6' },
+      // 4. سدم هادئة
+      { type: 'nebula', x: -210, y: -180, radius: 320, color: 'rgba(56, 189, 248, 0.07)' },
+      { type: 'nebula', x: 260, y: 210, radius: 340, color: 'rgba(244, 114, 182, 0.06)' },
+      { type: 'nebula', x: 0, y: -380, radius: 350, color: 'rgba(14, 165, 233, 0.05)' },
 
-      // 6. ثقب أسود ذو حافة دقيقة
-      { type: 'blackhole', x: 420, y: 310, radius: 32 },
+      // 5. ثقب أسود ونجم نابض ومستعر وحزام كويكبات
+      { type: 'blackhole', x: 380, y: 260, radius: 30 },
+      { type: 'pulsar', x: -310, y: 240 },
+      { type: 'supernova', x: -420, y: -80, radius: 70 },
+      { type: 'asteroid_field', x: 120, y: 380, count: 18 },
 
-      // 7. نجم نيوتروني نابض
-      { type: 'pulsar', x: -350, y: 280 },
+      // 6. الأجرام السبعة الكبرى مقربة وموزعة حول المركز مباشرة لسهولة الوصول إليها
+      // 1. سديم كارينا (Carina Nebula) - أعلى اليسار
+      { type: 'carina_nebula', x: -680, y: -520, radius: 220 },
 
-      // 8. كوكب ذو حلقات ناعمة
-      { type: 'ringed_planet', x: -410, y: -260, radius: 46 },
+      // 2. أعمدة الخلق (Pillars of Creation) - أعلى اليمين
+      { type: 'pillars_creation', x: 680, y: -560, radius: 200 },
 
-      // 9. حزام كويكبات هادئ
-      { type: 'asteroid_field', x: 120, y: 440, count: 18 }
+      // 3. سديم عين القط (Cat's Eye Nebula) - يمين المركز
+      { type: 'cats_eye_nebula', x: 740, y: 40, radius: 100 },
+
+      // 4. سديم الوردة (Rosette Nebula) - أسفل اليمين
+      { type: 'rosette_nebula', x: 620, y: 640, radius: 180 },
+
+      // 5. مجرة السومبريرو (Sombrero Galaxy - M104) - أسفل المركز
+      { type: 'sombrero_galaxy', x: -60, y: 780, radius: 170 },
+
+      // 6. سديم الفراشة (Butterfly Nebula - NGC 6302) - أسفل اليسار
+      { type: 'butterfly_nebula', x: -650, y: 520, radius: 150 },
+
+      // 7. سديم الحجاب (Veil Nebula) - يسار المركز
+      { type: 'veil_nebula_deep', x: -740, y: -30, radius: 210 }
     ];
+
+
+
 
 
 
@@ -1826,6 +2042,79 @@
           ctx.stroke();
           ctx.restore();
         }
+        else if (obj.type === 'planet_simple') {
+          // كواكب المنظومة الشمسية بتفاصيل وإضاءة
+          const pr = obj.radius * sceneScale;
+          ctx.save();
+          
+          // تدرج كروي بسيط يعطي عمقاً للكوكب بدون إرهاق المعالج
+          const planetGrad = ctx.createRadialGradient(screenX - pr * 0.3, screenY - pr * 0.3, pr * 0.1, screenX, screenY, pr);
+          planetGrad.addColorStop(0, '#ffffff');
+          planetGrad.addColorStop(0.3, obj.color);
+          planetGrad.addColorStop(1, '#020617');
+          
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, pr, 0, Math.PI * 2);
+          ctx.fillStyle = planetGrad;
+          ctx.fill();
+          
+          if (obj.bands) {
+            ctx.save();
+            ctx.translate(screenX, screenY);
+            ctx.rotate(0.2);
+            ctx.strokeStyle = 'rgba(120, 53, 15, 0.4)';
+            ctx.lineWidth = 4 * sceneScale;
+            ctx.beginPath();
+            ctx.moveTo(-pr * 0.8, -pr * 0.2);
+            ctx.lineTo(pr * 0.8, -pr * 0.2);
+            ctx.moveTo(-pr * 0.9, pr * 0.2);
+            ctx.lineTo(pr * 0.9, pr * 0.2);
+            ctx.stroke();
+            ctx.restore();
+          }
+          ctx.restore();
+        }
+
+        else if (obj.type === 'saturn_interactive') {
+          // كوكب زحل الكبير الواضح والقابل للنقر
+          const sr = obj.radius * sceneScale;
+          obj._screenX = screenX;
+          obj._screenY = screenY;
+          obj._screenR = sr * 2.2;
+
+          ctx.save();
+          ctx.translate(screenX, screenY);
+          ctx.rotate(0.42);
+
+          // الحلقات الذهبية الساحرة
+          ctx.scale(2.6, 0.45);
+          ctx.beginPath();
+          ctx.arc(0, 0, sr * 2.1, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(251, 191, 36, 0.75)';
+          ctx.lineWidth = 12 * sceneScale;
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.arc(0, 0, sr * 1.6, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(245, 158, 11, 0.55)';
+          ctx.lineWidth = 6 * sceneScale;
+          ctx.stroke();
+          ctx.restore();
+
+          // جسم كوكب زحل الذهبي المتوهج
+          ctx.save();
+          const sGrad = ctx.createRadialGradient(screenX - sr * 0.3, screenY - sr * 0.3, sr * 0.1, screenX, screenY, sr);
+          sGrad.addColorStop(0, '#fef08a');
+          sGrad.addColorStop(0.5, '#f59e0b');
+          sGrad.addColorStop(1, '#78350f');
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, sr, 0, Math.PI * 2);
+          ctx.fillStyle = sGrad;
+          ctx.shadowBlur = 18 * sceneScale;
+          ctx.shadowColor = 'rgba(251, 191, 36, 0.45)';
+          ctx.fill();
+          ctx.restore();
+        }
         else if (obj.type === 'supernova') {
           const sr = obj.radius * sceneScale;
           ctx.save();
@@ -1843,6 +2132,219 @@
           ctx.stroke();
           ctx.restore();
         }
+        else if (obj.type === 'carina_nebula') {
+          // سديم كارينا: المنحدرات الصخرية الذهبية والنحاسية مع خلفية فيروزية
+          const cr = obj.radius * sceneScale;
+          ctx.save();
+          ctx.translate(screenX, screenY);
+
+          // وهج فيروزي نيلي علوي
+          const cGrad = ctx.createRadialGradient(0, -cr * 0.4, 0, 0, 0, cr);
+          cGrad.addColorStop(0, 'rgba(56, 189, 248, 0.18)');
+          cGrad.addColorStop(0.6, 'rgba(30, 58, 138, 0.08)');
+          cGrad.addColorStop(1, 'transparent');
+          ctx.fillStyle = cGrad;
+          ctx.beginPath();
+          ctx.arc(0, 0, cr, 0, Math.PI * 2);
+          ctx.fill();
+
+          // قمم المنحدرات الصخرية النحاسية المتعرجة
+          ctx.beginPath();
+          ctx.moveTo(-cr, cr * 0.4);
+          ctx.bezierCurveTo(-cr * 0.6, -cr * 0.2, -cr * 0.2, cr * 0.3, 0, -cr * 0.1);
+          ctx.bezierCurveTo(cr * 0.3, -cr * 0.4, cr * 0.6, cr * 0.1, cr, -cr * 0.05);
+          ctx.lineTo(cr, cr);
+          ctx.lineTo(-cr, cr);
+          ctx.closePath();
+          ctx.fillStyle = 'rgba(217, 119, 6, 0.25)';
+          ctx.fill();
+
+          ctx.strokeStyle = 'rgba(251, 191, 36, 0.45)';
+          ctx.lineWidth = 2 * sceneScale;
+          ctx.stroke();
+          ctx.restore();
+        }
+        else if (obj.type === 'pillars_creation') {
+          // أعمدة الخلق: ثلاثة أبراج عملاقة من الغبار البني ووهج كوني
+          const pr = obj.radius * sceneScale;
+          ctx.save();
+          ctx.translate(screenX, screenY);
+
+          // هالة الغاز البارد
+          ctx.fillStyle = 'rgba(14, 165, 233, 0.08)';
+          ctx.beginPath();
+          ctx.arc(0, 0, pr, 0, Math.PI * 2);
+          ctx.fill();
+
+          // الأعمدة الثلاثة (يسار، وسط طويل، يمين)
+          const pillars = [
+            { x: -pr * 0.4, w: pr * 0.25, h: pr * 0.8 },
+            { x: -pr * 0.05, w: pr * 0.28, h: pr * 1.1 },
+            { x: pr * 0.35, w: pr * 0.22, h: pr * 0.65 }
+          ];
+
+          for (let p of pillars) {
+            ctx.beginPath();
+            ctx.moveTo(p.x - p.w * 0.5, pr * 0.7);
+            ctx.lineTo(p.x - p.w * 0.4, -p.h + pr * 0.7);
+            ctx.quadraticCurveTo(p.x, -p.h + pr * 0.5, p.x + p.w * 0.4, -p.h + pr * 0.7);
+            ctx.lineTo(p.x + p.w * 0.5, pr * 0.7);
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(68, 48, 34, 0.65)';
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(244, 114, 182, 0.25)';
+            ctx.lineWidth = 1.5 * sceneScale;
+            ctx.stroke();
+          }
+          ctx.restore();
+        }
+        else if (obj.type === 'cats_eye_nebula') {
+          // سديم عين القط: حلقات ودوائر متحدة المركز تحاكي البؤبؤ
+          const er = obj.radius * sceneScale;
+          ctx.save();
+          ctx.translate(screenX, screenY);
+
+          // الحلقات الخارجية البرتقالية والأرجوانية
+          ctx.strokeStyle = 'rgba(249, 115, 22, 0.28)';
+          ctx.lineWidth = 3 * sceneScale;
+          ctx.beginPath();
+          ctx.arc(0, 0, er, 0, Math.PI * 2);
+          ctx.stroke();
+
+          ctx.strokeStyle = 'rgba(168, 85, 247, 0.35)';
+          ctx.lineWidth = 2.5 * sceneScale;
+          ctx.beginPath();
+          ctx.ellipse(0, 0, er * 0.75, er * 0.55, Math.PI / 4, 0, Math.PI * 2);
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.ellipse(0, 0, er * 0.75, er * 0.55, -Math.PI / 4, 0, Math.PI * 2);
+          ctx.stroke();
+
+          // المركز الزمردي والفيروزي والبؤبؤ الداخلي
+          ctx.fillStyle = 'rgba(16, 185, 129, 0.35)';
+          ctx.beginPath();
+          ctx.arc(0, 0, er * 0.3, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(0, 0, Math.max(1.8, 3 * sceneScale), 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+        else if (obj.type === 'rosette_nebula') {
+          // سديم الوردة: بتلات دائرية متداخلة بلون أحمر قاني ووردي وعنقود بالقلب
+          const rr = obj.radius * sceneScale;
+          ctx.save();
+          ctx.translate(screenX, screenY);
+
+          for (let petal = 0; petal < 6; petal++) {
+            const pAngle = (petal / 6) * Math.PI * 2;
+            const px = Math.cos(pAngle) * (rr * 0.45);
+            const py = Math.sin(pAngle) * (rr * 0.45);
+            ctx.fillStyle = petal % 2 === 0 ? 'rgba(225, 29, 72, 0.18)' : 'rgba(244, 114, 182, 0.16)';
+            ctx.beginPath();
+            ctx.arc(px, py, rr * 0.45, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          // العنقود النجمي اللامع في القلب
+          ctx.fillStyle = '#ffffff';
+          for (let st = 0; st < 7; st++) {
+            const sAngle = (st / 7) * Math.PI * 2;
+            const sx = Math.cos(sAngle) * (rr * 0.15);
+            const sy = Math.sin(sAngle) * (rr * 0.15);
+            ctx.beginPath();
+            ctx.arc(sx, sy, Math.max(1, 1.8 * sceneScale), 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.restore();
+        }
+        else if (obj.type === 'sombrero_galaxy') {
+          // مجرة السومبريرو: قرص ناصع بيضاوي مع حزام غباري داكن فاصل
+          const sr = obj.radius * sceneScale;
+          ctx.save();
+          ctx.translate(screenX, screenY);
+          ctx.rotate(-0.15);
+
+          // التوهج الفضي البيضاوي الممتد (القبعة)
+          ctx.save();
+          ctx.scale(2.8, 0.65);
+          const sombGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, sr * 0.85);
+          sombGrad.addColorStop(0, 'rgba(255, 255, 255, 0.85)');
+          sombGrad.addColorStop(0.25, 'rgba(254, 240, 138, 0.55)');
+          sombGrad.addColorStop(0.7, 'rgba(226, 232, 240, 0.15)');
+          sombGrad.addColorStop(1, 'transparent');
+          ctx.fillStyle = sombGrad;
+          ctx.beginPath();
+          ctx.arc(0, 0, sr * 0.85, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+
+          // الحزام الغباري المظلم القاطع في المنتصف
+          ctx.strokeStyle = 'rgba(15, 23, 42, 0.88)';
+          ctx.lineWidth = 4 * sceneScale;
+          ctx.beginPath();
+          ctx.moveTo(-sr * 1.8, 0);
+          ctx.lineTo(sr * 1.8, 0);
+          ctx.stroke();
+          ctx.restore();
+        }
+        else if (obj.type === 'butterfly_nebula') {
+          // سديم الفراشة: أجنحة غازية ممزقة وممتدة في اتجاهين متعاكسين
+          const br = obj.radius * sceneScale;
+          ctx.save();
+          ctx.translate(screenX, screenY);
+          ctx.rotate(0.65);
+
+          // الجناح الأيمن
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.bezierCurveTo(br * 0.4, -br * 0.8, br * 1.1, -br * 0.4, br * 1.2, 0);
+          ctx.bezierCurveTo(br * 1.1, br * 0.4, br * 0.4, br * 0.7, 0, 0);
+          ctx.fillStyle = 'rgba(192, 132, 252, 0.22)';
+          ctx.fill();
+
+          // الجناح الأيسر
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.bezierCurveTo(-br * 0.4, br * 0.8, -br * 1.1, br * 0.4, -br * 1.2, 0);
+          ctx.bezierCurveTo(-br * 1.1, -br * 0.4, -br * 0.4, -br * 0.7, 0, 0);
+          ctx.fillStyle = 'rgba(244, 114, 182, 0.22)';
+          ctx.fill();
+
+          // النجم المحتضر في المنتصف
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(0, 0, Math.max(2, 3.5 * sceneScale), 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+        else if (obj.type === 'veil_nebula_deep') {
+          // سديم الحجاب بالأطراف البعيدة: خيوط نيون دقيقة زرقاء وحمراء ياقوتية
+          const vr = obj.radius * sceneScale;
+          ctx.save();
+          ctx.translate(screenX, screenY);
+          ctx.rotate(-0.55);
+
+          ctx.beginPath();
+          ctx.moveTo(-vr, -vr * 0.3);
+          ctx.bezierCurveTo(-vr * 0.3, -vr * 0.6, vr * 0.2, vr * 0.4, vr, vr * 0.2);
+          ctx.strokeStyle = 'rgba(56, 189, 248, 0.38)';
+          ctx.lineWidth = 3.5 * sceneScale;
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.moveTo(-vr * 0.85, -vr * 0.2);
+          ctx.bezierCurveTo(-vr * 0.2, -vr * 0.45, vr * 0.35, vr * 0.55, vr * 0.9, vr * 0.35);
+          ctx.strokeStyle = 'rgba(225, 29, 72, 0.35)';
+          ctx.lineWidth = 2.5 * sceneScale;
+          ctx.stroke();
+          ctx.restore();
+        }
+
+
         else if (obj.type === 'asteroid_field') {
           ctx.save();
           ctx.translate(screenX, screenY);
@@ -2069,7 +2571,7 @@
       ctx.globalAlpha = 1;
       ctx.shadowBlur = 0;
 
-      // 4. رسم المذنبات والشهب
+      // 4. رسم المذنبات والشهب بنظام تخفيف الأداء
       for (let c of comets) {
         c.x += c.vx;
         c.y += c.vy;
@@ -2084,30 +2586,33 @@
           const tailX = drawX - (c.vx / 2.6) * tailLen;
           const tailY = drawY - (c.vy / 2.6) * tailLen;
 
-          const cometGrad = ctx.createLinearGradient(drawX, drawY, tailX, tailY);
-          cometGrad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
-          cometGrad.addColorStop(0.3, 'rgba(56, 189, 248, 0.55)');
-          cometGrad.addColorStop(1, 'transparent');
-
+          // تقليل استخدام createLinearGradient لرفع الفريمات
           ctx.beginPath();
           ctx.moveTo(drawX, drawY);
-          ctx.lineTo(tailX, tailY);
-          ctx.strokeStyle = cometGrad;
+          ctx.lineTo(drawX - (c.vx / 2.6) * (tailLen * 0.4), drawY - (c.vy / 2.6) * (tailLen * 0.4));
+          ctx.strokeStyle = 'rgba(56, 189, 248, 0.6)';
           ctx.lineWidth = Math.max(1.5, c.size * sceneScale);
           ctx.lineCap = 'round';
           ctx.stroke();
 
           ctx.beginPath();
+          ctx.moveTo(drawX - (c.vx / 2.6) * (tailLen * 0.4), drawY - (c.vy / 2.6) * (tailLen * 0.4));
+          ctx.lineTo(tailX, tailY);
+          ctx.strokeStyle = 'rgba(56, 189, 248, 0.1)';
+          ctx.stroke();
+
+          ctx.beginPath();
           ctx.arc(drawX, drawY, Math.max(2, c.size * sceneScale), 0, Math.PI * 2);
           ctx.fillStyle = '#ffffff';
-          ctx.shadowBlur = 12;
-          ctx.shadowColor = '#38bdf8';
           ctx.fill();
-          ctx.shadowBlur = 0;
         }
       }
 
       spawnMeteor();
+      ctx.lineWidth = 2.4;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+      
       for (let i = meteors.length - 1; i >= 0; i--) {
         let m = meteors[i];
         let drawX = m.x + (sceneX * 0.5);
@@ -2116,17 +2621,11 @@
         let endX = drawX - Math.cos(m.angle) * m.length;
         let endY = drawY - Math.sin(m.angle) * m.length;
 
-        let grad = ctx.createLinearGradient(drawX, drawY, endX, endY);
-        grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
-        grad.addColorStop(0.25, 'rgba(56, 189, 248, 0.7)');
-        grad.addColorStop(1, 'transparent');
-
+        // استخدام الشفافية المتغيرة بدلاً من التدرج الخطي المكلّف
+        ctx.globalAlpha = m.alpha;
         ctx.beginPath();
         ctx.moveTo(drawX, drawY);
         ctx.lineTo(endX, endY);
-        ctx.strokeStyle = grad;
-        ctx.lineWidth = 2.4;
-        ctx.lineCap = 'round';
         ctx.stroke();
 
         m.x += Math.cos(m.angle) * m.speed;
@@ -2135,6 +2634,8 @@
 
         if (m.alpha <= 0) meteors.splice(i, 1);
       }
+      ctx.globalAlpha = 1.0;
+
 
       requestAnimationFrame(animateUniverse);
     }
@@ -2424,7 +2925,9 @@
       // تحويل النجمة فوراً إلى اللون الرمادي وتصغير حجمها
       if (currentOpenStarElement) {
         currentOpenStarElement.classList.add('is-read');
+        updateProgressStats();
       }
+
 
       memoryModalTitle.textContent = star.title;
       memoryModalMessage.textContent = star.message;
