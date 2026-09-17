@@ -1433,41 +1433,25 @@
 
     const DEFAULT_CONFIG = {
       glowName: "SOMY",
-      subtitle: "The Stars Align For You, Sky",
+      subtitle: "اضغطي على النجوم المتوهجة ",
       dateText: "Happy Birthday!",
-      ambientAudioUrl: R2_AMBIENT_URL,
+      ambientAudioUrl: "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/background.mp3",
       stars: [
         {
-          id: 1,
-          title: "نجمة البداية",
-          x: 220,
-          y: 180,
-          image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80",
-          message: "كل عام وأنتِ النور الذي يضيء عتمة هذه المجرة.. أسعد أيام عمري هي التي بدأت بوجودكِ.",
-          songUrl: ""
-        },
-        {
-          id: 2,
-          title: "أغنيتكِ الساحرة",
-          x: 820,
-          y: 220,
+          id: 1789653965565,
+          title: "ااا",
+          x: 246.3557055063919,
+          y: 507.74698889615183,
           image: "",
-          message: "عندما تلمعين في السماء، تعزف الألحان بهدوء لتليق بجمال روحكِ وعينيكِ.",
-          songUrl: "https://actions.google.com/sounds/v1/weather/gentle_rain_on_leaves.ogg"
-        },
-        {
-          id: 3,
-          title: "سرّ السماء",
-          x: 520,
-          y: 620,
-          image: "",
-          message: "اسمكِ سماء، ولكِ من اسمكِ كل الاتساع والنقاء والرفعة.. عيد ميلاد سعيد يا أغلى ما أملك.",
-          songUrl: ""
+          songUrl: "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/sasapp_1.mp3",
+          message: "2026/3/16 جانت ليلة رمضان بعد السحور😖\nshe promise me , now she have toooooooo tell me about why she sad , who make her sad , who make her feel bad \nWhoever he or she is , i will get them and make them stop \nget out on my bestie u fac*erit was one of my best day's ever \nسومي چانت تفكر هواي وحاولت اخليها تقلل تفكير ، لانها تفكر بأمور ماموجودة اصلا \nتفكر بانو هية بدون فائدة ، تفكر انو هية عبء علي ، هالشي كله مو صحيح ، هي مو عبء ، هي عبارة عن شمعة دخلت لتنير طريقي الي كان ظلام ، هي رفيقة الدرب الي ماحرضى بغيرها .\nجانت ليلة رمضان وهنا مر وقت السحور وما تسحرت وكلت حخليها (قربان لسومي) واصوم هاليوم بدون سحور🤣\ni love her so much \nوخلتني سعيد بنومي \nجانت اكو طيارات بسبب حرب ايران واخرائيل فوك منطقة سومي بالزعفرانية ف جانت خايفة بالنوم😭\nاخخخخخخخخخخ\n2026/3/9"
         }
       ]
     };
 
-    let appConfig = JSON.parse(localStorage.getItem('sky_celestial_cfg')) || DEFAULT_CONFIG;
+    let appConfig = DEFAULT_CONFIG;
+    localStorage.setItem('sky_celestial_cfg', JSON.stringify(DEFAULT_CONFIG));
+
     appConfig.ambientAudioUrl = R2_AMBIENT_URL; // ضمان دائم لرابطك
 
     function saveAppConfig() {
