@@ -2,12 +2,16 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
   <title>Sky's Celestial Universe | SOMY</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cinzel+Decorative:wght@700&family=Outfit:wght@300;400;600;700&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <!-- مكتبة الأيقونات الاحترافية FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
+
     :root {
       --bg-dark: #03030c;
       --accent-cyan: #38bdf8;
@@ -31,10 +35,15 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
+      position: fixed;
+      inset: 0;
+      touch-action: none;
+      -webkit-touch-callout: none;
       background-color: var(--bg-dark);
       font-family: 'Tajawal', sans-serif;
       color: var(--text-main);
     }
+
 
     /* تأثير الانطلاق من الأرض بمنظور الشخص الأول */
     #earthIntro {
@@ -75,17 +84,18 @@
       display: block;
     }
 
-    /* حاوية الفضاء القابلة للتحريك (يمين ويسار وفوق وتحت) */
+    /* حاوية الفضاء القابلة للتحريك الكامل - حرة وغير محدودة */
     #spaceScene {
       position: absolute;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
+      width: 100vw;
+      height: 100vh;
       z-index: 2;
       transform-origin: center;
       will-change: transform;
       cursor: grab;
+      overflow: visible;
     }
     #spaceScene:active {
       cursor: grabbing;
@@ -98,25 +108,10 @@
       left: 0;
       width: 100%;
       height: 100%;
+      overflow: visible;
       pointer-events: auto;
     }
 
-
-    /* عناصر النجوم التفاعلية */
-    .star-node {
-      position: absolute;
-      transform: translate(-50%, -50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      cursor: pointer;
-      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-      z-index: 10;
-    }
-
-    .star-node:hover {
-      transform: translate(-50%, -50%) scale(1.22);
-    }
 
     /* شكل النجمة الحقيقية ذات الأشعة المتوهجة */
     .star-pulse-core {
@@ -134,13 +129,11 @@
       background: #ffffff;
       transform: rotate(45deg);
       border-radius: 2px;
-      box-shadow: 0 0 12px currentColor, 0 0 24px currentColor;
       animation: pulseStar 2.8s infinite ease-in-out;
       position: relative;
       z-index: 2;
     }
 
-    /* أشعة النجمة الممتدة أفقياً وعمودياً */
     .star-shape-diamond::before,
     .star-shape-diamond::after {
       content: '';
@@ -199,6 +192,47 @@
       letter-spacing: 2px;
     }
 
+
+    /* عناصر النجوم التفاعلية */
+    .star-node {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 10;
+    }
+
+    .star-node:hover {
+      transform: translate(-50%, -50%) scale(1.22);
+    }
+
+    .star-pulse-core {
+      width: 22px;
+      height: 22px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .star-pulse-core::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fff 20%, var(--accent-cyan) 65%, transparent 85%);
+      box-shadow: 0 0 16px var(--accent-cyan), 0 0 32px var(--accent-cyan);
+      animation: pulseStar 2.6s infinite ease-in-out;
+    }
+
+    .star-node.has-special-song .star-pulse-core::before {
+      background: radial-gradient(circle, #fff 20%, var(--accent-pink) 65%, transparent 85%);
+      box-shadow: 0 0 18px var(--accent-pink), 0 0 36px var(--accent-pink);
+    }
 
     .star-label {
       margin-top: 8px;
@@ -300,6 +334,77 @@
       letter-spacing: 0.3px;
     }
 
+    /* أزرار الزوم الفلكي العائمة الثابتة */
+    #zoomControls {
+      position: absolute;
+      bottom: 24px;
+      left: 24px;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .zoom-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      color: #fff;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      transition: all 0.2s ease;
+    }
+
+    .zoom-btn:hover {
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+      transform: scale(1.1);
+    }
+    .zoom-btn:active {
+      transform: scale(0.95);
+    }
+
+    .zoom-btn.center-btn {
+      position: relative;
+      border-color: rgba(251, 191, 36, 0.4);
+      color: var(--accent-gold);
+    }
+    .zoom-btn.center-btn:hover {
+      border-color: var(--accent-gold);
+      color: #fff;
+      background: rgba(251, 191, 36, 0.2);
+    }
+
+    .btn-label-tooltip {
+      position: absolute;
+      right: calc(100% + 12px);
+      white-space: nowrap;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      color: #f8fafc;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateX(6px);
+      transition: all 0.2s ease;
+      backdrop-filter: blur(8px);
+    }
+    .zoom-btn.center-btn:hover .btn-label-tooltip {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+
+
     /* النوافذ المنبثقة (Glass Modal) */
     .modal-overlay {
       position: fixed;
@@ -362,101 +467,305 @@
       transform: rotate(90deg);
     }
 
-    /* بطاقة الذكرى */
+    /* تصميم بطاقة عرض النجمة الزجاجية الفاخرة 10000% */
+    #memoryModal .glass-card {
+      background: radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.16) 0%, rgba(15, 23, 42, 0.82) 65%, rgba(3, 7, 18, 0.94) 100%);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 32px;
+      padding: 34px 28px 28px;
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.85), 0 0 50px rgba(56, 189, 248, 0.22), inset 0 1px 2px rgba(255, 255, 255, 0.35);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #memoryModal .glass-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(244, 114, 182, 0.08) 0%, transparent 60%);
+      pointer-events: none;
+      animation: floatCenter 8s ease-in-out infinite alternate;
+    }
+
     .memory-img {
       width: 100%;
-      max-height: 220px;
+      max-height: 200px;
       object-fit: cover;
-      border-radius: 16px;
+      border-radius: 20px;
       margin-bottom: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65), 0 0 20px rgba(56, 189, 248, 0.2);
     }
 
     .memory-title {
-      font-size: 1.4rem;
+      font-family: 'Cinzel Decorative', 'Tajawal', sans-serif;
+      font-size: 1.55rem;
       font-weight: 700;
-      color: var(--accent-cyan);
-      margin-bottom: 12px;
+      letter-spacing: 0.8px;
+      margin-bottom: 16px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: center;
+      gap: 10px;
+      background: linear-gradient(135deg, #ffffff 40%, var(--accent-cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 20px rgba(56, 189, 248, 0.45);
+    }
+
+    /* حاوية الرسالة الزجاجية الفاخرة */
+    .memory-message-container {
+      position: relative;
+      margin-bottom: 20px;
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 16px 18px;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.45), 0 8px 24px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(14px);
     }
 
     .memory-message {
       font-family: 'Amiri', serif;
-      font-size: 1.15rem;
-      line-height: 1.8;
-      color: #e2e8f0;
+      font-size: 1.22rem;
+      line-height: 1.85;
+      color: #f1f5f9;
       white-space: pre-wrap;
+      max-height: 145px;
+      overflow-y: auto;
+      padding-left: 6px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent-cyan) rgba(255, 255, 255, 0.04);
+      text-align: right;
     }
 
-    .song-playing-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(244, 114, 182, 0.2);
-      border: 1px solid rgba(244, 114, 182, 0.4);
-      color: var(--accent-pink);
-      padding: 4px 12px;
+    .memory-message::-webkit-scrollbar {
+      width: 4px;
+    }
+    .memory-message::-webkit-scrollbar-thumb {
+      background: linear-gradient(to bottom, var(--accent-cyan), var(--accent-pink));
+      border-radius: 8px;
+    }
+
+    /* مؤشر السحب الأنيق التفاعلي */
+    .scroll-hint {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--accent-gold);
+      background: rgba(251, 191, 36, 0.14);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      padding: 4px 16px;
       border-radius: 20px;
-      font-size: 0.8rem;
-      margin-top: 16px;
+      display: inline-block;
+      margin-top: 10px;
+      animation: pulseStar 2s infinite ease-in-out;
+      pointer-events: none;
+      box-shadow: 0 0 14px rgba(251, 191, 36, 0.25);
+      letter-spacing: 0.3px;
     }
 
-    /* نافذة تسجيل الدخول */
+    /* زر العودة للمجرة الأثيري الفخم */
+    .btn-close-galaxy {
+      width: 100%;
+      padding: 15px 24px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: linear-gradient(135deg, rgba(2, 132, 199, 0.85) 0%, rgba(3, 105, 161, 0.85) 50%, rgba(56, 189, 248, 0.85) 100%);
+      color: #ffffff;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 10px 30px rgba(56, 189, 248, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.4);
+      letter-spacing: 0.6px;
+    }
+    .btn-close-galaxy:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 14px 40px rgba(56, 189, 248, 0.65);
+      border-color: rgba(255, 255, 255, 0.6);
+    }
+    .btn-close-galaxy:active {
+      transform: translateY(1px) scale(0.98);
+    }
+
+
+    /* شكل النجمة المقروءة: رمادية وأصغر حجماً */
+    .star-node.is-read {
+      transform: translate(-50%, -50%) scale(0.78) !important;
+      opacity: 0.55 !important;
+      filter: grayscale(100%) !important;
+    }
+    .star-node.is-read .star-shape-diamond {
+      box-shadow: 0 0 6px #64748b !important;
+      color: #94a3b8 !important;
+    }
+
+
+    /* نافذة تسجيل الدخول الفاخرة 1000% */
     .login-title {
       text-align: center;
-      font-size: 1.8rem;
-      margin-bottom: 8px;
-      color: #fff;
+      font-size: 2.1rem;
+      margin-bottom: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      background: linear-gradient(135deg, #ffffff 30%, var(--accent-cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 25px rgba(56, 189, 248, 0.35);
     }
 
     .login-sub {
       text-align: center;
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      margin-bottom: 24px;
+      color: #cbd5e1;
+      font-size: 1.15rem;
+      font-weight: 500;
+      margin-bottom: 26px;
+      font-family: 'Amiri', serif;
+      letter-spacing: 0.8px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      margin-bottom: 22px;
+      width: 100%;
+    }
+
+    .input-wrapper i {
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--accent-cyan);
+      font-size: 1.1rem;
+      pointer-events: none;
+      filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.6));
     }
 
     .custom-input {
       width: 100%;
-      padding: 14px 18px;
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 12px;
-      color: white;
-      font-size: 1.05rem;
-      margin-bottom: 16px;
+      padding: 16px 48px 16px 20px;
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 16px;
+      color: #ffffff;
+      font-size: 1.1rem;
       outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       text-align: center;
       font-family: inherit;
+      backdrop-filter: blur(10px);
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
     }
 
     .custom-input:focus {
       border-color: var(--accent-cyan);
-      box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.45), inset 0 2px 8px rgba(0,0,0,0.3);
+      background: rgba(15, 23, 42, 0.9);
+      transform: scale(1.02);
+    }
+
+    .custom-input::placeholder {
+      color: #64748b;
+      letter-spacing: 0.5px;
     }
 
     .btn-glow {
       width: 100%;
-      padding: 14px;
-      border-radius: 12px;
-      border: none;
-      background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
-      color: #fff;
-      font-size: 1.1rem;
+      padding: 16px 24px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 50%, #38bdf8 100%);
+      color: #ffffff;
+      font-size: 1.15rem;
       font-weight: 700;
       cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 4px 20px rgba(56, 189, 248, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 8px 30px rgba(56, 189, 248, 0.4);
+      letter-spacing: 0.5px;
+      position: relative;
+      overflow: hidden;
     }
 
     .btn-glow:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 25px rgba(56, 189, 248, 0.6);
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 12px 35px rgba(56, 189, 248, 0.65);
+      border-color: rgba(255, 255, 255, 0.6);
     }
+
+    .btn-glow:active {
+      transform: translateY(1px) scale(0.98);
+    }
+
+    /* شاشة إرشادات قبل الانطلاق الفلكي */
+    .guidelines-card {
+      max-width: 520px !important;
+      padding: 34px 28px !important;
+      border: 1px solid rgba(56, 189, 248, 0.3) !important;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 45px rgba(56, 189, 248, 0.25) !important;
+    }
+
+    .guide-step {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 14px 18px;
+      margin-bottom: 14px;
+      text-align: right;
+      backdrop-filter: blur(10px);
+      transition: transform 0.25s ease, border-color 0.25s ease;
+    }
+
+    .guide-step:hover {
+      transform: translateX(-4px);
+      border-color: rgba(56, 189, 248, 0.4);
+      background: rgba(15, 23, 42, 0.85);
+    }
+
+    .guide-icon-box {
+      width: 46px;
+      height: 46px;
+      min-width: 46px;
+      border-radius: 12px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-cyan);
+      font-size: 1.3rem;
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.3);
+    }
+
+    .guide-step.special-princess .guide-icon-box {
+      background: rgba(244, 114, 182, 0.15);
+      border-color: rgba(244, 114, 182, 0.4);
+      color: var(--accent-pink);
+      box-shadow: 0 0 16px rgba(244, 114, 182, 0.3);
+    }
+
+    .guide-text {
+      font-size: 1.05rem;
+      color: #f1f5f9;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
 
     /* استوديو التعديل والمطور (Admin Studio) */
     #adminStudioDrawer {
@@ -621,6 +930,78 @@
       backdrop-filter: blur(6px);
     }
 
+    /* جويستيك افتراضي عائم لتحريك النجمة */
+    #starJoystickWrapper {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      z-index: 999;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 14px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid var(--accent-gold);
+      border-radius: 28px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.75), 0 0 24px rgba(251, 191, 36, 0.35);
+      touch-action: none;
+      pointer-events: auto;
+    }
+
+    .joystick-base {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, rgba(2, 6, 23, 0.8) 100%);
+      border: 2px dashed rgba(251, 191, 36, 0.5);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+    }
+
+    .joystick-base:active {
+      cursor: grabbing;
+    }
+
+    .joystick-stick {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+      box-shadow: 0 4px 16px rgba(251, 191, 36, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.6);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      transition: transform 0.05s ease-out;
+    }
+
+    .btn-save-star-pos {
+      padding: 6px 16px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+      transition: transform 0.2s;
+    }
+
+    .btn-save-star-pos:hover {
+      transform: scale(1.05);
+    }
+
+
+
     /* قائمة النجوم في الاستوديو */
     .star-list-item {
       display: flex;
@@ -697,13 +1078,25 @@
     <div class="earth-sphere"></div>
   </div>
 
-  <!-- كانفاس السماء والشهب (الخلفية 3D البارالاكس) -->
+  <!-- كانفاس السماء والشهب (الخلفية 3D) -->
   <canvas id="universeCanvas"></canvas>
 
-  <!-- الحاوية المتحركة للفضاء (قابلة للسحب) -->
+  <!-- الحاوية المتحركة للفضاء (قابلة للسحب بالكامل) -->
   <div id="spaceScene">
     <!-- طبقة النجوم التفاعلية -->
     <div id="interactiveLayer"></div>
+
+    <!-- جويستيك افتراضي لتحريك النجمة في وضع التعديل -->
+    <div id="starJoystickWrapper">
+      <div class="joystick-base" id="joystickBase">
+        <div class="joystick-stick" id="joystickStick"></div>
+      </div>
+      <button class="btn-save-star-pos" id="joystickSaveBtn">
+        <i class="fa-solid fa-check"></i>
+        <span>حفظ الموقع ✨</span>
+      </button>
+    </div>
+
 
     <!-- الاسم المشع في المنتصف -->
     <div id="centerConstellation">
@@ -713,22 +1106,6 @@
     </div>
   </div>
 
-  <!-- تحكم الصوت -->
-  <div id="audioWidget">
-
-    <button id="audioToggleBtn" title="تشغيل / كتم الصوت">🔊</button>
-    <span class="audio-status-text" id="audioTrackName">Cosmic Serenade</span>
-  </div>
-
-  <!-- زر فتح الاستوديو (يظهر لك فقط عند تسجيل الدخول كـ diajb0) -->
-  <button class="admin-floating-toggle" id="adminToggleBtn">⚙️ لوحة التعديل والتحكم</button>
-  <div class="drag-hint" id="dragHint">✨ يمكنك الآن سحب أي نجمة بالماوس لتغيير موقعها على الشاشة!</div>
-
-  <!-- مشغلات الصوت الخفية -->
-  <audio id="ambientAudio" loop preload="auto"></audio>
-  <audio id="specialAudio" preload="auto"></audio>
-
-
 
   <!-- طبقة ظهور الكوكبة العشوائية السريعة -->
   <div id="constellationOverlay">
@@ -736,17 +1113,91 @@
     <div class="constellation-name" id="constellationTitle">كوكبة القيصر</div>
   </div>
 
-  <!-- نافذة تسجيل الدخول الأولية -->
-  <div class="modal-overlay active" id="loginModal">
+  <!-- أزرار التحكم بالملاحة والزوم -->
+  <div id="zoomControls">
+    <button class="zoom-btn center-btn" id="recenterBtn" title="العودة إلى المركز">
+      <i class="fa-solid fa-crosshairs"></i>
+      <span class="btn-label-tooltip">العودة إلى المركز</span>
+    </button>
+    <button class="zoom-btn" id="zoomInBtn" title="تقريب المجرة"><i class="fa-solid fa-plus"></i></button>
+    <button class="zoom-btn" id="zoomOutBtn" title="تبعيد المجرة"><i class="fa-solid fa-minus"></i></button>
+  </div>
 
+
+  <!-- تحكم الصوت -->
+  <div id="audioWidget">
+    <button id="audioToggleBtn" title="تشغيل / كتم الصوت">🔊</button>
+    <span class="audio-status-text" id="audioTrackName">Cosmic Serenade</span>
+  </div>
+
+
+  <!-- زر فتح الاستوديو (يظهر لك فقط عند تسجيل الدخول كـ diajb0) -->
+  <button class="admin-floating-toggle" id="adminToggleBtn">⚙️ لوحة التعديل والتحكم</button>
+  <div class="drag-hint" id="dragHint">✨ اضغط على أي نجمة ليظهر جويستيك تحريكها بسلاسة!</div>
+
+
+
+  <!-- مشغلات الصوت الخفية -->
+  <audio id="ambientAudio" loop preload="auto"></audio>
+  <audio id="specialAudio" preload="auto"></audio>
+
+  <!-- نافذة تسجيل الدخول الفاخرة (الخطوة الأولى) -->
+  <div class="modal-overlay active" id="loginModal">
     <div class="glass-card" style="text-align: center;">
-      <div style="font-size: 3rem; margin-bottom: 12px;">🌌</div>
+      <div style="font-size: 3.2rem; margin-bottom: 14px; filter: drop-shadow(0 0 18px rgba(56, 189, 248, 0.7));">
+        <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--accent-cyan);"></i>
+      </div>
       <h2 class="login-title">سماء النجوم الأبدية</h2>
-      <p class="login-sub">اكتبي اسمكِ للدخول إلى عالمكِ الخاص</p>
+      <p class="login-sub">شنو انادي سمائي؟</p>
       
-      <input type="text" id="usernameInput" class="custom-input" placeholder="اسم الدخول..." autocomplete="off">
-      <button class="btn-glow" id="loginSubmitBtn">دخول إلى المجرة ✨</button>
-      <div id="loginFeedback" style="color: #f87171; font-size: 0.85rem; margin-top: 12px; display: none;"></div>
+      <div class="input-wrapper">
+        <i class="fa-solid fa-moon"></i>
+        <input type="text" id="usernameInput" class="custom-input" placeholder="اكتبي اسمكِ" autocomplete="off">
+      </div>
+      
+      <button class="btn-glow" id="loginSubmitBtn">
+        <span>متابعة نحو النجوم</span>
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <div id="loginFeedback" style="color: #f87171; font-size: 0.9rem; margin-top: 14px; display: none;"></div>
+    </div>
+  </div>
+
+  <!-- شاشة الإرشادات الفلكية قبل الانطلاق (الخطوة الثانية) -->
+  <div class="modal-overlay" id="guidelinesModal">
+    <div class="glass-card guidelines-card" style="text-align: center;">
+      <div style="font-size: 2.6rem; margin-bottom: 10px; color: var(--accent-gold); filter: drop-shadow(0 0 16px rgba(251, 191, 36, 0.6));">
+        <i class="fa-solid fa-compass"></i>
+      </div>
+      <h2 class="login-title" style="font-size: 1.85rem; margin-bottom: 6px;">رحلتكِ إلى المجرة</h2>
+      <p class="login-sub" style="font-size: 1rem; margin-bottom: 22px;">قبل أن نُسافر بين النجوم.. جهّزي نفسكِ ✨</p>
+
+      <!-- خطوات الإرشادات المطلوبة -->
+      <div class="guide-step">
+        <div class="guide-icon-box">
+          <i class="fa-solid fa-headphones"></i>
+        </div>
+        <div class="guide-text">البسي سماعاتك وضعي الصوت اعلى شيء</div>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-icon-box">
+          <i class="fa-solid fa-tablet-screen-button"></i>
+        </div>
+        <div class="guide-text">استخدمي الايباد وضعيه بالوضع الطولي</div>
+      </div>
+
+      <div class="guide-step special-princess">
+        <div class="guide-icon-box">
+          <i class="fa-solid fa-crown"></i>
+        </div>
+        <div class="guide-text">اتمنى ان تستمتع اميرتي 💕</div>
+      </div>
+
+      <button class="btn-glow" id="launchUniverseBtn" style="margin-top: 10px;">
+        <span>ادخلي الى مجرتكِ</span>
+        <i class="fa-solid fa-shuttle-space"></i>
+      </button>
     </div>
   </div>
 
@@ -756,13 +1207,19 @@
       <button class="modal-close-btn" id="closeMemoryBtn">✕</button>
       <img id="memoryModalImg" src="" alt="Memory Image" class="memory-img" style="display: none;">
       <h3 class="memory-title" id="memoryModalTitle">✨ عنوان النجمة</h3>
-      <p class="memory-message" id="memoryModalMessage">هنا الرسالة الخاصة...</p>
       
-      <div id="memorySongBadge" class="song-playing-pill" style="display: none;">
-        <span>🎵</span> <span id="memorySongText">أغنيتكِ المفضلة تعمل الآن بصوت هادئ...</span>
+      <div class="memory-message-container">
+        <div class="memory-message" id="memoryModalMessage">هنا الرسالة الخاصة...</div>
+        <div id="scrollHint" class="scroll-hint" style="display: none;">اسحبي بإصبعكِ هناك المزيد ↓</div>
       </div>
+
+      <button class="btn-close-galaxy" id="returnGalaxyBtn">
+        <i class="fa-solid fa-arrow-rotate-left"></i>
+        <span>العودة للمجرّة</span>
+      </button>
     </div>
   </div>
+
 
   <!-- لوحة تحكم واستوديو المطور (Admin Drawer) -->
   <div id="adminStudioDrawer">
@@ -842,21 +1299,21 @@
 
   <script>
     /* =========================================================================
-       قاعدة البيانات الافتراضية (تتحدث تلقائياً من لوحة التحكم)
+       قاعدة البيانات الافتراضية
        ========================================================================= */
+    const R2_AMBIENT_URL = "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/space.mp3";
+
     const DEFAULT_CONFIG = {
       glowName: "SOMY",
       subtitle: "The Stars Align For You, Sky",
       dateText: "Happy Birthday!",
-      ambientAudioUrl: "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/space.mp3",
+      ambientAudioUrl: R2_AMBIENT_URL,
       stars: [
-
-
         {
           id: 1,
           title: "نجمة البداية",
-          x: 24,
-          y: 28,
+          x: 220,
+          y: 180,
           image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80",
           message: "كل عام وأنتِ النور الذي يضيء عتمة هذه المجرة.. أسعد أيام عمري هي التي بدأت بوجودكِ.",
           songUrl: ""
@@ -864,8 +1321,8 @@
         {
           id: 2,
           title: "أغنيتكِ الساحرة",
-          x: 76,
-          y: 32,
+          x: 820,
+          y: 220,
           image: "",
           message: "عندما تلمعين في السماء، تعزف الألحان بهدوء لتليق بجمال روحكِ وعينيكِ.",
           songUrl: "https://actions.google.com/sounds/v1/weather/gentle_rain_on_leaves.ogg"
@@ -873,8 +1330,8 @@
         {
           id: 3,
           title: "سرّ السماء",
-          x: 48,
-          y: 78,
+          x: 520,
+          y: 620,
           image: "",
           message: "اسمكِ سماء، ولكِ من اسمكِ كل الاتساع والنقاء والرفعة.. عيد ميلاد سعيد يا أغلى ما أملك.",
           songUrl: ""
@@ -882,8 +1339,8 @@
       ]
     };
 
-
     let appConfig = JSON.parse(localStorage.getItem('sky_celestial_cfg')) || DEFAULT_CONFIG;
+    appConfig.ambientAudioUrl = R2_AMBIENT_URL; // ضمان دائم لرابطك
 
     function saveAppConfig() {
       localStorage.setItem('sky_celestial_cfg', JSON.stringify(appConfig));
@@ -893,66 +1350,13 @@
     }
 
     /* =========================================================================
-       نظام السحب والتحريك 3D في الفضاء
-       ========================================================================= */
-    let sceneX = 0;
-    let sceneY = 0;
-    let isDraggingScene = false;
-    let startDragX, startDragY;
-    const spaceScene = document.getElementById('spaceScene');
-
-    window.addEventListener('mousedown', (e) => {
-      // نمنع سحب الشاشة فقط إذا ضغطت على نجمة أو داخل درج التحكم
-      if (e.target.closest('.star-node') || e.target.closest('#adminStudioDrawer') || e.target.closest('.admin-floating-toggle')) return;
-      isDraggingScene = true;
-      startDragX = e.clientX - sceneX;
-      startDragY = e.clientY - sceneY;
-    });
-
-    window.addEventListener('mousemove', (e) => {
-      if (!isDraggingScene) return;
-      playDriftSound();
-      sceneX = e.clientX - startDragX;
-      sceneY = e.clientY - startDragY;
-      spaceScene.style.transform = `translate(${sceneX}px, ${sceneY}px)`;
-    });
-
-
-    window.addEventListener('mouseup', () => {
-      isDraggingScene = false;
-    });
-
-    // للموبايل والأجهزة اللوحية
-    window.addEventListener('touchstart', (e) => {
-      if (e.target.closest('.star-node') || e.target.closest('#adminStudioDrawer') || e.target.closest('.admin-floating-toggle')) return;
-      isDraggingScene = true;
-      startDragX = e.touches[0].clientX - sceneX;
-      startDragY = e.touches[0].clientY - sceneY;
-    }, {passive: true});
-
-    window.addEventListener('touchmove', (e) => {
-      if (!isDraggingScene) return;
-      playDriftSound();
-      sceneX = e.touches[0].clientX - startDragX;
-      sceneY = e.touches[0].clientY - startDragY;
-      spaceScene.style.transform = `translate(${sceneX}px, ${sceneY}px)`;
-    }, {passive: true});
-
-
-    window.addEventListener('touchend', () => {
-      isDraggingScene = false;
-    });
-
-
-    /* =========================================================================
-       نظام الصوتيات الذكي والمؤثرات التفاعلية (خفيف وسلس للغاية)
+       محرك الصوتيات والمؤثرات التفاعلية
        ========================================================================= */
     const ambientAudio = document.getElementById('ambientAudio');
     const specialAudio = document.getElementById('specialAudio');
     const audioToggleBtn = document.getElementById('audioToggleBtn');
     let isMuted = false;
     let isSpecialPlaying = false;
-    
     let sfxCtx = null;
 
     function initWebAudio() {
@@ -965,7 +1369,21 @@
       }
     }
 
-    /* صوت فتح النجمة: رنين بلوري مخملي هادئ جداً وفلكي */
+    function setupAudioSources() {
+      ambientAudio.src = R2_AMBIENT_URL;
+      ambientAudio.volume = 0.6;
+      specialAudio.volume = 0.9;
+    }
+
+    function startMusicExperience() {
+      initWebAudio();
+      ambientAudio.src = R2_AMBIENT_URL;
+      ambientAudio.load();
+      ambientAudio.play().then(() => {
+        audioToggleBtn.textContent = '🔊';
+      }).catch(err => console.log('Audio autoplay prevented:', err));
+    }
+
     function playStarChime() {
       if (isMuted) return;
       initWebAudio();
@@ -973,106 +1391,67 @@
 
       try {
         const t = sfxCtx.currentTime;
-        // نغمتان متناغمتان فقط دافئتان وخافتتان (A4 و E5) مع خفض التردد ليكون ناعماً للأذن
-        const mellowNotes = [440.0, 659.25];
-        
-        mellowNotes.forEach((freq, idx) => {
+        const notes = [440.0, 659.25];
+        notes.forEach((freq, idx) => {
           const osc = sfxCtx.createOscillator();
           const gain = sfxCtx.createGain();
           const filter = sfxCtx.createBiquadFilter();
 
-          // فلتر لعزل الحدة وجعل الصوت دافئاً ومخملياً
           filter.type = 'lowpass';
-          filter.frequency.setValueAtTime(900, t);
+          filter.frequency.setValueAtTime(800, t);
 
           osc.type = 'sine';
           osc.frequency.setValueAtTime(freq, t + idx * 0.08);
 
-          // دخول ناعم جداً وخروج متلاشٍ ببطء
           gain.gain.setValueAtTime(0.0001, t + idx * 0.08);
-          gain.gain.exponentialRampToValueAtTime(0.035, t + idx * 0.08 + 0.05);
-          gain.gain.exponentialRampToValueAtTime(0.00001, t + idx * 0.08 + 1.4);
+          gain.gain.exponentialRampToValueAtTime(0.04, t + idx * 0.08 + 0.05);
+          gain.gain.exponentialRampToValueAtTime(0.00001, t + idx * 0.08 + 1.2);
 
           osc.connect(filter);
           filter.connect(gain);
           gain.connect(sfxCtx.destination);
 
           osc.start(t + idx * 0.08);
-          osc.stop(t + idx * 0.08 + 1.45);
+          osc.stop(t + idx * 0.08 + 1.25);
         });
-      } catch (e) {}
+      } catch(e) {}
     }
 
-    /* صوت سحب الفضاء: نسيم كوني خافت وهادئ يتفاعل مع السحب */
-    let lastDriftSoundTime = 0;
+    let lastDriftTime = 0;
     function playDriftSound() {
       if (isMuted) return;
       const now = performance.now();
-      if (now - lastDriftSoundTime < 280) return;
-      lastDriftSoundTime = now;
+      if (now - lastDriftTime < 280) return;
+      lastDriftTime = now;
 
       initWebAudio();
       if (!sfxCtx) return;
 
       try {
         const t = sfxCtx.currentTime;
-        // توليد عينة صوتية خفيفة تحاكي تيار الهواء الكوني
-        const bufferSize = sfxCtx.sampleRate * 0.25;
-        const buffer = sfxCtx.createBuffer(1, bufferSize, sfxCtx.sampleRate);
-        const data = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-          data[i] = Math.random() * 2 - 1;
-        }
+        const buf = sfxCtx.createBuffer(1, sfxCtx.sampleRate * 0.2, sfxCtx.sampleRate);
+        const data = buf.getChannelData(0);
+        for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
 
         const noise = sfxCtx.createBufferSource();
-        noise.buffer = buffer;
+        noise.buffer = buf;
 
-        // فلترة النسيم ليكون خافتاً وعميقاً بدون أي خشونة
         const filter = sfxCtx.createBiquadFilter();
         filter.type = 'bandpass';
-        filter.frequency.setValueAtTime(160, t);
-        filter.Q.setValueAtTime(1.5, t);
+        filter.frequency.setValueAtTime(150, t);
+        filter.Q.setValueAtTime(1.2, t);
 
         const gain = sfxCtx.createGain();
         gain.gain.setValueAtTime(0.0001, t);
-        gain.gain.linearRampToValueAtTime(0.04, t + 0.08);
-        gain.gain.exponentialRampToValueAtTime(0.00001, t + 0.24);
+        gain.gain.linearRampToValueAtTime(0.035, t + 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.00001, t + 0.2);
 
         noise.connect(filter);
         filter.connect(gain);
         gain.connect(sfxCtx.destination);
-
         noise.start(t);
-      } catch (e) {}
+      } catch(e) {}
     }
-
-
-    function setupAudioSources() {
-      const r2Url = "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/space.mp3";
-      appConfig.ambientAudioUrl = r2Url;
-      ambientAudio.src = r2Url;
-      ambientAudio.volume = 0.6;
-      specialAudio.volume = 0.9;
-    }
-
-    function startMusicExperience() {
-      initWebAudio();
-      const r2Url = "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/space.mp3";
-      if (!ambientAudio.src || ambientAudio.src === "" || ambientAudio.src.indexOf("pub-") === -1) {
-        ambientAudio.src = r2Url;
-      }
-      ambientAudio.load();
-      ambientAudio.play().then(() => {
-        audioToggleBtn.textContent = '🔊';
-      }).catch(err => {
-        console.log('Audio play failed:', err);
-      });
-    }
-
-    window.addEventListener('pointerdown', () => initWebAudio(), { once: true });
-
-
-
 
     audioToggleBtn.addEventListener('click', () => {
       isMuted = !isMuted;
@@ -1100,44 +1479,282 @@
     }
 
     /* =========================================================================
-       محرك الفضاء والنجوم (بارالاكس وواقعية أكثر)
+       نظام السحب والتحريك والزوم الثابت للمجرة
+       ========================================================================= */
+    let sceneX = 0;
+    let sceneY = 0;
+    let sceneScale = 1.0; // الزوم الدائم الثابت
+    let isDraggingScene = false;
+    let startDragX, startDragY;
+    let initialPinchDistance = null;
+    let initialPinchScale = 1.0;
+    const spaceScene = document.getElementById('spaceScene');
+
+    function applySceneTransform() {
+      spaceScene.style.transform = `translate(${sceneX}px, ${sceneY}px) scale(${sceneScale})`;
+    }
+
+    // أزرار الزوم والعودة إلى المركز
+    const zoomInBtn = document.getElementById('zoomInBtn');
+    const zoomOutBtn = document.getElementById('zoomOutBtn');
+    const recenterBtn = document.getElementById('recenterBtn');
+
+    if (zoomInBtn && zoomOutBtn) {
+      zoomInBtn.addEventListener('click', () => {
+        sceneScale = Math.min(2.4, sceneScale + 0.15);
+        applySceneTransform();
+      });
+      zoomOutBtn.addEventListener('click', () => {
+        sceneScale = Math.max(0.45, sceneScale - 0.15);
+        applySceneTransform();
+      });
+    }
+
+    // زر العودة إلى المركز بسلاسة
+    if (recenterBtn) {
+      recenterBtn.addEventListener('click', () => {
+        sceneX = 0;
+        sceneY = 0;
+        sceneScale = 1.0;
+        applySceneTransform();
+        showToast("🌌 عُدتِ إلى مركز المجرة");
+      });
+    }
+
+
+    // زوم عجلة الماوس
+    window.addEventListener('wheel', (e) => {
+      if (e.target.closest('#adminStudioDrawer') || e.target.closest('#memoryModal')) return;
+      e.preventDefault();
+      const delta = e.deltaY < 0 ? 0.08 : -0.08;
+      sceneScale = Math.max(0.45, Math.min(2.4, sceneScale + delta));
+      applySceneTransform();
+    }, { passive: false });
+
+    window.addEventListener('mousedown', (e) => {
+      if (e.target.closest('.star-node') || e.target.closest('#starJoystickWrapper') || e.target.closest('#adminStudioDrawer') || e.target.closest('.admin-floating-toggle') || e.target.closest('.modal-overlay') || e.target.closest('#zoomControls')) return;
+      isDraggingScene = true;
+      startDragX = e.clientX - sceneX;
+      startDragY = e.clientY - sceneY;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDraggingScene) return;
+      playDriftSound();
+      sceneX = e.clientX - startDragX;
+      sceneY = e.clientY - startDragY;
+      applySceneTransform();
+    });
+
+    window.addEventListener('mouseup', () => { isDraggingScene = false; });
+
+    // اللمس التفاعلي المزدوج: تكبير وسحب في جميع الاتجاهات سوياً (Pinch Zoom & Pan Simultaneously)
+    let lastPinchMidX = 0;
+    let lastPinchMidY = 0;
+
+    window.addEventListener('touchstart', (e) => {
+      if (e.target.closest('.star-node') || e.target.closest('#starJoystickWrapper') || e.target.closest('#adminStudioDrawer') || e.target.closest('.admin-floating-toggle') || e.target.closest('.modal-overlay') || e.target.closest('#zoomControls')) return;
+
+      if (e.touches.length === 2) {
+        isDraggingScene = false;
+        initialPinchDistance = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        initialPinchScale = sceneScale;
+        lastPinchMidX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        lastPinchMidY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+      } else if (e.touches.length === 1) {
+        isDraggingScene = true;
+        startDragX = e.touches[0].clientX - sceneX;
+        startDragY = e.touches[0].clientY - sceneY;
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+      if (e.touches.length === 2 && initialPinchDistance) {
+        playDriftSound();
+
+        const currentDist = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        const factor = currentDist / initialPinchDistance;
+        const newScale = Math.max(0.45, Math.min(2.4, initialPinchScale * factor));
+        
+        const currentMidX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        const currentMidY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+
+        // حساب حركة وسحب الإصبعين أفقياً وعمودياً مع التكبير دون أي قفل للمحاور
+        const panDeltaX = currentMidX - lastPinchMidX;
+        const panDeltaY = currentMidY - lastPinchMidY;
+
+        // دمج الزوم البؤري مع إزاحة السحب المباشرة
+        const scaleChange = newScale / sceneScale;
+        sceneX = currentMidX - (currentMidX - sceneX) * scaleChange + panDeltaX;
+        sceneY = currentMidY - (currentMidY - sceneY) * scaleChange + panDeltaY;
+        sceneScale = newScale;
+
+        lastPinchMidX = currentMidX;
+        lastPinchMidY = currentMidY;
+
+        applySceneTransform();
+      } else if (isDraggingScene && e.touches.length === 1) {
+        playDriftSound();
+        sceneX = e.touches[0].clientX - startDragX;
+        sceneY = e.touches[0].clientY - startDragY;
+        applySceneTransform();
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchend', (e) => {
+      if (e.touches.length === 2) {
+        initialPinchDistance = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        initialPinchScale = sceneScale;
+        lastPinchMidX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        lastPinchMidY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+      } else if (e.touches.length === 1) {
+        initialPinchDistance = null;
+        isDraggingScene = true;
+        startDragX = e.touches[0].clientX - sceneX;
+        startDragY = e.touches[0].clientY - sceneY;
+      } else {
+        initialPinchDistance = null;
+        isDraggingScene = false;
+      }
+    });
+
+
+
+
+    /* =========================================================================
+       محرك الأجرام والظواهر الفلكية العميقة (Deep Cosmic Engine)
        ========================================================================= */
     const canvas = document.getElementById('universeCanvas');
     const ctx = canvas.getContext('2d');
-    let stars = [];
+
+    const SPACE_BOUND = 4500; // نطاق فلكي شاسع
+    let bgStars = [];
+    let cosmicDust = [];
     let meteors = [];
+    let comets = [];
+    let pulsarAngle = 0;
+
+    // مصفوفة أجرام بألوان خافتة وعميقة للحفاظ على سواد الفضاء
+    const celestialObjects = [
+      // 1. ضوء بروجي هادئ وشديد الخفوت
+      { type: 'zodiacal_light', x: 0, y: 0 },
+
+      // 2. سديم الحجاب / شريط الدجاجة خافت وشفاف
+      { type: 'cygnus_ribbon', x: 190, y: -130 },
+
+      // 3. سدم فضائية بألوان شفافة لا تطغى على السواد
+      { type: 'nebula', x: -210, y: -180, radius: 380, color: 'rgba(56, 189, 248, 0.07)' },
+      { type: 'nebula', x: 260, y: 210, radius: 400, color: 'rgba(244, 114, 182, 0.06)' },
+      { type: 'nebula', x: -240, y: 230, radius: 340, color: 'rgba(168, 85, 247, 0.06)' },
+      { type: 'nebula', x: 0, y: -480, radius: 440, color: 'rgba(14, 165, 233, 0.05)' },
+
+      // 4. بقايا مستعر أعظم هادئة
+      { type: 'supernova', x: -480, y: -90, radius: 75 },
+
+      // 5. مجرات بعيدة وشاحبة
+      { type: 'galaxy', x: 460, y: -270, radius: 180, angle: 0.58, color: '#38bdf8' },
+      { type: 'galaxy', x: -520, y: 390, radius: 160, angle: -0.65, color: '#f472b6' },
+
+      // 6. ثقب أسود ذو حافة دقيقة
+      { type: 'blackhole', x: 420, y: 310, radius: 32 },
+
+      // 7. نجم نيوتروني نابض
+      { type: 'pulsar', x: -350, y: 280 },
+
+      // 8. كوكب ذو حلقات ناعمة
+      { type: 'ringed_planet', x: -410, y: -260, radius: 46 },
+
+      // 9. حزام كويكبات هادئ
+      { type: 'asteroid_field', x: 120, y: 440, count: 18 }
+    ];
+
+
+
+
+
+
 
     function resizeCanvas() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-      createStars(Math.floor((canvas.width * canvas.height) / 1600)); 
+      initCosmos();
     }
 
-    function createStars(count) {
-      stars = [];
-      for (let i = 0; i < count; i++) {
-        let depth = Math.random() * 3 + 0.8; 
-        stars.push({
-          x: Math.random() * canvas.width * 2 - canvas.width/2,
-          y: Math.random() * canvas.height * 2 - canvas.height/2,
-          z: depth, 
-          radius: (Math.random() * 1.8 + 0.3) / (depth * 0.6),
-          color: Math.random() > 0.35 ? '#ffffff' : (Math.random() > 0.65 ? '#bae6fd' : '#fbcfe8'),
-          alpha: Math.random() * 0.8 + 0.2,
-          speed: Math.random() * 0.015 + 0.005,
-          angle: Math.random() * Math.PI * 2
+    function initCosmos() {
+      bgStars = [];
+      const starCount = Math.floor((window.innerWidth * window.innerHeight) / 1400) + 380;
+      for (let i = 0; i < starCount; i++) {
+        bgStars.push({
+          x: (Math.random() - 0.5) * SPACE_BOUND,
+          y: (Math.random() - 0.5) * SPACE_BOUND,
+          z: Math.random() * 2.8 + 0.6,
+          radius: Math.random() * 1.6 + 0.4,
+          color: Math.random() > 0.4 ? '#ffffff' : (Math.random() > 0.65 ? '#bae6fd' : '#fbcfe8'),
+          alpha: Math.random() * 0.75 + 0.25,
+          twinkleSpeed: Math.random() * 0.02 + 0.008,
+          phase: Math.random() * Math.PI * 2
         });
       }
+
+      cosmicDust = [];
+      for (let i = 0; i < 40; i++) {
+        cosmicDust.push({
+          x: (Math.random() - 0.5) * SPACE_BOUND,
+          y: (Math.random() - 0.5) * SPACE_BOUND,
+          radius: Math.random() * 18 + 6,
+          alpha: Math.random() * 0.02 + 0.008,
+          color: Math.random() > 0.5 ? 'rgba(56, 189, 248,' : 'rgba(236, 72, 153,'
+        });
+      }
+
+      // الأجرام المتحركة عبر الفضاء السحيق
+      comets = [
+        { x: -900, y: -700, vx: 1.2, vy: 0.8, length: 180, size: 3.5 },
+        { x: 1100, y: -900, vx: -0.9, vy: 1.1, length: 140, size: 2.8 }
+      ];
+
+      // كويكبات متطايرة وتدور حول نفسها في الفضاء
+      window.driftingAsteroids = [
+        { x: -350, y: 150, vx: 0.25, vy: -0.15, rot: 0, rotSpeed: 0.012, size: 6.5 },
+        { x: 280, y: -220, vx: -0.18, vy: 0.22, rot: 0, rotSpeed: -0.015, size: 8 },
+        { x: -120, y: -380, vx: 0.12, vy: 0.2, rot: 0, rotSpeed: 0.008, size: 5.5 }
+      ];
+
+      // حطام فضائي وقمر اصطناعي يعبر المدار
+      window.orbitingSatellite = { x: -500, y: -180, vx: 0.45, vy: 0.12, rot: 0 };
+
+      // جسيمات الرياح الشمسية والإشعاع الكوني
+      window.solarWindParticles = [];
+      for (let w = 0; w < 35; w++) {
+        window.solarWindParticles.push({
+          x: (Math.random() - 0.5) * SPACE_BOUND,
+          y: (Math.random() - 0.5) * SPACE_BOUND,
+          vx: Math.random() * 1.8 + 1.2,
+          vy: Math.random() * 0.4 - 0.2,
+          len: Math.random() * 22 + 10,
+          alpha: Math.random() * 0.25 + 0.08
+        });
+      }
+
     }
 
     function spawnMeteor() {
-      if (Math.random() < 0.015 && meteors.length < 2) {
+      if (Math.random() < 0.018 && meteors.length < 2) {
         meteors.push({
-          x: Math.random() * canvas.width * 1.5,
-          y: Math.random() * canvas.height,
-          length: Math.random() * 140 + 70,
-          speed: Math.random() * 9 + 7,
-          angle: (Math.PI / 4) + (Math.random() * 0.15 - 0.1),
+          x: Math.random() * canvas.width * 1.4,
+          y: Math.random() * (canvas.height * 0.7),
+          length: Math.random() * 120 + 80,
+          speed: Math.random() * 8 + 7,
+          angle: (Math.PI / 4) + (Math.random() * 0.1 - 0.05),
           alpha: 1
         });
       }
@@ -1146,56 +1763,364 @@
     function animateUniverse() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      for (let s of stars) {
-        s.alpha += Math.sin(s.angle) * 0.01;
-        s.angle += s.speed;
-        let finalAlpha = Math.max(0.08, Math.min(1, s.alpha));
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+      pulsarAngle += 0.025;
 
-        // حساب مكان النجمة مع السحب للحصول على بارالاكس (النجوم البعيدة تتحرك أبطأ)
-        let drawX = s.x + (sceneX / s.z);
-        let drawY = s.y + (sceneY / s.z);
+      // 1. رسم الظواهر والأجرام الفلكية الكبرى
+      for (let obj of celestialObjects) {
+        const screenX = cx + (obj.x * sceneScale) + (sceneX * 0.25);
+        const screenY = cy + (obj.y * sceneScale) + (sceneY * 0.25);
 
-        // جعل النجوم تلتف وتستمر بالظهور
-        drawX = ((drawX % (canvas.width * 2)) + canvas.width * 2) % (canvas.width * 2) - canvas.width/2;
-        drawY = ((drawY % (canvas.height * 2)) + canvas.height * 2) % (canvas.height * 2) - canvas.height/2;
+        if (screenX < -800 || screenX > canvas.width + 800 || screenY < -800 || screenY > canvas.height + 800) continue;
+
+        if (obj.type === 'zodiacal_light') {
+          // ضوء بروجي شفاف جداً
+          ctx.save();
+          ctx.translate(screenX, screenY);
+          ctx.rotate(-0.45);
+          const zodGrad = ctx.createRadialGradient(0, 0, 30 * sceneScale, 0, 0, 750 * sceneScale);
+          zodGrad.addColorStop(0, 'rgba(251, 191, 36, 0.04)');
+          zodGrad.addColorStop(0.4, 'rgba(56, 189, 248, 0.02)');
+          zodGrad.addColorStop(1, 'transparent');
+          ctx.scale(3.0, 0.8);
+          ctx.beginPath();
+          ctx.arc(0, 0, 750 * sceneScale, 0, Math.PI * 2);
+          ctx.fillStyle = zodGrad;
+          ctx.fill();
+          ctx.restore();
+        }
+        else if (obj.type === 'nebula') {
+          const grad = ctx.createRadialGradient(screenX, screenY, 0, screenX, screenY, obj.radius * sceneScale);
+          grad.addColorStop(0, obj.color);
+          grad.addColorStop(0.6, 'transparent');
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, obj.radius * sceneScale, 0, Math.PI * 2);
+          ctx.fillStyle = grad;
+          ctx.fill();
+        } 
+        else if (obj.type === 'cygnus_ribbon') {
+          // شريط الدجاجة خافت بخطوط رقيقة
+          ctx.save();
+          ctx.translate(screenX, screenY);
+          ctx.rotate(-0.38);
+
+          ctx.beginPath();
+          ctx.moveTo(-160 * sceneScale, -40 * sceneScale);
+          ctx.bezierCurveTo(-60 * sceneScale, -75 * sceneScale, 50 * sceneScale, 60 * sceneScale, 170 * sceneScale, 20 * sceneScale);
+          ctx.strokeStyle = 'rgba(56, 189, 248, 0.22)';
+          ctx.lineWidth = 7 * sceneScale;
+          ctx.lineCap = 'round';
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.moveTo(-150 * sceneScale, -30 * sceneScale);
+          ctx.bezierCurveTo(-45 * sceneScale, -55 * sceneScale, 65 * sceneScale, 75 * sceneScale, 180 * sceneScale, 30 * sceneScale);
+          ctx.strokeStyle = 'rgba(244, 114, 182, 0.2)';
+          ctx.lineWidth = 4 * sceneScale;
+          ctx.stroke();
+          ctx.restore();
+        }
+        else if (obj.type === 'supernova') {
+          const sr = obj.radius * sceneScale;
+          ctx.save();
+          ctx.translate(screenX, screenY);
+          ctx.beginPath();
+          ctx.arc(0, 0, sr, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(251, 146, 60, 0.25)';
+          ctx.lineWidth = 2 * sceneScale;
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.arc(0, 0, sr * 0.75, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(168, 85, 247, 0.2)';
+          ctx.lineWidth = 1.5 * sceneScale;
+          ctx.stroke();
+          ctx.restore();
+        }
+        else if (obj.type === 'asteroid_field') {
+          ctx.save();
+          ctx.translate(screenX, screenY);
+          for (let a = 0; a < obj.count; a++) {
+            const angle = (a / obj.count) * Math.PI * 2 + pulsarAngle * 0.03;
+            const dist = (75 + (a % 4) * 18) * sceneScale;
+            const ax = Math.cos(angle) * dist;
+            const ay = Math.sin(angle) * (dist * 0.45);
+            ctx.beginPath();
+            ctx.arc(ax, ay, (1.2 + (a % 2) * 0.8) * sceneScale, 0, Math.PI * 2);
+            ctx.fillStyle = '#64748b';
+            ctx.fill();
+          }
+          ctx.restore();
+        }
+        else if (obj.type === 'galaxy') {
+          ctx.save();
+          ctx.translate(screenX, screenY);
+          ctx.rotate(obj.angle);
+          const gGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, obj.radius * sceneScale);
+          gGrad.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
+          gGrad.addColorStop(0.2, obj.color.replace(')', ', 0.18)').replace('rgb', 'rgba'));
+          gGrad.addColorStop(0.65, 'transparent');
+          ctx.scale(1.8, 0.65);
+          ctx.beginPath();
+          ctx.arc(0, 0, obj.radius * sceneScale, 0, Math.PI * 2);
+          ctx.fillStyle = gGrad;
+          ctx.fill();
+          ctx.restore();
+        } 
+        else if (obj.type === 'blackhole') {
+          const r = obj.radius * sceneScale;
+          ctx.save();
+          ctx.translate(screenX, screenY);
+          ctx.rotate(-0.35);
+          const diskGrad = ctx.createRadialGradient(0, 0, r * 0.8, 0, 0, r * 2.2);
+          diskGrad.addColorStop(0, 'rgba(251, 191, 36, 0.4)');
+          diskGrad.addColorStop(0.4, 'rgba(249, 115, 22, 0.25)');
+          diskGrad.addColorStop(1, 'transparent');
+          ctx.scale(2.2, 0.55);
+          ctx.beginPath();
+          ctx.arc(0, 0, r * 2.2, 0, Math.PI * 2);
+          ctx.fillStyle = diskGrad;
+          ctx.fill();
+          ctx.restore();
+
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, r, 0, Math.PI * 2);
+          ctx.fillStyle = '#000000';
+          ctx.shadowBlur = 8 * sceneScale;
+          ctx.shadowColor = 'rgba(251, 191, 36, 0.4)';
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        } 
+        else if (obj.type === 'ringed_planet') {
+          const pr = obj.radius * sceneScale;
+          ctx.save();
+          ctx.translate(screenX, screenY);
+          ctx.rotate(0.45);
+          ctx.scale(2.2, 0.42);
+          ctx.beginPath();
+          ctx.arc(0, 0, pr * 1.8, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(226, 232, 240, 0.22)';
+          ctx.lineWidth = 6 * sceneScale;
+          ctx.stroke();
+          ctx.restore();
+
+          const pGrad = ctx.createRadialGradient(screenX - pr * 0.3, screenY - pr * 0.3, pr * 0.1, screenX, screenY, pr);
+          pGrad.addColorStop(0, '#38bdf8');
+          pGrad.addColorStop(0.7, '#075985');
+          pGrad.addColorStop(1, '#020617');
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, pr, 0, Math.PI * 2);
+          ctx.fillStyle = pGrad;
+          ctx.fill();
+
+          const moonX = screenX + Math.cos(pulsarAngle * 0.5) * (pr * 2.2);
+          const moonY = screenY + Math.sin(pulsarAngle * 0.5) * (pr * 0.8);
+          ctx.beginPath();
+          ctx.arc(moonX, moonY, Math.max(1.8, 3 * sceneScale), 0, Math.PI * 2);
+          ctx.fillStyle = '#cbd5e1';
+          ctx.fill();
+        } 
+        else if (obj.type === 'pulsar') {
+          const beamLen = 120 * sceneScale;
+          ctx.save();
+          ctx.translate(screenX, screenY);
+          ctx.rotate(pulsarAngle);
+          const bGrad = ctx.createLinearGradient(0, -beamLen, 0, beamLen);
+          bGrad.addColorStop(0, 'transparent');
+          bGrad.addColorStop(0.48, 'rgba(56, 189, 248, 0.35)');
+          bGrad.addColorStop(0.5, '#ffffff');
+          bGrad.addColorStop(0.52, 'rgba(56, 189, 248, 0.35)');
+          bGrad.addColorStop(1, 'transparent');
+          ctx.fillStyle = bGrad;
+          ctx.fillRect(-1.5, -beamLen, 3, beamLen * 2);
+          ctx.restore();
+
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, Math.max(2.5, 4 * sceneScale), 0, Math.PI * 2);
+          ctx.fillStyle = '#ffffff';
+          ctx.fill();
+        }
+      }
+
+      // ================= رسم الأجرام المتحركة الحية =================
+      // 1. كويكبات سابحة وتدور حول نفسها ببطء
+      if (window.driftingAsteroids) {
+        for (let ast of window.driftingAsteroids) {
+          ast.x += ast.vx;
+          ast.y += ast.vy;
+          ast.rot += ast.rotSpeed;
+          if (ast.x > 1800) ast.x = -1800;
+          if (ast.x < -1800) ast.x = 1800;
+          if (ast.y > 1800) ast.y = -1800;
+          if (ast.y < -1800) ast.y = 1800;
+
+          const ax = cx + (ast.x * sceneScale) + (sceneX * 0.35);
+          const ay = cy + (ast.y * sceneScale) + (sceneY * 0.35);
+
+          if (ax > -50 && ax < canvas.width + 50 && ay > -50 && ay < canvas.height + 50) {
+            ctx.save();
+            ctx.translate(ax, ay);
+            ctx.rotate(ast.rot);
+            const sz = ast.size * sceneScale;
+            ctx.beginPath();
+            ctx.moveTo(-sz, -sz * 0.5);
+            ctx.lineTo(sz * 0.3, -sz);
+            ctx.lineTo(sz, -sz * 0.2);
+            ctx.lineTo(sz * 0.6, sz);
+            ctx.lineTo(-sz * 0.6, sz * 0.7);
+            ctx.closePath();
+            ctx.fillStyle = '#475569';
+            ctx.fill();
+            ctx.restore();
+          }
+        }
+      }
+
+      // 2. قمر اصطناعي وحطام فضائي يعبر ببطء
+      if (window.orbitingSatellite) {
+        const sat = window.orbitingSatellite;
+        sat.x += sat.vx;
+        sat.y += sat.vy;
+        sat.rot += 0.008;
+        if (sat.x > 1600) sat.x = -1600;
+
+        const sx = cx + (sat.x * sceneScale) + (sceneX * 0.4);
+        const sy = cy + (sat.y * sceneScale) + (sceneY * 0.4);
+
+        if (sx > -60 && sx < canvas.width + 60 && sy > -60 && sy < canvas.height + 60) {
+          ctx.save();
+          ctx.translate(sx, sy);
+          ctx.rotate(sat.rot);
+          const sr = 3.5 * sceneScale;
+          ctx.fillStyle = '#94a3b8';
+          ctx.fillRect(-sr, -sr, sr * 2, sr * 2);
+          ctx.fillStyle = '#0284c7';
+          ctx.fillRect(-sr * 2.6, -sr * 0.5, sr * 1.4, sr);
+          ctx.fillRect(sr * 1.2, -sr * 0.5, sr * 1.4, sr);
+          ctx.restore();
+        }
+      }
+
+      // 3. خيوط الرياح الشمسية والجسيمات المشحونة السابحة
+      if (window.solarWindParticles) {
+        ctx.lineWidth = 1.2 * sceneScale;
+        ctx.lineCap = 'round';
+        for (let sw of window.solarWindParticles) {
+          sw.x += sw.vx;
+          sw.y += sw.vy;
+          if (sw.x > SPACE_BOUND / 2) sw.x = -SPACE_BOUND / 2;
+
+          const swx = cx + (sw.x * sceneScale) + (sceneX * 0.3);
+          const swy = cy + (sw.y * sceneScale) + (sceneY * 0.3);
+
+          if (swx > -80 && swx < canvas.width + 80 && swy > -40 && swy < canvas.height + 40) {
+            ctx.beginPath();
+            ctx.moveTo(swx, swy);
+            ctx.lineTo(swx - sw.len * sceneScale, swy);
+            ctx.strokeStyle = `rgba(56, 189, 248, ${sw.alpha})`;
+            ctx.stroke();
+          }
+        }
+      }
+
+
+      // 2. رسم الغبار الكوني
+      for (let d of cosmicDust) {
+        const dx = cx + (d.x * sceneScale) + (sceneX * 0.15);
+        const dy = cy + (d.y * sceneScale) + (sceneY * 0.15);
+        if (dx < -100 || dx > canvas.width + 100 || dy < -100 || dy > canvas.height + 100) continue;
 
         ctx.beginPath();
-        ctx.arc(drawX, drawY, s.radius, 0, Math.PI * 2);
+        ctx.arc(dx, dy, d.radius * sceneScale, 0, Math.PI * 2);
+        ctx.fillStyle = `${d.color} ${d.alpha})`;
+        ctx.fill();
+      }
+
+      // 3. رسم نجوم الفضاء العميقة الموزعة بالتساوي 360 درجة
+      for (let s of bgStars) {
+        s.phase += s.twinkleSpeed;
+        const finalAlpha = Math.max(0.12, Math.min(1, s.alpha + Math.sin(s.phase) * 0.25));
+
+        const drawX = cx + (s.x * sceneScale) + (sceneX / s.z);
+        const drawY = cy + (s.y * sceneScale) + (sceneY / s.z);
+
+        if (drawX < -20 || drawX > canvas.width + 20 || drawY < -20 || drawY > canvas.height + 20) continue;
+
+        const currentRadius = Math.max(0.35, s.radius * Math.sqrt(sceneScale));
+
+        ctx.beginPath();
+        ctx.arc(drawX, drawY, currentRadius, 0, Math.PI * 2);
         ctx.fillStyle = s.color;
         ctx.globalAlpha = finalAlpha;
-        
-        // إعطاء توهج واقعي للنجوم
-        if(s.radius > 1.2) {
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = s.color;
+        if (currentRadius > 1.3) {
+          ctx.shadowBlur = 8 * sceneScale;
+          ctx.shadowColor = s.color;
         } else {
-            ctx.shadowBlur = 0;
+          ctx.shadowBlur = 0;
         }
         ctx.fill();
       }
       ctx.globalAlpha = 1;
       ctx.shadowBlur = 0;
 
+      // 4. رسم المذنبات والشهب
+      for (let c of comets) {
+        c.x += c.vx;
+        c.y += c.vy;
+        if (c.x > SPACE_BOUND / 2) c.x = -SPACE_BOUND / 2;
+        if (c.y > SPACE_BOUND / 2) c.y = -SPACE_BOUND / 2;
+
+        const drawX = cx + (c.x * sceneScale) + (sceneX * 0.4);
+        const drawY = cy + (c.y * sceneScale) + (sceneY * 0.4);
+
+        if (drawX > -200 && drawX < canvas.width + 200 && drawY > -200 && drawY < canvas.height + 200) {
+          const tailLen = c.length * sceneScale;
+          const tailX = drawX - (c.vx / 2.6) * tailLen;
+          const tailY = drawY - (c.vy / 2.6) * tailLen;
+
+          const cometGrad = ctx.createLinearGradient(drawX, drawY, tailX, tailY);
+          cometGrad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+          cometGrad.addColorStop(0.3, 'rgba(56, 189, 248, 0.55)');
+          cometGrad.addColorStop(1, 'transparent');
+
+          ctx.beginPath();
+          ctx.moveTo(drawX, drawY);
+          ctx.lineTo(tailX, tailY);
+          ctx.strokeStyle = cometGrad;
+          ctx.lineWidth = Math.max(1.5, c.size * sceneScale);
+          ctx.lineCap = 'round';
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.arc(drawX, drawY, Math.max(2, c.size * sceneScale), 0, Math.PI * 2);
+          ctx.fillStyle = '#ffffff';
+          ctx.shadowBlur = 12;
+          ctx.shadowColor = '#38bdf8';
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
+      }
+
       spawnMeteor();
       for (let i = meteors.length - 1; i >= 0; i--) {
         let m = meteors[i];
-        
-        let drawX = m.x + (sceneX * 0.6);
-        let drawY = m.y + (sceneY * 0.6);
+        let drawX = m.x + (sceneX * 0.5);
+        let drawY = m.y + (sceneY * 0.5);
 
         let endX = drawX - Math.cos(m.angle) * m.length;
         let endY = drawY - Math.sin(m.angle) * m.length;
 
         let grad = ctx.createLinearGradient(drawX, drawY, endX, endY);
         grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
-        grad.addColorStop(0.2, 'rgba(56, 189, 248, 0.7)');
+        grad.addColorStop(0.25, 'rgba(56, 189, 248, 0.7)');
         grad.addColorStop(1, 'transparent');
 
         ctx.beginPath();
         ctx.moveTo(drawX, drawY);
         ctx.lineTo(endX, endY);
         ctx.strokeStyle = grad;
-        ctx.lineWidth = 2.5;
+        ctx.lineWidth = 2.4;
         ctx.lineCap = 'round';
         ctx.stroke();
 
@@ -1203,9 +2128,7 @@
         m.y += Math.sin(m.angle) * m.speed;
         m.alpha -= 0.02;
 
-        if (m.alpha <= 0) {
-          meteors.splice(i, 1);
-        }
+        if (m.alpha <= 0) meteors.splice(i, 1);
       }
 
       requestAnimationFrame(animateUniverse);
@@ -1217,32 +2140,34 @@
 
 
     /* =========================================================================
-       عرض وتحديث النجوم التفاعلية
+       عرض النجوم وتلوينها وسحبها الحر
        ========================================================================= */
     const interactiveLayer = document.getElementById('interactiveLayer');
     let isEditModeActive = false;
 
-    // باقة ألوان المجرة العشوائية
-    const STAR_COLOR_PALETTES = [
-      '#38bdf8', // سماوي جليدي
-      '#f472b6', // وردي أورورا
-      '#fbbf24', // ذهبي كوني
-      '#c084fc', // بنفسجي سديمي
-      '#34d399', // زمردي فلكي
-      '#60a5fa'  // أزرق نيزكي
-    ];
+    const STAR_COLOR_PALETTES = ['#38bdf8', '#f472b6', '#fbbf24', '#c084fc', '#34d399', '#60a5fa'];
+
+    function normalizeStarCoordinates(star) {
+      // تحويل أي نسبة قديمة إلى إحداثيات بكسل مطلقة وثابتة لمرة واحدة
+      if (typeof star.x === 'string' || star.x <= 100) {
+        star.x = Math.round((parseFloat(star.x) / 100) * window.innerWidth);
+        star.y = Math.round((parseFloat(star.y) / 100) * window.innerHeight);
+      }
+    }
 
     function renderStars() {
       interactiveLayer.innerHTML = '';
       appConfig.stars.forEach((star, index) => {
+        normalizeStarCoordinates(star);
+
         const starEl = document.createElement('div');
         const hasSong = star.songUrl && star.songUrl.trim() !== "";
         starEl.className = 'star-node' + (hasSong ? ' has-special-song' : '');
-        starEl.style.left = (typeof star.x === 'number' && star.x > 100 ? star.x + 'px' : star.x + '%');
-        starEl.style.top = (typeof star.y === 'number' && star.y > 100 ? star.y + 'px' : star.y + '%');
+
+        starEl.style.left = star.x + 'px';
+        starEl.style.top = star.y + 'px';
         starEl.dataset.id = star.id;
 
-        // اختيار لون عشوائي مميز لكل نجمة بناءً على معرفها
         const color = STAR_COLOR_PALETTES[(star.id || index) % STAR_COLOR_PALETTES.length];
 
         starEl.innerHTML = `
@@ -1253,22 +2178,175 @@
         `;
 
         starEl.addEventListener('click', (e) => {
-          if (starEl.dataset.dragging === 'true') return;
+          e.stopPropagation();
+          if (isEditModeActive) {
+            attachMovePadToStar(starEl, star);
+            return;
+          }
           playStarChime();
-          openMemoryModal(star);
+          openMemoryModal(star, starEl);
         });
 
-
-        makeDraggable(starEl, star);
         interactiveLayer.appendChild(starEl);
       });
     }
+
+    function updateCenterDisplay() {
+      document.getElementById('displayCenterTitle').textContent = appConfig.glowName || 'SOMY';
+      document.getElementById('displaySubtitle').textContent = appConfig.subtitle || '';
+      document.getElementById('displayDate').textContent = appConfig.dateText || '';
+    }
+
+    /* =========================================================================
+       نظام الجويستيك الافتراضي (Virtual Joystick System)
+       ========================================================================= */
+    const starJoystickWrapper = document.getElementById('starJoystickWrapper');
+    const joystickBase = document.getElementById('joystickBase');
+    const joystickStick = document.getElementById('joystickStick');
+    const joystickSaveBtn = document.getElementById('joystickSaveBtn');
+
+    let activeStarElement = null;
+    let activeStarData = null;
+    let isJoystickActive = false;
+    let joystickOriginX = 0;
+    let joystickOriginY = 0;
+    let joystickVectorX = 0;
+    let joystickVectorY = 0;
+    let joystickLoopId = null;
+    const MAX_JOYSTICK_RADIUS = 36;
+    const JOYSTICK_MAX_SPEED = 7.5;
+
+    if (starJoystickWrapper) {
+      starJoystickWrapper.addEventListener('mousedown', (e) => e.stopPropagation());
+      starJoystickWrapper.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
+    }
+
+    function attachMovePadToStar(starEl, star) {
+      activeStarElement = starEl;
+      activeStarData = star;
+      normalizeStarCoordinates(activeStarData);
+
+      updateJoystickWrapperPosition();
+      starJoystickWrapper.style.display = 'flex';
+      resetJoystickStick();
+    }
+
+    function updateJoystickWrapperPosition() {
+      if (!activeStarData || !activeStarElement) return;
+      activeStarElement.style.left = activeStarData.x + 'px';
+      activeStarElement.style.top = activeStarData.y + 'px';
+
+      // وضع الجويستيك دائماً فوق النجمة بدون أي قفز
+      starJoystickWrapper.style.left = activeStarData.x + 'px';
+      starJoystickWrapper.style.top = (activeStarData.y - 110) + 'px';
+    }
+
+
+    function resetJoystickStick() {
+      joystickVectorX = 0;
+      joystickVectorY = 0;
+      if (joystickStick) {
+        joystickStick.style.transform = 'translate(-50%, -50%)';
+      }
+    }
+
+    function startJoystickMovement() {
+      if (joystickLoopId) return;
+      function loop() {
+        if (isJoystickActive && activeStarData) {
+          activeStarData.x += joystickVectorX * JOYSTICK_MAX_SPEED;
+          activeStarData.y += joystickVectorY * JOYSTICK_MAX_SPEED;
+          updateJoystickWrapperPosition();
+        }
+        joystickLoopId = requestAnimationFrame(loop);
+      }
+      joystickLoopId = requestAnimationFrame(loop);
+    }
+
+    function stopJoystickMovement() {
+      if (joystickLoopId) {
+        cancelAnimationFrame(joystickLoopId);
+        joystickLoopId = null;
+      }
+      resetJoystickStick();
+    }
+
+    const onJoystickStart = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      isJoystickActive = true;
+      const rect = joystickBase.getBoundingClientRect();
+      joystickOriginX = rect.left + rect.width / 2;
+      joystickOriginY = rect.top + rect.height / 2;
+      startJoystickMovement();
+    };
+
+    const onJoystickMove = (e) => {
+      if (!isJoystickActive) return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+      const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+
+      let deltaX = clientX - joystickOriginX;
+      let deltaY = clientY - joystickOriginY;
+      const distance = Math.hypot(deltaX, deltaY);
+
+      if (distance > MAX_JOYSTICK_RADIUS) {
+        deltaX = (deltaX / distance) * MAX_JOYSTICK_RADIUS;
+        deltaY = (deltaY / distance) * MAX_JOYSTICK_RADIUS;
+      }
+
+      joystickVectorX = deltaX / MAX_JOYSTICK_RADIUS;
+      joystickVectorY = deltaY / MAX_JOYSTICK_RADIUS;
+
+      if (joystickStick) {
+        joystickStick.style.transform = `translate(calc(-50% + ${deltaX}px), calc(-50% + ${deltaY}px))`;
+      }
+    };
+
+    const onJoystickEnd = () => {
+      if (!isJoystickActive) return;
+      isJoystickActive = false;
+      stopJoystickMovement();
+    };
+
+    if (joystickBase) {
+      joystickBase.addEventListener('mousedown', onJoystickStart);
+      window.addEventListener('mousemove', onJoystickMove);
+      window.addEventListener('mouseup', onJoystickEnd);
+
+      joystickBase.addEventListener('touchstart', onJoystickStart, { passive: false });
+      window.addEventListener('touchmove', onJoystickMove, { passive: false });
+      window.addEventListener('touchend', onJoystickEnd);
+    }
+
+    if (joystickSaveBtn) {
+      joystickSaveBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        saveAppConfig();
+        hideMovePad();
+        showToast("✨ تم تثبيت وحفظ موقع النجمة الجديد بنجاح!");
+      });
+    }
+
+    function hideMovePad() {
+      stopJoystickMovement();
+      if (starJoystickWrapper) {
+        starJoystickWrapper.style.display = 'none';
+      }
+      activeStarElement = null;
+      activeStarData = null;
+    }
+
+
 
     /* =========================================================================
        نظام الكوكبات العشوائية العابرة بعد قراءة 3-4 نجوم
        ========================================================================= */
     let starsOpenedCount = 0;
-    let nextConstellationTarget = Math.floor(Math.random() * 2) + 3; // كل 3 أو 4 نجوم
+    let nextConstellationTarget = Math.floor(Math.random() * 2) + 3;
     let isShowingConstellation = false;
 
     const CONSTELLATIONS = [
@@ -1288,7 +2366,7 @@
         nodes: [[80,70], [220,60], [110,150], [150,150], [190,150], [70,240], [230,230]]
       },
       {
-        name: "كوكبة ذات الكرسي (سماء كاسيوبيا)",
+        name: "كوكبة ذات الكرسي (كاسيوبيا)",
         lines: [[50,180, 100,100], [100,100, 160,150], [160,150, 220,70], [220,70, 260,130]],
         nodes: [[50,180], [100,100], [160,150], [220,70], [260,130]]
       }
@@ -1316,88 +2394,36 @@
       svg.innerHTML = svgContent;
       overlay.classList.add('active');
 
-      // تبقى واضحة لـ 3.2 ثانية ثم تختفي بسلاسة
       setTimeout(() => {
         overlay.classList.remove('active');
         setTimeout(() => { isShowingConstellation = false; }, 1000);
       }, 3200);
     }
 
-
-
-    function updateCenterDisplay() {
-      document.getElementById('displayCenterTitle').textContent = appConfig.glowName || 'SOMY';
-      document.getElementById('displaySubtitle').textContent = appConfig.subtitle || '';
-      document.getElementById('displayDate').textContent = appConfig.dateText || '';
-    }
-
-    /* نظام السحب والإفلات للنجوم */
-    function makeDraggable(el, starData) {
-      let isDragging = false;
-
-      const getClientPos = (e) => {
-        if (e.touches && e.touches.length > 0) {
-          return { x: e.touches[0].clientX, y: e.touches[0].clientY };
-        }
-        return { x: e.clientX, y: e.clientY };
-      };
-
-      const onStart = (e) => {
-        if (!isEditModeActive) return;
-        isDragging = true;
-        el.dataset.dragging = 'false';
-        e.stopPropagation();
-      };
-
-      const onMove = (e) => {
-        if (!isDragging) return;
-        el.dataset.dragging = 'true';
-        const pos = getClientPos(e);
-        
-        // حساب الإحداثيات الحقيقية مع خصم إزاحة الفضاء (sceneX, sceneY)
-        const currentSpaceX = pos.x - sceneX;
-        const currentSpaceY = pos.y - sceneY;
-
-        el.style.left = currentSpaceX + 'px';
-        el.style.top = currentSpaceY + 'px';
-
-        starData.x = Math.round(currentSpaceX);
-        starData.y = Math.round(currentSpaceY);
-      };
-
-      const onEnd = () => {
-        if (isDragging) {
-          isDragging = false;
-          saveAppConfig();
-          setTimeout(() => el.dataset.dragging = 'false', 100);
-        }
-      };
-
-      el.addEventListener('mousedown', onStart);
-      window.addEventListener('mousemove', onMove);
-      window.addEventListener('mouseup', onEnd);
-
-      el.addEventListener('touchstart', onStart, {passive: false});
-      window.addEventListener('touchmove', onMove, {passive: false});
-      window.addEventListener('touchend', onEnd);
-    }
-
-
     /* =========================================================================
-       نظام النوافذ المنبثقة (Memory Modal)
+       النوافذ المنبثقة وتشغيل الأغنية والملاحظات التفاعلية
        ========================================================================= */
     const memoryModal = document.getElementById('memoryModal');
     const memoryModalTitle = document.getElementById('memoryModalTitle');
     const memoryModalMessage = document.getElementById('memoryModalMessage');
     const memoryModalImg = document.getElementById('memoryModalImg');
-    const memorySongBadge = document.getElementById('memorySongBadge');
     const closeMemoryBtn = document.getElementById('closeMemoryBtn');
+    const returnGalaxyBtn = document.getElementById('returnGalaxyBtn');
+    const scrollHint = document.getElementById('scrollHint');
 
-    function openMemoryModal(star) {
-      playStarChime();
+    let currentOpenStarElement = null;
+
+    function openMemoryModal(star, starElement) {
+      currentOpenStarElement = starElement;
+
+      // تحويل النجمة فوراً إلى اللون الرمادي وتصغير حجمها
+      if (currentOpenStarElement) {
+        currentOpenStarElement.classList.add('is-read');
+      }
+
       memoryModalTitle.textContent = star.title;
       memoryModalMessage.textContent = star.message;
-
+      memoryModalMessage.scrollTop = 0; // إعادة التمرير للأعلى
 
       if (star.image && star.image.trim() !== "") {
         memoryModalImg.src = star.image;
@@ -1406,92 +2432,126 @@
         memoryModalImg.style.display = 'none';
       }
 
+      // خفض صوت الفضاء المحيط تلقائياً عند فتح أي نجمة حتى لو لم تكن تحتوي على أغنية
+      fadeAudio(ambientAudio, 0.06, 1200);
+
       if (star.songUrl && star.songUrl.trim() !== "") {
-        memorySongBadge.style.display = 'inline-flex';
-        fadeAudio(ambientAudio, 0.12, 600);
         specialAudio.src = star.songUrl.trim();
         specialAudio.currentTime = 0;
-        specialAudio.volume = 0.65;
-        specialAudio.play().catch(e => console.log(e));
+        specialAudio.volume = 0;
+        specialAudio.playbackRate = 0.88;
+
+        specialAudio.play().then(() => {
+          fadeAudio(specialAudio, 0.38, 2200);
+        }).catch(err => console.log("Audio play error:", err));
+
         isSpecialPlaying = true;
-      } else {
-        memorySongBadge.style.display = 'none';
       }
 
 
       memoryModal.classList.add('active');
+
+      // فحص إذا كانت الرسالة أطول من 5 أسطر لإظهار تنبيه السحب
+      setTimeout(() => {
+        if (memoryModalMessage.scrollHeight > memoryModalMessage.clientHeight + 8) {
+          scrollHint.style.display = 'inline-block';
+        } else {
+          scrollHint.style.display = 'none';
+        }
+      }, 100);
     }
+
+    // إخفاء مؤشر السحب بمجرد أن تنزل للقراءة لأسفل
+    memoryModalMessage.addEventListener('scroll', () => {
+      if (memoryModalMessage.scrollTop > 15) {
+        scrollHint.style.display = 'none';
+      }
+    });
 
     function closeMemory() {
       memoryModal.classList.remove('active');
+
       if (isSpecialPlaying) {
-        fadeAudio(specialAudio, 0, 600);
+        fadeAudio(specialAudio, 0, 1200);
         setTimeout(() => {
           specialAudio.pause();
           specialAudio.currentTime = 0;
-        }, 650);
-        fadeAudio(ambientAudio, 0.45, 600);
+        }, 1250);
         isSpecialPlaying = false;
       }
 
-      // زيادة عداد النجوم التي تمت رؤيتها
+      // إعادة صوت الفضاء دائماً لمستواه الكامل حتى لو لم تكن النجمة تحتوي على أغنية
+      fadeAudio(ambientAudio, 0.6, 1500);
+
       starsOpenedCount++;
       if (starsOpenedCount >= nextConstellationTarget) {
         starsOpenedCount = 0;
-        nextConstellationTarget = Math.floor(Math.random() * 2) + 3; // تجهيز الهدف القادم (3 أو 4)
-        setTimeout(() => {
-          triggerConstellationMystery();
-        }, 400);
+        nextConstellationTarget = Math.floor(Math.random() * 2) + 3;
+        setTimeout(() => triggerConstellationMystery(), 400);
       }
     }
 
 
     closeMemoryBtn.addEventListener('click', closeMemory);
+    if (returnGalaxyBtn) {
+      returnGalaxyBtn.addEventListener('click', closeMemory);
+    }
     memoryModal.addEventListener('click', (e) => {
       if (e.target === memoryModal) closeMemory();
     });
 
+
     /* =========================================================================
-       شاشة الدخول الذكية (Login Logic)
+       تسجيل الدخول وشاشة الإرشادات وانطلاق الفضاء
        ========================================================================= */
     const loginModal = document.getElementById('loginModal');
+    const guidelinesModal = document.getElementById('guidelinesModal');
     const usernameInput = document.getElementById('usernameInput');
     const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+    const launchUniverseBtn = document.getElementById('launchUniverseBtn');
     const loginFeedback = document.getElementById('loginFeedback');
     const adminToggleBtn = document.getElementById('adminToggleBtn');
     const dragHint = document.getElementById('dragHint');
 
+    let currentLoggedInUser = '';
+
     function handleLogin() {
       const val = usernameInput.value.trim().toLowerCase();
-
       if (!val) {
         showLoginError("يرجى كتابة الاسم أولاً ✨");
         return;
       }
+      currentLoggedInUser = val;
 
-      // إخفاء نافذة الدخول
+      if (val === 'diajb0') {
+        loginModal.classList.remove('active');
+        startUniverseJourney();
+        return;
+      }
+
       loginModal.classList.remove('active');
-      
-      // تشغيل أنيميشن الانطلاق من الأرض (منظور الشخص الأول)
+      guidelinesModal.classList.add('active');
+    }
+
+    function startUniverseJourney() {
+      guidelinesModal.classList.remove('active');
+
       const earthIntro = document.getElementById('earthIntro');
       setTimeout(() => {
         earthIntro.classList.add('zoom-out');
-        startMusicExperience(); // تشغيل جميع الصوتيات بفضل تفاعل المستخدم هنا
+        startMusicExperience();
       }, 100);
 
-      // بعد انتهاء الانطلاق نظهر الفضاء والنجوم
       setTimeout(() => {
         earthIntro.classList.add('hidden');
-        
-        if (val === 'diajb0') {
+        if (currentLoggedInUser === 'diajb0') {
           enableAdminStudio();
           showToast("مرحباً بك diajb0! فُتح لك استوديو التعديل الآن ✨");
         } else {
-          showToast("مرحباً بكِ في سمائكِ الخاصة.. استمتعي بالرحلة 🌌");
+          showToast("مرحباً بكِ في سمائكِ الخاصة يا أميرتي.. استمتعي بالرحلة 🌌");
         }
-      }, 2500); 
+      }, 2500);
     }
-
 
     function showLoginError(msg) {
       loginFeedback.textContent = msg;
@@ -1503,8 +2563,12 @@
       if (e.key === 'Enter') handleLogin();
     });
 
+    if (launchUniverseBtn) {
+      launchUniverseBtn.addEventListener('click', startUniverseJourney);
+    }
+
     /* =========================================================================
-       لوحة تحكم واستوديو المطور (diajb0 Studio)
+       استوديو التعديل والتحكم (diajb0 Studio)
        ========================================================================= */
     const adminStudioDrawer = document.getElementById('adminStudioDrawer');
     const closeAdminBtn = document.getElementById('closeAdminBtn');
@@ -1539,14 +2603,13 @@
       renderAdminStarsList();
     }
 
-
     function renderAdminStarsList() {
       adminStarsList.innerHTML = '';
       appConfig.stars.forEach(star => {
         const item = document.createElement('div');
         item.className = 'star-list-item';
         item.innerHTML = `
-          <span>⭐ ${star.title} (${star.x}%, ${star.y}%)</span>
+          <span>⭐ ${star.title} (${star.x}px, ${star.y}px)</span>
           <div class="item-btns">
             <button class="btn-xs btn-edit" onclick="editStar(${star.id})">تعديل</button>
             <button class="btn-xs btn-delete" onclick="deleteStar(${star.id})">حذف</button>
@@ -1578,9 +2641,10 @@
           target.songUrl = newStarSong.value.trim();
         }
       } else {
-        // توليد النجمة الجديدة في منتصف الشاشة الظاهرة أمامك حالياً
-        const spawnX = Math.round((window.innerWidth / 2) - sceneX);
-        const spawnY = Math.round((window.innerHeight / 2) - sceneY);
+        // حساب إحداثيات المنتصف بدقة مع خصم الإزاحة والزوم الحالي
+        const spawnX = Math.round(((window.innerWidth / 2) - sceneX) / sceneScale);
+        const spawnY = Math.round(((window.innerHeight / 2) - sceneY) / sceneScale);
+
 
         const newStar = {
           id: Date.now(),
@@ -1591,7 +2655,6 @@
           songUrl: newStarSong.value.trim(),
           message: msg
         };
-
         appConfig.stars.push(newStar);
       }
 
@@ -1634,24 +2697,19 @@
       cancelEditStarBtn.style.display = 'none';
     }
 
-
     cancelEditStarBtn.addEventListener('click', resetStarForm);
-
-    adminToggleBtn.addEventListener('click', () => {
-      adminStudioDrawer.classList.toggle('open');
-    });
-
-    closeAdminBtn.addEventListener('click', () => {
-      adminStudioDrawer.classList.remove('open');
-    });
+    adminToggleBtn.addEventListener('click', () => adminStudioDrawer.classList.toggle('open'));
+    closeAdminBtn.addEventListener('click', () => adminStudioDrawer.classList.remove('open'));
 
     previewAsSkyBtn.addEventListener('click', () => {
       adminStudioDrawer.classList.remove('open');
       dragHint.style.display = 'none';
       adminToggleBtn.style.display = 'none';
+      hideMovePad();
       isEditModeActive = false;
       showToast("أنت الآن في وضع المعاينة كما ستشاهده هي!");
     });
+
 
     exportConfigBtn.addEventListener('click', () => {
       const jsonStr = JSON.stringify(appConfig, null, 2);
@@ -1673,5 +2731,6 @@
     renderStars();
     updateCenterDisplay();
   </script>
+
 </body>
 </html>
