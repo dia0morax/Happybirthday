@@ -92,11 +92,12 @@
       width: 100vw;
       height: 100vh;
       z-index: 2;
-      transform-origin: center;
+      transform-origin: 0 0;
       will-change: transform;
       cursor: grab;
       overflow: visible;
     }
+
     #spaceScene:active {
       cursor: grabbing;
     }
@@ -840,7 +841,257 @@
     }
 
 
+    /* ----------------------------------------------------
+       فيجول نوفل كوكب زحل (Saturn Visual Novel Mode)
+       ---------------------------------------------------- */
+    .vn-container {
+      position: fixed;
+      inset: 0;
+      background: 
+        radial-gradient(ellipse 120% 70% at 50% 15%, rgba(251, 191, 36, 0.28) 0%, transparent 60%),
+        radial-gradient(circle at 50% -10%, #78350f 0%, #1e1b4b 45%, #020617 90%);
+      z-index: 1500;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(1.15);
+      filter: blur(14px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow: hidden;
+    }
+    .vn-container.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1);
+      filter: blur(0px);
+    }
+    .vn-container.leaving {
+      opacity: 0;
+      transform: scale(0.85);
+      filter: blur(16px);
+      transition: opacity 0.65s cubic-bezier(0.7, 0, 0.84, 0), transform 0.65s cubic-bezier(0.7, 0, 0.84, 0), filter 0.65s ease;
+    }
+    /* حلقات زحل وأجواء الكوكب الساحرة في الخلفية */
+    .vn-container::before {
+      content: '';
+      position: absolute;
+      top: 18%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-14deg);
+      width: min(150vw, 1100px);
+      height: min(34vw, 240px);
+      border-radius: 50%;
+      border: min(3.8vw, 28px) double rgba(251, 191, 36, 0.4);
+      box-shadow: 
+        0 0 70px rgba(251, 191, 36, 0.3),
+        inset 0 0 60px rgba(245, 158, 11, 0.35);
+      pointer-events: none;
+      z-index: 1;
+    }
+    .vn-container::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 100%, rgba(15, 23, 42, 0.85) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 2;
+    }
+    .vn-close-btn {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      background: rgba(15, 23, 42, 0.75);
+      color: #f8fafc;
+      border: 1px solid rgba(251, 191, 36, 0.4);
+      padding: 10px 22px;
+      border-radius: 20px;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 15;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(251, 191, 36, 0.2);
+      transition: all 0.25s ease;
+    }
+    .vn-close-btn:hover {
+      background: rgba(239, 68, 68, 0.85);
+      border-color: rgba(255, 255, 255, 0.4);
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 8px 25px rgba(239, 68, 68, 0.5);
+    }
+    
+    .vn-scene {
+      width: 100%;
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 4;
+      margin-bottom: -18px;
+    }
+    /* تصميم مجسم الفضائي الأيقوني بدلاً من الإيموجي البعيد */
+    .vn-alien-sprite {
+      width: clamp(140px, 26vw, 210px);
+      height: clamp(170px, 32vw, 250px);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.35s ease, filter 0.35s ease, opacity 0.35s ease;
+      animation: alienHover 3.4s ease-in-out infinite alternate;
+      cursor: default;
+    }
+    .alien-head {
+      width: 100%;
+      height: 75%;
+      background: #475569;
+      border-radius: 50% 50% 46% 46% / 60% 60% 40% 40%;
+      position: relative;
+      box-shadow: 0 0 25px rgba(30, 41, 59, 0.6);
+    }
+    /* حواجب حادة تعطي ملامح غاضبة وعابسة */
+    .alien-head::before,
+    .alien-head::after {
+      content: '';
+      position: absolute;
+      top: 36%;
+      width: 26%;
+      height: 4px;
+      background: #0f172a;
+      border-radius: 2px;
+      z-index: 3;
+    }
+    .alien-head::before { left: 17%; transform: rotate(20deg); }
+    .alien-head::after { right: 17%; transform: rotate(-20deg); }
+    .alien-eye {
+      position: absolute;
+      top: 42%;
+      width: 26%;
+      height: 34%;
+      background: #0f172a;
+      border-radius: 50% 50% 40% 40% / 65% 65% 35% 35%;
+    }
+    .alien-eye.left { left: 18%; transform: rotate(18deg); }
+    .alien-eye.right { right: 18%; transform: rotate(-18deg); }
+    .alien-eye::after {
+      content: '';
+      display: none;
+    }
+    /* فم عابس ومائل للأسفل ومجرد */
+    .alien-head-mouth {
+      position: absolute;
+      bottom: 16%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 28%;
+      height: 10px;
+      border-top: 3.5px solid #0f172a;
+      border-radius: 50% 50% 0 0;
+    }
+    .alien-body {
+      width: 48%;
+      height: 30%;
+      margin-top: -8%;
+      background: #334155;
+      border-radius: 35% 35% 20% 20%;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    @keyframes alienHover {
+      0% { transform: translateY(0px) scale(1); }
+      100% { transform: translateY(-10px) scale(1.02); }
+    }
+    
+    .vn-dialogue-wrapper {
+      width: 94%;
+      max-width: 820px;
+      margin-bottom: 24px;
+      position: relative;
+      z-index: 6;
+    }
+
+    .vn-name-plate {
+      display: inline-block;
+      background: rgba(15, 23, 42, 0.95);
+      border: 2px solid rgba(56, 189, 248, 0.6);
+      border-bottom: none;
+      border-radius: 16px 16px 0 0;
+      padding: 8px 24px;
+      font-family: 'Amiri', serif;
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #34d399;
+      margin-left: 20px;
+      box-shadow: 0 -4px 15px rgba(0,0,0,0.5);
+    }
+    .vn-dialogue-box {
+      background: rgba(15, 23, 42, 0.85);
+      border: 2px solid rgba(56, 189, 248, 0.4);
+      border-radius: 16px;
+      border-top-left-radius: 0;
+      padding: 24px 30px;
+      min-height: 140px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+      position: relative;
+      cursor: pointer;
+    }
+    .vn-text {
+      font-family: 'Tajawal', sans-serif;
+      font-size: clamp(1.2rem, 3vw, 1.45rem);
+      line-height: 1.8;
+      color: #f8fafc;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+      min-height: 80px;
+    }
+    .vn-next-indicator {
+      position: absolute;
+      bottom: 14px;
+      left: 18px;
+      color: var(--accent-gold);
+      font-size: 0.95rem;
+      font-weight: 500;
+      opacity: 0.85;
+      display: none;
+      pointer-events: none;
+      letter-spacing: 0.3px;
+    }
+
+    
+    .vn-choices-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 16px;
+      display: none;
+    }
+    .vn-choice-btn {
+      background: linear-gradient(90deg, rgba(2, 132, 199, 0.9), rgba(56, 189, 248, 0.9));
+      border: 1px solid rgba(255,255,255,0.3);
+      color: white;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-family: 'Tajawal', sans-serif;
+      font-size: clamp(1.1rem, 2.5vw, 1.25rem);
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+      text-align: right;
+    }
+    .vn-choice-btn:hover {
+      transform: scale(1.02);
+      box-shadow: 0 6px 20px rgba(56, 189, 248, 0.6);
+      background: linear-gradient(90deg, rgba(3, 105, 161, 0.95), rgba(2, 132, 199, 0.95));
+    }
+
     /* استوديو التعديل والمطور (Admin Studio) */
+
     #adminStudioDrawer {
       position: fixed;
       top: 0;
@@ -1330,22 +1581,33 @@
     </div>
   </div>
 
-  <!-- نافذة كوكب زحل التفاعلي الاستكشافية -->
-  <div class="modal-overlay" id="saturnModal">
-    <div class="glass-card" style="text-align: center; max-width: 500px;">
-      <button class="modal-close-btn" id="closeSaturnBtn">✕</button>
-      <div style="font-size: 3.2rem; color: var(--accent-gold); margin-bottom: 10px; filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.6));">
-        🪐
-      </div>
-      <h3 style="font-size: 1.7rem; color: var(--accent-gold); margin-bottom: 12px;">سيد الحلقات: كوكب زحل</h3>
-      <p style="font-family: 'Amiri', serif; font-size: 1.25rem; line-height: 1.9; color: #e2e8f0; margin-bottom: 18px;">
-        جوهرة المنظومة الفضائية وأجمل كواكب المجرة.. تدور حوله حلقات ساحرة من الجليد والغبار الذهبي، تماماً كجمالكِ الذي تلتف حوله كل مجرات الكون.
-      </p>
-      <div style="background: rgba(251, 191, 36, 0.12); border: 1px solid rgba(251, 191, 36, 0.35); border-radius: 16px; padding: 12px; font-size: 0.95rem; color: #fde68a;">
-        ✨ تم اكتشاف سر كوكب زحل واحتسابه ضمن نسبة إنجازكِ!
+  <!-- نافذة زحل السري (فيجول نوفل) -->
+  <div class="vn-container" id="vnContainer">
+    <button class="vn-close-btn" id="exitVnBtn">
+      <i class="fa-solid fa-person-walking-arrow-right"></i> العودة للفضاء
+    </button>
+    <div class="vn-scene">
+      <div class="vn-alien-sprite" id="vnAlienSprite">
+        <div class="alien-head">
+          <div class="alien-eye left"></div>
+          <div class="alien-eye right"></div>
+          <div class="alien-head-mouth"></div>
+        </div>
+        <div class="alien-body"></div>
       </div>
     </div>
+
+
+    <div class="vn-dialogue-wrapper">
+      <div class="vn-name-plate" id="vnName">الفضائي</div>
+      <div class="vn-dialogue-box">
+        <p class="vn-text" id="vnText"></p>
+        <div class="vn-next-indicator" id="vnNextIndicator">▼ اضغطي للمتابعة ▼</div>
+      </div>
+      <div class="vn-choices-container" id="vnChoices"></div>
+    </div>
   </div>
+
 
   <!-- لوحة تحكم واستوديو المطور (Admin Drawer) -->
 
@@ -1449,10 +1711,18 @@
       ]
     };
 
-    let appConfig = DEFAULT_CONFIG;
-    localStorage.setItem('sky_celestial_cfg', JSON.stringify(DEFAULT_CONFIG));
+    // قراءة وحفظ التعديلات في ذاكرة المتصفح بشكل دائم
+    let appConfig = null;
+    try {
+      const saved = localStorage.getItem('sky_celestial_cfg');
+      appConfig = saved ? JSON.parse(saved) : DEFAULT_CONFIG;
+    } catch (e) {
+      appConfig = DEFAULT_CONFIG;
+    }
 
-    appConfig.ambientAudioUrl = R2_AMBIENT_URL; // ضمان دائم لرابطك
+    if (!appConfig.stars || appConfig.stars.length === 0) {
+      appConfig = DEFAULT_CONFIG;
+    }
 
     function saveAppConfig() {
       localStorage.setItem('sky_celestial_cfg', JSON.stringify(appConfig));
@@ -1460,6 +1730,7 @@
       updateCenterDisplay();
       setupAudioSources();
     }
+
 
     /* =========================================================================
        محرك الصوتيات والمؤثرات التفاعلية
@@ -1602,8 +1873,9 @@
     let initialPinchScale = 1.0;
     const spaceScene = document.getElementById('spaceScene');
 
-    // حدود السحب القصوى لمنع الفضاء اللانهائي
-    const MAX_PAN_LIMIT = 1350;
+    // حدود السحب القصوى بعد توسيع الفضاء بنسبة 40%
+    const MAX_PAN_LIMIT = 1900;
+
 
     function applySceneTransform() {
       // قفل أطراف الشاشة لتبقى دائماً داخل حدود الفضاء المعقولة
@@ -1644,33 +1916,307 @@
     }
 
 
-    // رصد النقر على كوكب زحل التفاعلي عبر الشاشة
+    // بيانات الفيجول نوفل لكوكب زحل
+    const saturnDialogue = [
+      {
+        alien: "هاه فامب؟ شتسوين هنا اخيرا حسيتي بسوء كوكب الارض وقررتي تعيشين بزحل مو؟",
+        choices: [
+          { btn: "لا ماحعيش هنا", txt: "لا ماحعيش هنا بس جيت اسلم عليك، اليوم عيددد ميلاديي وضياء انطاني هدية مركبة فضائية" },
+          { btn: "كوكب زحل كئيب أصلًا", txt: "مستحيل أعيش هنا، بس مريت أسلّم عليك! اليوم عيد ميلادي وضياء فاجأني بهدية تخبل: مركبة فضائية!" }
+        ]
+      },
+      {
+        alien: "فرحانة بنفسها وتحجي بكل ثقة، هوة حتى الرضيع عنده مركبة فضائية، ماتتوبين وتصادقين البشر الفاشلين",
+        choices: [
+          { btn: "انت حاقد على البشر", txt: "ناه ماجاية اسمع حقدك على البشر ، المهم شلون عايش هنا ماتحس بالوحدة؟" },
+          { btn: "البشر أوفياء وأحسن منك", txt: "وفّر طاقتك وكرهك للبشر على صفحة، كلي هسة.. صدك ما تمل من كعدتك وحيد هنا؟" }
+        ]
+      },
+      {
+        alien: "تحسبنا نفس البشر نحس بالوحدة، احنى اصلا مانحس باغلب الاشياء ، نهتم بانو نعيش بس",
+        choices: [
+          { btn: "كائنات مملة", txt: "ها يعني باختصار انتو كائنات مملة ماعدها اي هدف بالحياة وبس تحجي على البشر بدون سبب" },
+          { btn: "ما عدكم أي إحساس", txt: "يعني بصراحة، حياتكم فارغة وباردة، بس عايشين تاكلون بروحكم وتحجون عالبشر ليل ونهار." }
+        ]
+      },
+      {
+        alien: "مو سالفة ملل، احنا نشتغل بالمنطق، البشر مشاعرهم توديهم للهلاك، وانتي مصاصة دماء ومصاحبتهم؟ نسيتي أصلج؟",
+        choices: [
+          { btn: "المنطق مالتكم غبي", txt: "اهجد يالمنطقي، المشاعر هية اللي تسوي للخلود طعم، بعدين ضياء بشر مميز مو مثل أي بشري شفته بحياتك." },
+          { btn: "المشاعر هي سر الوجود", txt: "بلا فلسفة زايدة، المشاعر هي اللي تنطي للخلود معنى وقيمة! وضياء بالذات مميز وغير عن كل البشر اللي شفتهم." }
+        ]
+      },
+      {
+        alien: "مميز؟ شنو يعني مميز؟ مجرد خلايا لحمية تموت ورا كم سنة، شلون تضيعين خلودج وي كائن موقت؟",
+        choices: [
+          { btn: "الموت يخليهم أثمن", txt: "بالضبط لأن وقتي وياهم قليل، كل لحظة وياهم تسوى قرون من برودكم هنا، انت شمعرفك بهالسوالف وأنت عايش بين الصخور والغبار؟" },
+          { btn: "اللحظة وياهم تسوى عمر", txt: "لأن عمرهم قصير نعيش كل ثانية بحب، وهالشي يسوى ملايين السنين من برودكم، لو تنزل من زحل جان فهمت." }
+        ]
+      },
+      {
+        alien: "على الأقل صخور زحل ما تغدر ولا تجرح المشاعر، انتو الفامبز تاكلون دمهم اصلا وهسة صرتي حنينة؟ تضحكين على نفسج.",
+        choices: [
+          { btn: "زمن الغدر ولى", txt: "أحنى تطورنا يا متخلف، ما نعيش على القتل مثل ما تتخيل بافلامكم مدري رواياتكم ، ضياء يعرف منو سومي ومتقبلني بكل تفاصيلي." },
+          { btn: "احنا صرنا غير", txt: "صحصح عمي بيا عصر عايش؟ بطلنا سالفة القتل من زمان، وضياء يعرف سومي الحقيقية ومتقبلني مثل ما أني." }
+        ]
+      },
+      {
+        alien: "متقبلج؟ لو خايف منج؟ البشر يركضون ورا الوحوش بس علمود يحسون بالأمان ، باجر يعوفج ويدور وحدة من بني جنسه.",
+        choices: [
+          { btn: "ضياء مستحيل يسويها", txt: "احلم على كدك، ثقتنا ببعض أكبر من عقولكم الفضائية، أصلاً هو جهز المركبة وجابني مخصوص حتى أثبتلك إنك غلطان." },
+          { btn: "ثقتي بيه ما تنهز أبد", txt: "لتضل تألف سيناريوهات من يمك، حبنا أكبر بهواي منك، وهو بنفسه انطاني المركبة واجيت حتى أكسر عينك." }
+        ]
+      },
+      {
+        alien: "جبتي مركبة بوقود بلازما لمسافة ملايين الكيلومترات بس حتى تثبتين لفضائي على زحل إن حبج حقيقي؟ غباء كوكب الارض وراثة لكل الكائنات بيه لعد.",
+        choices: [
+          { btn: "هذا اسمه تقدير", txt: "هذا اسمه تقدير، واحتفال بعيد ميلادي بطريقته، ردت أراويك شلون نعيش مو بس نتنفس ونصفن على الكواكب" },
+          { btn: "إثبات إني عايشة صح", txt: "سميها اللي تريده، هاي طريقة ضياء حتى يحتفل بعيد ميلادي، حتى تشوف بعينك الفرق بين اللي يعيش واللي بس كاعد يصفن." }
+        ]
+      },
+      {
+        alien: "وتسمين الطيران بالفضاء عيشة؟ شفتي حرارة الأرض وشلون جاي تتدمر؟ البشر يدمرون كوكبهم وانتي معلقة روحج بيهم.",
+        choices: [
+          { btn: "الأرض بيها جمال ما تفهمه", txt: "كوكبهم بي ألوان وموسيقى ومشاعر انت بحياتك ما حتحس بيها." },
+          { btn: "عدهم دنيا تجنن", txt: "الأرض بيها فن، حنية، ودفء، شغلات عقلك الفضائي مستحيل يستوعبها." }
+        ]
+      },
+      {
+        alien: "سؤال إذا انتي خالدة وضياء يكبر ويموت، شحسوين بعدين؟",
+        choices: [
+          { btn: "أعيش على ذكرياته", txt: "كل لحظة أعيشها وياه هسة تسوى ألم الفراق بعدين، الذكريات الحلوة تكسر حتى لعنة الخلود وتخلي القلب ينبض." },
+          { btn: "الحب ما يموت وياه", txt: "كل ثانية أقضيها يمه تسوى عندي ألف فراق، الذكريات الحلوة تكسر لعنة الخلود وتخلي كلبي يرجع يعيش من جديد." }
+        ]
+      },
+      {
+        alien: "كلام شعر مو واقع، ما يحميج من الفراغ اللي حيصير بعدين، جان المفروض تظلين وية كائنات مثلج بدل ما تربطين مصيرج بفانين.",
+        choices: [
+          { btn: "اختياري وأني حرة", txt: "الكائنات اللي مثلي ملل ونفاق، ضياء علمني معنى الاهتمام الحقيقي، الهدية هاي مو مجرد حديد، هاي تعب وسهر علمودي." },
+          { btn: "شخص ممكن يعوضني عن الكل", txt: "ممكن اكو ناس منافقة، بس ضياء الوحيد جاي يحسسني بقيمتي اكثر، والمركبة هاي نتاج تعبه وسهره مو مجرد خردة." }
+        ]
+      },
+      {
+        alien: "تدرين إن محركات هاي المركبة صناعة أرضية بدائية؟ لو مارة يم عاصفة نيزكية جان رحتي بيها انتي وهديتج.",
+        choices: [
+          { btn: "بس وصلت بالسلامة", txt: "وصلت لأن إرادتي وتصميم ضياء أقوى من حزام الكويكبات مالتك، عوف الحسد واعترف إن المركبة كشخة!" },
+          { btn: "التحدي هو الحلو بالموضوع", txt: "هياتني كدامك سليمة، إصراري وحب ضياء حموني من كل نيازكك، كول ما شاء الله وبطل تنكد وصارحني المركبة تخبل مو؟" }
+        ]
+      },
+      {
+        alien: "مو حسد، تقييم تقني بحت، عموماً بما إنج وصلتي، ناوية ترجعين لو تظلين تضايقيني بسوالفج الأرضية؟",
+        choices: [
+          { btn: "راجعة بسرعة للأرض", txt: "أكيد راجعة، أصلاً اريد اسولف لضياء عن كل تجربتي، اكيد هسا هو منتظرني ، ما أبقى بكوكبك الكئيب دقيقة زيادة، ووراي كيكة من اهلي همين، وموت قهرر." },
+          { btn: "لعد شعندي ضالة يمك", txt: "لعد شتتوقع أصفن بوجهك؟ طايرة لضياء حتى أحجيله شصار، هو هسة اكيد ينتظرني، وكيكتي جاهزة بالأرض وموت من غيرتك!" }
+        ]
+      },
+      {
+        alien: "كيكة؟ تاكلون سكريات ومواد مصنعة؟ انتي مصاصة دماء المفروض تشربين... دقيقة، كمتي تاكلين كيك بعد؟!",
+        choices: [
+          { btn: "كلشي تغير هسة", txt: "حتى مصاصين الدماء يحبون الشوكولاتة والاحتفال، لازم تجرب تغير روتينك البائس وتذوق شي بي سكر حتى تحس بالحياة." },
+          { btn: "الكيك اختراع أسطوري", txt: "عاد حتى الفامبز يستمتعون بالحلاوة وطعم الكيك، جربلك قطعة سكر بلكي تطلع من مود النكد والكآبة اللي عايش بيه." }
+        ]
+      },
+      {
+        alien: "طاقتي أستمدها من التفاعل النووي البارد، ما أحتاج كلوكوز يرفع ضغطي، بس شكراً للعرض المغري اللي يهدد نظامي الحيوي.",
+        choices: [
+          { btn: "محروم من كلشي", txt: "والله كسرت خاطري، لا عيد ميلاد، لا هدايا، لا ناس تحبك، بس كاعد تراقب المجرات وتعد النيازك." },
+          { btn: "وضعك يحزن الصراحة", txt: "والله خزنت عليك، لا طلعة، لا حفلة، ولا بشر يكلك كلمة حلوة، مچلب بس بالحسابات ومراقبة الكواكب." }
+        ]
+      },
+      {
+        alien: "المراقبة وظيفة مقدسة، نحمي التوازن الكوني، انتو عايشين بفوضى وتسمونها حب وسعادة.",
+        choices: [
+          { btn: "الفوضى هي الحياة", txt: "بدون شوي فوضى ومشاعر الكون يصير صحراء ميتة مثلك، التوازن مالتك يعني الموت بالنسبة الي، اعترف إنك فضولي بخصوص البشر." },
+          { btn: "بدون مشاعر الكون ميت", txt: "نظامك الجامد هذا مجرد موت بطيء، لولا الشغف جان الكون صار صحراء كئيبة، اعترف إنك فضولي وتحب تعرف تفاصيل أكثر عن البشر!" }
+        ]
+      },
+      {
+        alien: "فضولي؟ يمكن من ناحية دراسة سلوك الكائنات الغريبة بس، مو أكثر من اهتمام علمي بمدى خبالكم.",
+        choices: [
+          { btn: "واعترافك كافي", txt: "بداية حلوة، المرة الجاية لمن أجي برحلة فضائية ويا ضياء، نجيبلك ويانا قطعة كيك ونعلمك شلون تضحك." },
+          { btn: "الفضول بداية التغيير", txt: "خطوة ممتازة! برحلتي الجاية اني وضياء حنجيبلك ويانا قطعة كيك ونعلمك تكون سعيد." }
+        ]
+      },
+      {
+        alien: "لتجيبون شي، ولتجون لزحل مرة ثانية، الرادارات مالتي تنزعج من طاقة الحب مالتكم هاي.",
+        choices: [
+          { btn: "حنجي ونعاندك", txt: "حنجي ونجرّك غصب ويانا، وهسة رايحة الحگ على ضياء وحفلتي، حتى ماكلتلي كلعام وانتي بخير" },
+          { btn: "راجعين وزحل مو مالتك", txt: "حنجي ونعلمك الونسة غصب، وهسة لازم أطير لضياء، عاد تعلم الذوق شوي وكلي كلعام وانتي بخير" }
+        ]
+      },
+      {
+        alien: "عيد... شنو؟ يلا، دوران فلكي سعيد لمدارج السنوي، وروحي قبل لا تخلص بطارية مركبتج هنا.",
+        choices: [
+          { btn: "شكراً يا فضائي", txt: "تسلم يا معقد، يلا باي، رايحة لأحلى كوكب وأحلى بشر منتظريني هناك ، بالمناسبة مهما جنت سيء وياي محضوج منك لاني اعرف شنو الي خلاك هيج." },
+          { btn: "طلعت كيوت", txt: "هيهيهيهيهي طلعت كيت ، يلا مع السلامة، رايحة لدودي ولكوكبي الكيت، وأدري بكلامك هذا نابع من وحدتك فما شايلة عليك حقد ابد." }
+        ]
+      },
+      {
+        alien: "يلا روحي روحي بطاريتك راح تخلص ونوب تجين تدورين بطارية مني",
+        choices: [
+          { btn: "بايي", txt: "ميتة على بطاريتك اني (يارب ماتخلص) ، يلا بايييي [طارت المركبة]" },
+          { btn: "ميتة على بطاريتك", txt: "ميتة على بطاريتك اني (بس الله يستر لتوكف بنص الطريق)، مع سلامة! [طارت المركبة]" }
+        ]
+      }
+    ];
+
+    let vnCurrentStep = 0;
+    let vnIsTyping = false;
+    let vnInterval = null;
+    let isVNActive = false;
+
+    // رصد النقر على كوكب زحل التفاعلي عبر الشاشة لفتح الفيجول نوفل
     window.addEventListener('click', (e) => {
-      if (isDraggingScene || e.target.closest('.star-node') || e.target.closest('#adminStudioDrawer') || e.target.closest('.modal-overlay') || e.target.closest('#zoomControls')) return;
+      if (isDraggingScene || e.target.closest('.star-node') || e.target.closest('#adminStudioDrawer') || e.target.closest('.modal-overlay') || e.target.closest('#zoomControls') || e.target.closest('.vn-container')) return;
       if (typeof celestialObjects === 'undefined') return;
       const saturn = celestialObjects.find(o => o.type === 'saturn_interactive');
       if (saturn && saturn._screenX) {
         const dist = Math.hypot(e.clientX - saturn._screenX, e.clientY - saturn._screenY);
         if (dist <= saturn._screenR) {
-          discoveredSecrets.saturn = true;
-          playStarChime();
-          document.getElementById('saturnModal').classList.add('active');
-          updateProgressStats();
+          startSaturnVisualNovel();
         }
       }
     });
 
-
-    const saturnModal = document.getElementById('saturnModal');
-    const closeSaturnBtn = document.getElementById('closeSaturnBtn');
-    if (closeSaturnBtn) {
-      closeSaturnBtn.addEventListener('click', () => saturnModal.classList.remove('active'));
+    function playVnBlip() {
+      if (isMuted) return;
+      initWebAudio();
+      if (!sfxCtx) return;
+      try {
+        const t = sfxCtx.currentTime;
+        const osc = sfxCtx.createOscillator();
+        const gain = sfxCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(500 + Math.random() * 300, t);
+        gain.gain.setValueAtTime(0.015, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+        osc.connect(gain);
+        gain.connect(sfxCtx.destination);
+        osc.start(t);
+        osc.stop(t + 0.05);
+      } catch(e){}
     }
-    saturnModal.addEventListener('click', (e) => {
-      if (e.target === saturnModal) saturnModal.classList.remove('active');
-    });
+
+    function startSaturnVisualNovel() {
+      isVNActive = true;
+      fadeAudio(ambientAudio, 0, 1000);
+      if(isSpecialPlaying) fadeAudio(specialAudio, 0, 1000);
+      
+      const vnContainer = document.getElementById('vnContainer');
+      vnContainer.classList.add('active');
+      
+      vnCurrentStep = 0;
+      showVnAlienDialogue();
+    }
+
+    function exitSaturnVisualNovel() {
+      const vnContainer = document.getElementById('vnContainer');
+      vnContainer.classList.add('leaving');
+
+      setTimeout(() => {
+        isVNActive = false;
+        vnContainer.classList.remove('active');
+        vnContainer.classList.remove('leaving');
+        fadeAudio(ambientAudio, 0.6, 1500);
+
+        if (!discoveredSecrets.saturn) {
+          discoveredSecrets.saturn = true;
+          updateProgressStats();
+          showToast("🪐✨ تم إنهاء مغامرة كوكب زحل واكتشاف السر بنجاح!");
+        }
+      }, 620);
+    }
+
+    function typeVnText(text, isAlien, onComplete) {
+      clearInterval(vnInterval);
+      const textEl = document.getElementById('vnText');
+      const nameEl = document.getElementById('vnName');
+      const spriteEl = document.getElementById('vnAlienSprite');
+      const nextInd = document.getElementById('vnNextIndicator');
+      
+      textEl.textContent = '';
+      nextInd.style.display = 'none';
+      
+      if (isAlien) {
+        nameEl.textContent = 'فضائي';
+        nameEl.style.color = '#34d399';
+        spriteEl.style.filter = 'drop-shadow(0 0 35px rgba(16, 185, 129, 0.65)) grayscale(0%) brightness(1.08)';
+        spriteEl.style.opacity = '1';
+        spriteEl.style.transform = 'translateY(-6px) scale(1.04)';
+      } else {
+        nameEl.textContent = 'سومي';
+        nameEl.style.color = '#f472b6';
+        spriteEl.style.filter = 'drop-shadow(0 0 10px rgba(0,0,0,0.6)) grayscale(100%) brightness(0.4)';
+        spriteEl.style.opacity = '0.35';
+        spriteEl.style.transform = 'translateY(12px) scale(0.92)';
+      }
+
+
+
+      let i = 0;
+      vnIsTyping = true;
+      
+      vnInterval = setInterval(() => {
+        if (i < text.length) {
+          textEl.textContent += text.charAt(i);
+          playVnBlip();
+          i++;
+        } else {
+          clearInterval(vnInterval);
+          vnIsTyping = false;
+          if (onComplete) onComplete();
+        }
+      }, 35);
+
+      // للتمكين من النقر السريع (Skip)
+      document.querySelector('.vn-dialogue-box').onclick = () => {
+        if (vnIsTyping) {
+          clearInterval(vnInterval);
+          textEl.textContent = text;
+          vnIsTyping = false;
+          if (onComplete) onComplete();
+        } else {
+          if (!isAlien) {
+            // الانتقال للخطوة التالية إذا كانت سماء هي المتحدثة وانتهى الكلام
+            vnCurrentStep++;
+            if (vnCurrentStep < saturnDialogue.length) {
+              showVnAlienDialogue();
+            } else {
+              exitSaturnVisualNovel();
+            }
+          }
+        }
+      };
+    }
+
+    function showVnAlienDialogue() {
+      const choicesEl = document.getElementById('vnChoices');
+      choicesEl.style.display = 'none';
+      choicesEl.innerHTML = '';
+      
+      typeVnText(saturnDialogue[vnCurrentStep].alien, true, () => {
+        // بعد انتهاء الفضائي تظهر الأزرار
+        saturnDialogue[vnCurrentStep].choices.forEach(choice => {
+          const btn = document.createElement('button');
+          btn.className = 'vn-choice-btn';
+          btn.textContent = choice.btn;
+          btn.onclick = (e) => {
+            e.stopPropagation();
+            choicesEl.style.display = 'none';
+            typeVnText(choice.txt, false, () => {
+              document.getElementById('vnNextIndicator').style.display = 'block';
+            });
+          };
+          choicesEl.appendChild(btn);
+        });
+        choicesEl.style.display = 'flex';
+      });
+    }
+
+    document.getElementById('exitVnBtn').addEventListener('click', exitSaturnVisualNovel);
 
     // حساب نسبة الإنجاز المئوية وتحديث القائمة
+
     function updateProgressStats() {
       const totalStars = appConfig.stars.length;
       const readStars = document.querySelectorAll('.star-node.is-read').length;
@@ -1711,7 +2257,7 @@
 
     // زوم عجلة الماوس حتى 0.18
     window.addEventListener('wheel', (e) => {
-      if (e.target.closest('#adminStudioDrawer') || e.target.closest('#memoryModal') || e.target.closest('#progressModal') || e.target.closest('#saturnModal')) return;
+      if (e.target.closest('#adminStudioDrawer') || e.target.closest('#memoryModal') || e.target.closest('#progressModal') || e.target.closest('.vn-container')) return;
       e.preventDefault();
       const delta = e.deltaY < 0 ? 0.08 : -0.08;
       sceneScale = Math.max(0.18, Math.min(2.4, sceneScale + delta));
@@ -1722,7 +2268,7 @@
 
     // نظام السحب بالماوس (للكمبيوتر)
     window.addEventListener('mousedown', (e) => {
-      if (e.target.closest('.star-node') || e.target.closest('#starJoystickWrapper') || e.target.closest('#adminStudioDrawer') || e.target.closest('.admin-floating-toggle') || e.target.closest('.modal-overlay') || e.target.closest('#zoomControls')) return;
+      if (e.target.closest('.star-node') || e.target.closest('#starJoystickWrapper') || e.target.closest('#adminStudioDrawer') || e.target.closest('.admin-floating-toggle') || e.target.closest('.modal-overlay') || e.target.closest('#zoomControls') || e.target.closest('.vn-container')) return;
       isDraggingScene = true;
       startDragX = e.clientX - sceneX;
       startDragY = e.clientY - sceneY;
@@ -1745,9 +2291,10 @@
     let lastTouchMidY = 0;
 
     window.addEventListener('touchstart', (e) => {
-      if (e.target.closest('.star-node') || e.target.closest('#starJoystickWrapper') || e.target.closest('#adminStudioDrawer') || e.target.closest('.admin-floating-toggle') || e.target.closest('.modal-overlay') || e.target.closest('#zoomControls')) return;
+      if (e.target.closest('.star-node') || e.target.closest('#starJoystickWrapper') || e.target.closest('#adminStudioDrawer') || e.target.closest('.admin-floating-toggle') || e.target.closest('.modal-overlay') || e.target.closest('#zoomControls') || e.target.closest('.vn-container')) return;
 
       if (e.touches.length === 1) {
+
         isDraggingScene = true;
         startDragX = e.touches[0].clientX - sceneX;
         startDragY = e.touches[0].clientY - sceneY;
@@ -1818,7 +2365,7 @@
     const canvas = document.getElementById('universeCanvas');
     const ctx = canvas.getContext('2d');
 
-    const SPACE_BOUND = 2200; // مساحة محددة ومحكومة لمنع الفراغ اللانهائي
+    const SPACE_BOUND = 3100; // توسيع الفضاء بنسبة 40%
     let bgStars = [];
     let cosmicDust = [];
     let meteors = [];
@@ -1828,7 +2375,7 @@
     // تتبع استكشاف الأسرار (زحل وأسرار أخرى)
     let discoveredSecrets = { saturn: false };
 
-    // مصفوفة الأجرام: قريبة من المركز وموزعة بنسق مداري متناسق يسهل رؤيته واستكشافه
+    // مصفوفة الأجرام متضمنة الأجرام السبعة الجديدة في النطاق الموسّع
     const celestialObjects = [
       // 1. الضوء البروجي وشريط الدجاجة
       { type: 'zodiacal_light', x: 0, y: 0 },
@@ -1856,28 +2403,42 @@
       { type: 'supernova', x: -420, y: -80, radius: 70 },
       { type: 'asteroid_field', x: 120, y: 380, count: 18 },
 
-      // 6. الأجرام السبعة الكبرى مقربة وموزعة حول المركز مباشرة لسهولة الوصول إليها
-      // 1. سديم كارينا (Carina Nebula) - أعلى اليسار
+      // 6. الأجرام السابقة
       { type: 'carina_nebula', x: -680, y: -520, radius: 220 },
-
-      // 2. أعمدة الخلق (Pillars of Creation) - أعلى اليمين
       { type: 'pillars_creation', x: 680, y: -560, radius: 200 },
-
-      // 3. سديم عين القط (Cat's Eye Nebula) - يمين المركز
       { type: 'cats_eye_nebula', x: 740, y: 40, radius: 100 },
-
-      // 4. سديم الوردة (Rosette Nebula) - أسفل اليمين
       { type: 'rosette_nebula', x: 620, y: 640, radius: 180 },
-
-      // 5. مجرة السومبريرو (Sombrero Galaxy - M104) - أسفل المركز
       { type: 'sombrero_galaxy', x: -60, y: 780, radius: 170 },
-
-      // 6. سديم الفراشة (Butterfly Nebula - NGC 6302) - أسفل اليسار
       { type: 'butterfly_nebula', x: -650, y: 520, radius: 150 },
+      { type: 'veil_nebula_deep', x: -740, y: -30, radius: 210 },
 
-      // 7. سديم الحجاب (Veil Nebula) - يسار المركز
-      { type: 'veil_nebula_deep', x: -740, y: -30, radius: 210 }
+      // 7. الأجرام السبعة الجديدة لملء الفضاء الموسّع بنسبة 40%
+      // 1. سديم الساعة الرملية المعكوسة (MyCn 18)
+      { type: 'hourglass_nebula', x: 1050, y: -900, radius: 160 },
+
+      // 2. سديم رأس الفرس في ضوء الأشعة تحت الحمراء (Horsehead Nebula)
+      { type: 'horsehead_nebula', x: -1100, y: -950, radius: 180 },
+
+      // 3. سديم الحلقة الجنوبي (Southern Ring Nebula)
+      { type: 'southern_ring', x: 1180, y: 250, radius: 150 },
+
+      // 4. مجرة الدوامة (Whirlpool Galaxy - M51)
+      { type: 'whirlpool_galaxy', x: -1150, y: 880, radius: 210 },
+
+      // 5. سديم تريفيد (Trifid Nebula - M20)
+      { type: 'trifid_nebula', x: 920, y: 1050, radius: 170 },
+
+      // 6. عاصفة كوكب المشتري وسداسي زحل (Jupiter Marbled & Saturn Hexagon)
+      { type: 'gas_giant_storms', x: -450, y: 1150, radius: 140 },
+
+      // 7. فقاعة الصابون الكونية (Bubble Nebula - NGC 7635)
+      { type: 'bubble_nebula', x: 420, y: -1150, radius: 150 },
+
+      // أحزمة كويكبات إضافية في الفضاء الجديد
+      { type: 'asteroid_field', x: -980, y: -300, count: 16 },
+      { type: 'asteroid_field', x: 950, y: -350, count: 16 }
     ];
+
 
 
 
@@ -1921,18 +2482,24 @@
         });
       }
 
-      // الأجرام المتحركة عبر الفضاء السحيق
+      // الأجرام المتحركة عبر الفضاء السحيق الموسّع
       comets = [
         { x: -900, y: -700, vx: 1.2, vy: 0.8, length: 180, size: 3.5 },
-        { x: 1100, y: -900, vx: -0.9, vy: 1.1, length: 140, size: 2.8 }
+        { x: 1100, y: -900, vx: -0.9, vy: 1.1, length: 140, size: 2.8 },
+        { x: -1200, y: 800, vx: 1.1, vy: -0.7, length: 160, size: 3.0 },
+        { x: 700, y: 1100, vx: -1.0, vy: -0.9, length: 150, size: 3.2 }
       ];
 
-      // كويكبات متطايرة وتدور حول نفسها في الفضاء
+      // كويكبات متطايرة وتدور حول نفسها موزعة في المساحات الجديدة
       window.driftingAsteroids = [
         { x: -350, y: 150, vx: 0.25, vy: -0.15, rot: 0, rotSpeed: 0.012, size: 6.5 },
         { x: 280, y: -220, vx: -0.18, vy: 0.22, rot: 0, rotSpeed: -0.015, size: 8 },
-        { x: -120, y: -380, vx: 0.12, vy: 0.2, rot: 0, rotSpeed: 0.008, size: 5.5 }
+        { x: -120, y: -380, vx: 0.12, vy: 0.2, rot: 0, rotSpeed: 0.008, size: 5.5 },
+        { x: 850, y: -750, vx: -0.22, vy: 0.14, rot: 0, rotSpeed: 0.016, size: 7.0 },
+        { x: -950, y: 650, vx: 0.18, vy: -0.20, rot: 0, rotSpeed: -0.012, size: 8.5 },
+        { x: 750, y: 850, vx: -0.15, vy: -0.18, rot: 0, rotSpeed: 0.010, size: 6.0 }
       ];
+
 
       // حطام فضائي وقمر اصطناعي يعبر المدار
       window.orbitingSatellite = { x: -500, y: -180, vx: 0.45, vy: 0.12, rot: 0 };
@@ -2327,6 +2894,225 @@
           ctx.stroke();
           ctx.restore();
         }
+        else if (obj.type === 'hourglass_nebula') {
+          // 1. سديم الساعة الرملية المعكوسة (MyCn 18)
+          const hr = obj.radius * sceneScale;
+          ctx.save();
+          ctx.translate(screenX, screenY);
+          ctx.rotate(0.25);
+
+          // الحلقتان المتناظرتان (برتقالي وأصفر ناري)
+          ctx.strokeStyle = 'rgba(249, 115, 22, 0.4)';
+          ctx.lineWidth = 3 * sceneScale;
+          ctx.beginPath();
+          ctx.ellipse(0, -hr * 0.45, hr * 0.45, hr * 0.35, 0, 0, Math.PI * 2);
+          ctx.stroke();
+
+          ctx.strokeStyle = 'rgba(251, 191, 36, 0.4)';
+          ctx.beginPath();
+          ctx.ellipse(0, hr * 0.45, hr * 0.45, hr * 0.35, 0, 0, Math.PI * 2);
+          ctx.stroke();
+
+          // العين البيضاوية الخضراء في المنتصف
+          ctx.fillStyle = 'rgba(16, 185, 129, 0.45)';
+          ctx.beginPath();
+          ctx.ellipse(0, 0, hr * 0.22, hr * 0.14, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = '#67e8f9';
+          ctx.beginPath();
+          ctx.arc(0, 0, Math.max(1.8, 3 * sceneScale), 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+        else if (obj.type === 'horsehead_nebula') {
+          // 2. سديم رأس الفرس (Horsehead Nebula)
+          const hhr = obj.radius * sceneScale;
+          ctx.save();
+          ctx.translate(screenX, screenY);
+
+          // ستارة خلفية قرمزية ووردية
+          ctx.fillStyle = 'rgba(225, 29, 72, 0.16)';
+          ctx.beginPath();
+          ctx.arc(0, 0, hhr * 0.9, 0, Math.PI * 2);
+          ctx.fill();
+
+          // خيال رأس الفرس الشطرنجي البني الداكن
+          ctx.beginPath();
+          ctx.moveTo(-hhr * 0.25, hhr * 0.6);
+          ctx.lineTo(-hhr * 0.25, -hhr * 0.1);
+          ctx.quadraticCurveTo(-hhr * 0.35, -hhr * 0.5, 0, -hhr * 0.6);
+          ctx.quadraticCurveTo(hhr * 0.35, -hhr * 0.5, hhr * 0.2, -hhr * 0.2);
+          ctx.quadraticCurveTo(hhr * 0.05, -hhr * 0.1, hhr * 0.15, hhr * 0.1);
+          ctx.lineTo(hhr * 0.3, hhr * 0.6);
+          ctx.closePath();
+          ctx.fillStyle = 'rgba(41, 26, 17, 0.85)';
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(244, 114, 182, 0.3)';
+          ctx.lineWidth = 1.5 * sceneScale;
+          ctx.stroke();
+          ctx.restore();
+        }
+        else if (obj.type === 'southern_ring') {
+          // 3. سديم الحلقة الجنوبي (Southern Ring Nebula)
+          const srr = obj.radius * sceneScale;
+          ctx.save();
+          ctx.translate(screenX, screenY);
+
+          // حلقات متتابعة تتوسع كأمواج ماء
+          for (let w = 3; w >= 1; w--) {
+            ctx.strokeStyle = w === 3 ? 'rgba(56, 189, 248, 0.25)' : (w === 2 ? 'rgba(249, 115, 22, 0.3)' : 'rgba(254, 240, 138, 0.4)');
+            ctx.lineWidth = (4 - w) * 1.5 * sceneScale;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, srr * (w * 0.3), srr * (w * 0.22), 0.35, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+
+          // النجم المركزي المزدوج
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(-3 * sceneScale, 0, Math.max(1.5, 2.5 * sceneScale), 0, Math.PI * 2);
+          ctx.arc(3 * sceneScale, 0, Math.max(1.2, 2 * sceneScale), 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+        else if (obj.type === 'whirlpool_galaxy') {
+          // 4. مجرة الدوامة (Whirlpool Galaxy - M51)
+          const wr = obj.radius * sceneScale;
+          ctx.save();
+          ctx.translate(screenX, screenY);
+
+          // أذرع حلزونية لولبية بلورية
+          ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
+          ctx.lineWidth = 2.5 * sceneScale;
+          for (let arm = 0; arm < 2; arm++) {
+            ctx.beginPath();
+            const startAngle = arm * Math.PI;
+            for (let t = 0; t < 25; t++) {
+              const theta = startAngle + t * 0.2;
+              const rad = wr * 0.03 * t;
+              const x = Math.cos(theta) * rad * 1.2;
+              const y = Math.sin(theta) * rad * 0.8;
+              if (t === 0) ctx.moveTo(x, y);
+              else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+          }
+
+          // المجرة القزمة الرفيقة في الطرف
+          ctx.fillStyle = 'rgba(244, 114, 182, 0.45)';
+          ctx.beginPath();
+          ctx.arc(wr * 0.7, -wr * 0.4, wr * 0.16, 0, Math.PI * 2);
+          ctx.fill();
+
+          // قلب المجرة
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(0, 0, Math.max(2, 4 * sceneScale), 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+        else if (obj.type === 'trifid_nebula') {
+          // 5. سديم تريفيد (Trifid Nebula - M20)
+          const tr = obj.radius * sceneScale;
+          ctx.save();
+          ctx.translate(screenX, screenY);
+
+          // الجانب الأزرق السماوي العاكس
+          ctx.fillStyle = 'rgba(56, 189, 248, 0.22)';
+          ctx.beginPath();
+          ctx.arc(tr * 0.35, 0, tr * 0.4, 0, Math.PI * 2);
+          ctx.fill();
+
+          // الجانب الأحمر القاني/الوردي
+          ctx.fillStyle = 'rgba(225, 29, 72, 0.25)';
+          ctx.beginPath();
+          ctx.arc(-tr * 0.3, 0, tr * 0.5, 0, Math.PI * 2);
+          ctx.fill();
+
+          // الممرات الغبارية المظلمة الثلاثية
+          ctx.strokeStyle = 'rgba(15, 23, 42, 0.8)';
+          ctx.lineWidth = 3 * sceneScale;
+          for (let m = 0; m < 3; m++) {
+            const mAngle = (m * Math.PI * 2) / 3;
+            ctx.beginPath();
+            ctx.moveTo(-tr * 0.3, 0);
+            ctx.lineTo(-tr * 0.3 + Math.cos(mAngle) * (tr * 0.45), Math.sin(mAngle) * (tr * 0.45));
+            ctx.stroke();
+          }
+          ctx.restore();
+        }
+        else if (obj.type === 'gas_giant_storms') {
+          // 6. عاصفة كوكب المشتري وسداسي زحل
+          const gr = obj.radius * sceneScale;
+          ctx.save();
+          ctx.translate(screenX, screenY);
+
+          // قرص الغاز المتموج بتدرج كراميل وأزرق
+          ctx.fillStyle = 'rgba(217, 119, 6, 0.35)';
+          ctx.beginPath();
+          ctx.arc(0, 0, gr * 0.7, 0, Math.PI * 2);
+          ctx.fill();
+
+          // خطوط متماوجة رخامية
+          ctx.strokeStyle = 'rgba(254, 243, 199, 0.4)';
+          ctx.lineWidth = 2 * sceneScale;
+          for (let l = -2; l <= 2; l++) {
+            ctx.beginPath();
+            ctx.moveTo(-gr * 0.6, l * (gr * 0.2));
+            ctx.bezierCurveTo(-gr * 0.2, l * (gr * 0.2) + 6, gr * 0.2, l * (gr * 0.2) - 6, gr * 0.6, l * (gr * 0.2));
+            ctx.stroke();
+          }
+
+          // الإعصار السداسي في القطب
+          ctx.strokeStyle = 'rgba(56, 189, 248, 0.55)';
+          ctx.lineWidth = 2 * sceneScale;
+          ctx.beginPath();
+          for (let h = 0; h < 6; h++) {
+            const hAngle = (h * Math.PI) / 3;
+            const hx = Math.cos(hAngle) * (gr * 0.25);
+            const hy = -gr * 0.4 + Math.sin(hAngle) * (gr * 0.12);
+            if (h === 0) ctx.moveTo(hx, hy);
+            else ctx.lineTo(hx, hy);
+          }
+          ctx.closePath();
+          ctx.stroke();
+          ctx.restore();
+        }
+        else if (obj.type === 'bubble_nebula') {
+          // 7. فقاعة الصابون الكونية (Bubble Nebula)
+          const bbr = obj.radius * sceneScale;
+          ctx.save();
+          ctx.translate(screenX, screenY);
+
+          // الغيوم البنفسجية والذهبية الخلفية
+          ctx.fillStyle = 'rgba(168, 85, 247, 0.12)';
+          ctx.beginPath();
+          ctx.arc(0, 0, bbr * 0.85, 0, Math.PI * 2);
+          ctx.fill();
+
+          // غشاء الفقاعة الرقيق الأزرق الفسفوري
+          ctx.strokeStyle = 'rgba(56, 189, 248, 0.65)';
+          ctx.lineWidth = 2.5 * sceneScale;
+          ctx.beginPath();
+          ctx.arc(bbr * 0.1, -bbr * 0.1, bbr * 0.45, 0, Math.PI * 2);
+          ctx.stroke();
+
+          // لمعان ضوئي رقيق على حافة الفقاعة
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+          ctx.lineWidth = 1.5 * sceneScale;
+          ctx.beginPath();
+          ctx.arc(bbr * 0.1, -bbr * 0.1, bbr * 0.45, -0.8, 0.4);
+          ctx.stroke();
+
+          // النجم الداخلي النافخ للفقاعة
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(0, 0, Math.max(1.5, 2.5 * sceneScale), 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+
 
 
         else if (obj.type === 'asteroid_field') {
@@ -2638,12 +3424,16 @@
     const STAR_COLOR_PALETTES = ['#38bdf8', '#f472b6', '#fbbf24', '#c084fc', '#34d399', '#60a5fa'];
 
     function normalizeStarCoordinates(star) {
-      // تحويل أي نسبة قديمة إلى إحداثيات بكسل مطلقة وثابتة لمرة واحدة
-      if (typeof star.x === 'string' || star.x <= 100) {
+      // تحويل النسبة المئوية فقط إذا كانت نصاً قديماً يحتوي على علامة %
+      if (typeof star.x === 'string' && star.x.includes('%')) {
         star.x = Math.round((parseFloat(star.x) / 100) * window.innerWidth);
         star.y = Math.round((parseFloat(star.y) / 100) * window.innerHeight);
+      } else {
+        star.x = parseFloat(star.x) || 0;
+        star.y = parseFloat(star.y) || 0;
       }
     }
+
 
     function renderStars() {
       interactiveLayer.innerHTML = '';
@@ -2744,14 +3534,17 @@
       if (joystickLoopId) return;
       function loop() {
         if (isJoystickActive && activeStarData) {
-          activeStarData.x += joystickVectorX * JOYSTICK_MAX_SPEED;
-          activeStarData.y += joystickVectorY * JOYSTICK_MAX_SPEED;
+          // موازنة السرعة مع زوم الفضاء لكي تتحرك بسلاسة تامة في أي مكان
+          activeStarData.x += (joystickVectorX * JOYSTICK_MAX_SPEED) / sceneScale;
+          activeStarData.y += (joystickVectorY * JOYSTICK_MAX_SPEED) / sceneScale;
           updateJoystickWrapperPosition();
         }
         joystickLoopId = requestAnimationFrame(loop);
       }
       joystickLoopId = requestAnimationFrame(loop);
     }
+
+
 
     function stopJoystickMovement() {
       if (joystickLoopId) {
@@ -3133,10 +3926,9 @@
           target.songUrl = newStarSong.value.trim();
         }
       } else {
-        // حساب إحداثيات المنتصف بدقة مع خصم الإزاحة والزوم الحالي
-        const spawnX = Math.round(((window.innerWidth / 2) - sceneX) / sceneScale);
-        const spawnY = Math.round(((window.innerHeight / 2) - sceneY) / sceneScale);
-
+        // حساب مركز الشاشة الفعلي داخل الفضاء مهما كان موقع الكاميرا أو الزوم
+        const spawnX = Math.round((window.innerWidth / 2 - sceneX) / sceneScale);
+        const spawnY = Math.round((window.innerHeight / 2 - sceneY) / sceneScale);
 
         const newStar = {
           id: Date.now(),
@@ -3148,6 +3940,7 @@
           message: msg
         };
         appConfig.stars.push(newStar);
+
       }
 
       saveAppConfig();
