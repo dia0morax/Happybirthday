@@ -951,12 +951,32 @@
       100% { transform: scaleY(1.35); opacity: 1; }
     }
 
+    /* قائمة التحذير الحمراء المختصرة عند زيارة الكوكب مسبقاً */
+    #planetConfirmModal.visited-warning .glass-card {
+      border: 2px solid #ef4444 !important;
+      box-shadow: 0 0 35px rgba(239, 68, 68, 0.4), inset 0 0 20px rgba(239, 68, 68, 0.15) !important;
+      background: radial-gradient(circle at 50% 0%, rgba(239, 68, 68, 0.22) 0%, rgba(15, 23, 42, 0.94) 80%) !important;
+      max-width: 380px !important;
+      padding: 26px 20px !important;
+    }
+    #planetConfirmModal.visited-warning #planetConfirmTitle {
+      color: #f87171 !important;
+      font-size: 1.35rem !important;
+      margin-bottom: 8px !important;
+    }
+    #planetConfirmModal.visited-warning #planetConfirmText {
+      color: #fca5a5 !important;
+      font-size: 0.95rem !important;
+      margin-bottom: 18px !important;
+    }
+
     /* أنماط خلفيات الكواكب بدون تحميل مسبق ثقيل */
     .vn-container.mode-saturn {
       background-position: center center;
       background-size: cover;
       background-repeat: no-repeat;
     }
+
     .vn-container.mode-neptune {
       background-position: center center;
       background-size: cover;
@@ -1901,9 +1921,13 @@
           <span>النجوم المقروءة:</span>
           <b id="starsProgressText">0 / 0</b>
         </div>
+        <div class="progress-detail-item">
+          <span>الكواكب والمشاهد:</span>
+          <b id="scenesProgressText" style="color: var(--accent-cyan);">0 / 22</b>
+        </div>
         <div class="progress-detail-item" style="align-items: center;">
           <div style="display: flex; align-items: center; gap: 8px;">
-            <span>الأسرار المستكشفة:</span>
+            <span>الأسرار الكبرى:</span>
             <button id="openHintsBtn" style="background: rgba(251, 191, 36, 0.15); border: 1px solid var(--accent-gold); color: var(--accent-gold); border-radius: 12px; padding: 2px 10px; font-size: 0.82rem; cursor: pointer; font-family: 'Tajawal', sans-serif;">
               💡 تلميح
             </button>
@@ -1911,6 +1935,7 @@
           <b id="secretsProgressText">0 / 4</b>
         </div>
       </div>
+
 
 
       <div class="progress-hint-note">
@@ -2325,11 +2350,61 @@
       }
     }
 
-    // روابط صور الكواكب - تُحمّل فقط عند الحاجة لتوفير البيانات والتخلص من اللاق تماماً
+    // قاعدة بيانات الخلفيات الشاملة لكافة الأجرام والمشاهد
     const PLANET_BG_MAP = {
       'saturn': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8135%20(1).png",
       'mars': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8136.png",
-      'neptune': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8137.png"
+      'neptune': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8137.png",
+      'mercury': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8078.png",
+      'venus': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8079.png",
+      'jupiter': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8080.png",
+      'uranus': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8081.png",
+      'zodiacal': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8082.png",
+      'cygnus': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8083.png",
+      'blackhole': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8084.png",
+      'pulsar': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8085.png",
+      'supernova': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8086.png",
+      'carina': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8087.png",
+      'pillars': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8129.png",
+      'catseye': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8088.png",
+      'rosette': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8089.png",
+      'sombrero': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8090.png",
+      'butterfly': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8091.png",
+      'veil': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8092.png",
+      'hourglass': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8093.png",
+      'horsehead': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8094.png",
+      'southern_ring': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8095.png",
+      'whirlpool': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8096.png",
+      'trifid': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8097.png",
+      'gas_storms': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8098.png",
+      'bubble': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8099.png"
+    };
+
+    // نصوص حديث سومي مع نفسها لكل كوكب وجرم جديد
+    const CELESTIAL_MONOLOGUES = {
+      'mercury': "«(وقفت سومي على حافة فوهة عملاقة وصخورها السوداء باردة وجامدة مثل الزجاج)... واه الشمس طالعة بالسما بحجم مهيب، جبيرة وتملي العين بنور أبيض يلمع على الوديان والتراب الناعم بدون ولا ذرة هوى تخلي الغبار يتحرك.»",
+      'venus': "«الأرضية البازلتية الصخرية صلبة وثكيلة جوة رجلي، وممتدة لسهول بركانية مسطحة مالها آخر... رفعت عيني لكيت الغيوم الصفرة الكثيفة سادة السما فوگي مثل سگف ذهبي ، والضوء متشتت ودافي عبالك وكت غروب أزلي ما يخلص.»",
+      'jupiter': "«نزلت على سطح صخري صلب ومجمد بنص هاي البيئة العملاقة... صخور جليدية مكسرة وصافية، وسما الكوكب فوگي عبارة عن جبال من غيوم كهرمانية وبيضة دتتحرك بسرعة رهيبة مثل شلالات غاز معلكة بالأفق.»",
+      'uranus': "«كاع مجلدة بالكامل، مثل صخور من زجاج أزرق ثلجي تكسر الضوة وي كل خطوة... السما فوگي صافية بلون فيروزي يرد الروح، وحلقات الكوكب طالعة بالسما كأنها جسر رفيع من ثلج يعبر المنظر كدامي.»",
+      'zodiacal': "«صخور داكنة ملسة تشبه شواطئ مهجورة، بس الأفق كدامي مابيه بحر... بيه مسار كامل من غبار ماسي ناعم سابح بمسار مايل بالسما، ديلمع ببطء وهدوء كأن السما دتتنفس ضوة.»",
+      'cygnus': "«واكفة على هضبة حجرية عالية برودتها تلمس الروح... السما فوگي مو ليل عادي، النجوم متراصة حيل وحدة بصف اللخ لدرجة مسوية سقف صلب من النور الأبيض، مضوي كل حجر وحفرة كدامي بوضوح يخبل.»",
+      'blackhole': "«صخور الكوكب هنا كأنها فحم مصقول، سوداء وثابتة بثكل عجيب... السما فوك راسي مشدودة بقوس ضوئي ساحر يفتر بحركة مهيبة، النجوم ملتفة داير مدايره بنور برتقالي يحبس الأنفاس من هيبته.»",
+      'pulsar': "«الأرضية خشنة ومرتفعة بين جبال صخرية حادة... وكل ثانية، يمر بالسما خط ضوء أبيض حاد يمسح الأفق مثل منارة بحر، ينور قمم الجبال اللي حولي بومضة ويرجع يختفي بانتظام ،دوخنييييي.»",
+      'supernova': "«واكفة على حافة وادي صخري مكسر، والمنظر بالسما عبالك نار مشتعلة بألوان الياقوت والأخضر الزمردي... الضوة المتفجر ديصبغ سفوح الصخور اللي يمي بألوان متغيرة تسر النظر.»",
+      'carina': "«صخور الجبال اللي دا اتسلقها رمادية دافية، ومطرزة بعروق ملونة... السما كبالي بحر من غبار وردي وبنفسجي يتخلل القمم، والنجوم الطالعة جديدة تبين كأنها قناديل مشعولة بين كتل الضباب الصاعد من الوديان.»",
+      'pillars': "«واكفة على أرض ترابية ثابتة بقاع السديم... الأبراج كدامي مو دخان، كأنها جبال شاهقة من طين وذهب مرتفعة للسما، وضوء النجوم ديشق طريقه من ورا القمم مالتها ويفرش ظلال طويلة هادئة يمي.»",
+      'catseye': "«الأرضية من صخر أملس عبالك شاطئ بحر ناشف، والسما مفتوحة على حلقات دائرية متراكبة باللون الفيروزي والأخضر... الدوائر كاملة التناسق فوگي تحسسني كأني واكفة بنص قبة قصر بدون حايط.»",
+      'rosette': "«الحجارة هنا عليها لمعة خفيفة، والتلال تمتد لمسافات بعيدة... بالسما، السحب الحمرة تلف بنعومة متدرجة مثل طبقات وردة عملاقة مغطية الأفق كله، ومنطية الأرض ضوة وردي مريح حيل للأعصاب.»",
+      'sombrero': "«واكفة على حافة صخرة ممتدة بحزام غباري عريض... بالسما كبالي قرص ضخم من ضوة أبيض ناصع، وخط أسود كاحل كاسر النور بالنص، منظر متوازن وهادئ لدرجة تخليك بس تصفن وتسمع السكون.»",
+      'butterfly': "«تلال كلسية بيضة وباردة، والسما فوگها مشكوكة بنصين من أجنحة غاز بنفسجي وأزرق... الرياح الفضائية رقيقة تداعب الصخور، والضوء المتناثر من الأجنحة منعكس على الحصى بنعومة.»",
+      'veil': "«صخور هادية خالية من أي أثر، بس السما كأنها مشبوكة بشباك حريرية متوهجة بخطوط زرگ وحمر رفيعة... خيوط النور نازلة من الفضاء وقريبة كأنها راح تلمس قمم الصخور.»",
+      'hourglass': "«واكفة بوسط سهل صخري منبسط... بالسما، الوهج محصور ومخصور من النص بشكل هندسي متناظر تماماً، صاير مثل برج مراقبة من ضوء برتقالي ناصع يسكب نوره على أطراف الأرض المنبسطة.»",
+      'horsehead': "«واكفة بين صخور متناثرة بوادي مظلم... رفعت راسي ولكيت جدار غباري أسود عملاق يرتفع كدامي مثل تمثال راس خيل صامد بالسما، ووراه مباشرة شفق أحمر قانٍ يحدد ملامحه بدقة خيالية.»",
+      'southern_ring': "«أرضية حجرية زركة تلمع مثل البلور المنكسر... والسما دائرية بالكامل، طبقة غاز ورا طبقة تتسع بهدوء، وبالمركز نجمة بيضة صغيرة كأنها درّة محطوطة بنص محارة عملاقة من نور.»",
+      'whirlpool': "«واكفة على شاطئ صخري يطل على فراغ ماله نهاية... وبنص السما، أذرع المجرة تفتر ببطء كأنها شلالات من نجوم زركة تدور بحركة حلزونية واضحة تنور الأفق والجبال كدامي.»",
+      'trifid': "«الأرض صخرية بنية ومستقرة، ومقسمة لمسارات طبيعية... السما فوگي مقسومة ل3 كتل ضوئية؛ جهة وردية دافية وجهة زركة ثلجية، وبيناتهم أودية من سحاب أسود تفصل الضوة عن الضوة.»",
+      'gas_storms': "«واكفة على هضبة جليدية متجمدة وصلبة... بالسما، الغيوم تسوي زوايا حادة ومستقيمة بست أضلاع هندسية مثالية تدور بدون توقف، منظر غريب ومهيب يخليك تحس شكد الطبيعة دقيقة.»",
+      'bubble': "«الأرضية صلبة وسوداء... بالسما فوگي كروي رقيق جداً وشفاف، الضوة ينكسر عليه بألوان قوس قزح خفيفة تسبح بنص ظلام النجوم، مشهد ناعم حيل ينطي شعور عجيب بالراحة.»"
     };
 
     function setupAudioSources() {
@@ -2337,6 +2412,7 @@
       ambientAudio.volume = 0.6;
       specialAudio.volume = 0.9;
     }
+
 
 
 
@@ -2648,7 +2724,7 @@
     let vnInterval = null;
     let isVNActive = false;
 
-    // نظام تأكيد الدخول للكواكب
+    // نظام تأكيد الدخول الذكي للكواكب والمشاهد
     let pendingPlanetAction = null;
     const planetConfirmModal = document.getElementById('planetConfirmModal');
     const planetConfirmIcon = document.getElementById('planetConfirmIcon');
@@ -2657,15 +2733,22 @@
     const confirmEnterPlanetBtn = document.getElementById('confirmEnterPlanetBtn');
     const cancelEnterPlanetBtn = document.getElementById('cancelEnterPlanetBtn');
 
-    function askToEnterPlanet(icon, planetName, onConfirm) {
+    function askToEnterPlanet(icon, planetName, onConfirm, isVisited = false) {
       pendingPlanetAction = onConfirm;
-      planetConfirmIcon.textContent = icon;
-      planetConfirmTitle.textContent = `هل تريدين الدخول إلى ${planetName}؟`;
-      planetConfirmText.textContent = `أنتِ الآن على مشارف ${planetName}، هل ترغبين بالهبوط وبدء المغامرة؟`;
+      planetConfirmIcon.textContent = icon || '🪐';
+      if (isVisited) {
+        planetConfirmModal.classList.add('visited-warning');
+        planetConfirmTitle.textContent = `⚠️ تنبيه: المكان مُستكشف!`;
+        planetConfirmText.textContent = `لقد هبطتِ على ${planetName} من قبل، هل تريدين الدخول مجدداً؟`;
+      } else {
+        planetConfirmModal.classList.remove('visited-warning');
+        planetConfirmTitle.textContent = `هل تريدين الدخول إلى ${planetName}؟`;
+        planetConfirmText.textContent = `أنتِ الآن على مشارف ${planetName}، هل ترغبين بالهبوط وبدء الاستكشاف؟`;
+      }
       planetConfirmModal.classList.add('active');
     }
 
-    // دالة الانتقال والتحميل الفضائي الذكية
+    // دالة الانتقال والتحميل: 4 ثوانٍ للأجرام الجديدة وثانيتان للكواكب الكبرى الثلاثة
     function launchPlanetLoadingTransition(planetKey, planetName, onReady) {
       const loader = document.getElementById('planetLoadingScreen');
       const bar = document.getElementById('warpBarInner');
@@ -2675,22 +2758,23 @@
       bar.style.width = '0%';
       loader.classList.add('active');
 
-      // تخفيف الفضاء في الخلفية بإيقاف التأثيرات اللحظية
       isDraggingScene = false;
 
-      // تحميل صورة خلفية الكوكب المحددة فقط أثناء شاشة الانتظار
       const img = new Image();
       const targetBg = PLANET_BG_MAP[planetKey] || '';
       if (targetBg) img.src = targetBg;
 
       const startTime = performance.now();
-      const minDuration = 2000; // ثانيتان على الأقل كما طلبت
+      // مدة 4 ثوانٍ (4000ms) للأجرام الجديدة، وثانيتان (2000ms) للكواكب الثلاثة الأساسية
+      const isCustomPlanet = (planetKey !== 'saturn' && planetKey !== 'mars' && planetKey !== 'neptune');
+      const minDuration = isCustomPlanet ? 4000 : 2000;
 
       let progressInterval = setInterval(() => {
         const elapsed = performance.now() - startTime;
         const pct = Math.min(95, Math.round((elapsed / minDuration) * 95));
         bar.style.width = pct + '%';
       }, 50);
+
 
       function finalizeTransition() {
         clearInterval(progressInterval);
@@ -2793,13 +2877,16 @@
         }
       }
 
-      // 4. كوكب المريخ
+      // 4. كوكب المريخ (محمي بالكامل)
       const mars = celestialObjects.find(o => o.type === 'mars_interactive');
       if (mars && mars._screenX) {
         const dist = Math.hypot(clientX - mars._screenX, clientY - mars._screenY);
         if (dist <= mars._screenR) {
           playStarChime();
+          const hasVisitedMars = !!visitedScenes['mars'];
           askToEnterPlanet("🔴", "كوكب المريخ", () => {
+            visitedScenes['mars'] = true;
+            persistSecrets();
             launchPlanetLoadingTransition('mars', "كوكب المريخ", () => {
               if (discoveredSecrets.mars) {
                 startLinearVN('mode-mars', [
@@ -2813,14 +2900,37 @@
                 startLinearVN('mode-mars', marsDialogue, 'mars');
               }
             });
-          });
+          }, hasVisitedMars);
           return true;
         }
       }
 
+      // 5. فحص باقي الأجرام والكواكب الـ 21 التفاعلية الجديدة
+      for (let obj of celestialObjects) {
+        if (obj.key && CELESTIAL_MONOLOGUES[obj.key] && obj._screenX) {
+          const hitRadius = Math.max(30, (obj.radius || 25) * sceneScale * 1.3);
+          const dist = Math.hypot(clientX - obj._screenX, clientY - obj._screenY);
+          if (dist <= hitRadius) {
+            playStarChime();
+            const isAlreadyVisited = !!visitedScenes[obj.key];
+            askToEnterPlanet(obj.icon || '🌌', obj.name, () => {
+              visitedScenes[obj.key] = true;
+              persistSecrets();
+              launchPlanetLoadingTransition(obj.key, obj.name, () => {
+                // دخول الجرم بموسيقى الفضاء الأساسية وتحدث سومي مع نفسها
+                startLinearVN('mode-celestial-custom', [
+                  { speaker: "سومي", isAlien: false, text: CELESTIAL_MONOLOGUES[obj.key] }
+                ], obj.key);
+              });
+            }, isAlreadyVisited);
+            return true;
+          }
+        }
+      }
 
       return false;
     }
+
 
     // زر إعادة الحوار من البداية
     const vnReplayBtn = document.getElementById('vnReplayBtn');
@@ -2844,9 +2954,14 @@
           startLinearVN('mode-mars', [
             { speaker: "سماء (سومي)", isAlien: false, text: "اوه شكله خال الفضائي الي اشغل جدنا بفزعته واربعة وعشرين ساعة نايم، خلي ارجع بعدين." }
           ], 'mono_mars');
+        } else if (CELESTIAL_MONOLOGUES[vnCurrentStory]) {
+          startLinearVN('mode-celestial-custom', [
+            { speaker: "سومي", isAlien: false, text: CELESTIAL_MONOLOGUES[vnCurrentStory] }
+          ], vnCurrentStory);
         }
       });
     }
+
 
 
     // إدارة نافذة تلميحات الأسرار
@@ -3236,7 +3351,13 @@
           </div>
         `;
       } else {
-        updatePlanetBadge("🌌", "مدار الفضاء الخارجي", "rgba(255, 255, 255, 0.3)");
+        // جميع الأجرام والكواكب الجديدة: إبقاء المشهد نقياً وكاملاً ورؤية خلفية الكوكب بوضوح
+        const objDef = celestialObjects.find(o => o.key === vnCurrentStory);
+        if (objDef) {
+          updatePlanetBadge(objDef.icon || "🌌", objDef.name, "rgba(56, 189, 248, 0.5)");
+        } else {
+          updatePlanetBadge("🌌", "مدار الفضاء الخارجي", "rgba(255, 255, 255, 0.3)");
+        }
         spriteEl.innerHTML = '';
       }
 
@@ -3244,7 +3365,6 @@
         document.getElementById('vnNextIndicator').style.display = 'block';
       });
     }
-
 
     function typeCustomVnText(speakerName, text, isAlien, onComplete) {
       clearInterval(vnInterval);
@@ -3291,18 +3411,23 @@
         }
       }, 32);
 
-      document.querySelector('.vn-dialogue-box').onclick = () => {
+      const box = document.querySelector('.vn-dialogue-box');
+      box.onclick = (e) => {
+        e.stopPropagation();
         if (vnIsTyping) {
+          // إذا كان يكتب: يظهر النص كاملاً فوراً ويتوقف التكرار
           clearInterval(vnInterval);
           textEl.textContent = text;
           vnIsTyping = false;
           if (onComplete) onComplete();
         } else {
+          // إذا كان قد اكتمل: ينتقل للسطر التالي فقط
           vnLinearIndex++;
           playLinearStep();
         }
       };
     }
+
 
 
     function typeVnText(text, isAlien, onComplete) {
@@ -3396,30 +3521,39 @@
 
     document.getElementById('exitVnBtn').addEventListener('click', exitSaturnVisualNovel);
 
-    // حساب نسبة الإنجاز المئوية وتحديث القائمة بدقة لجميع الأسرار
+    // حساب نسبة الإنجاز وتحديث الأسرار والكواكب والمشاهد
     function updateProgressStats() {
       const totalStars = appConfig.stars.length;
       const readStars = document.querySelectorAll('.star-node.is-read').length;
-      const totalSecrets = 4; // زحل + النجمة البلورية + نيبتون + المريخ
+      
+      // 1. الأسرار الكبرى الأربعة (زحل، النجمة البلورية، نيبتون، المريخ)
+      const totalSecrets = 4;
       const secretsFound = (discoveredSecrets.saturn ? 1 : 0) + 
                            (discoveredSecrets.crystalDestroyed ? 1 : 0) + 
                            (discoveredSecrets.neptune ? 1 : 0) + 
                            (discoveredSecrets.mars ? 1 : 0);
 
-      const totalItems = totalStars + totalSecrets;
-      const completedItems = readStars + secretsFound;
+      // 2. الكواكب والمشاهد المستكشفة (22 كوكب وجرم)
+      const totalScenes = Object.keys(CELESTIAL_MONOLOGUES).length;
+      const scenesFound = Object.keys(visitedScenes).filter(k => k !== 'saturn' && k !== 'neptune').length;
+
+      const totalItems = totalStars + totalSecrets + totalScenes;
+      const completedItems = readStars + secretsFound + scenesFound;
       const percent = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
 
       const barFill = document.getElementById('progressBarFill');
       const label = document.getElementById('progressPercentLabel');
       const starsText = document.getElementById('starsProgressText');
+      const scenesText = document.getElementById('scenesProgressText');
       const secretsText = document.getElementById('secretsProgressText');
 
       if (barFill) barFill.style.width = percent + '%';
       if (label) label.textContent = percent + '%';
       if (starsText) starsText.textContent = `${readStars} / ${totalStars}`;
+      if (scenesText) scenesText.textContent = `${scenesFound} / ${totalScenes}`;
       if (secretsText) secretsText.textContent = `${secretsFound} / ${totalSecrets}`;
     }
+
 
 
 
@@ -3550,19 +3684,20 @@
     const canvas = document.getElementById('universeCanvas');
     const ctx = canvas.getContext('2d');
 
-    const SPACE_BOUND = 3100; // توسيع الفضاء بنسبة 40%
+    const SPACE_BOUND = 4500; // توسيع حدود انتشار النجوم والمتحركات بنسبة 40% إضافية للأطراف
     let bgStars = [];
     let cosmicDust = [];
     let meteors = [];
     let comets = [];
     let pulsarAngle = 0;
 
+
     // مسح وتصفير تقدم الأحداث تلقائياً عند أي رفرش لتبدأ التجربة دائماً من الصفر
     try {
       localStorage.removeItem('sky_secrets_state');
     } catch(e){}
 
-    // تتبع استكشاف الأحداث والأسرار من الصفر دائماً أثناء الجلسة
+    // تتبع استكشاف الأحداث والأسرار والمشاهد
     let discoveredSecrets = { 
       saturn: false, 
       crystalDestroyed: false, 
@@ -3570,79 +3705,64 @@
       mars: false 
     };
 
+    // سجل الكواكب والمشاهد التي تمت زيارتها خلال الجلسة الحالية
+    let visitedScenes = {};
+
     function persistSecrets() {
-      // حفظ في حدود الجلسة الحالية فقط بدون تثبيت عبر الرفرش
       updateProgressStats();
     }
 
 
 
-    // مصفوفة الأجرام
+
+    // مصفوفة الأجرام التفاعلية - موزعة بدقة هندسية 360 درجة داخل نطاق النجوم، وزحل منعزل وواسع
     const celestialObjects = [
-      { type: 'zodiacal_light', x: 0, y: 0 },
-      { type: 'cygnus_ribbon', x: 190, y: -130 },
-      { type: 'planet_simple', name: 'عطارد', x: -130, y: -90, radius: 9, color: '#94a3b8' },
-      { type: 'planet_simple', name: 'الزهرة', x: 140, y: 110, radius: 14, color: '#fde047' },
-      { type: 'planet_simple', name: 'المشتري', x: 310, y: -180, radius: 24, color: '#d97706', bands: true },
-      { type: 'planet_simple', name: 'أورانوس', x: -330, y: -210, radius: 16, color: '#67e8f9' },
+      // 1. كوكب زحل بمكان واسع وهادئ في الشمال الغربي بدون أي كواكب قريبة لتزاحمه
+      { key: 'saturn', name: 'زحل', icon: '🪐', type: 'saturn_interactive', x: -680, y: -680, radius: 42 },
 
-      // الكواكب التفاعلية الكبيرة
-      { type: 'saturn_interactive', x: -240, y: -180, radius: 36 },
-      { type: 'mars_interactive', x: -160, y: 140, radius: 32 },
-      { type: 'neptune_interactive', x: 260, y: 220, radius: 34 },
+      // 2. الكواكب الأساسية والنجمة البلورية
+      { key: 'mars', name: 'المريخ', icon: '🔴', type: 'mars_interactive', x: -180, y: 190, radius: 32 },
+      { key: 'neptune', name: 'نيبتون', icon: '🔵', type: 'neptune_interactive', x: 280, y: 250, radius: 34 },
+      { key: 'crystal', name: 'النجمة البلورية', icon: '✨', type: 'crystal_star', x: 380, y: 200, radius: 24 },
 
-      // النجمة البلورية الذهبية: لا تظهر إلا بعد إنهاء زحل وقبل تدميرها
-      { type: 'crystal_star', x: 340, y: 180, radius: 24 },
+      // 3. كواكب المنظومة الشمسية موزعة بأناقة
+      { key: 'mercury', name: 'عطارد', icon: '🌑', type: 'planet_rendered', x: -210, y: -80, radius: 16, baseColor: '#94a3b8', glowColor: 'rgba(148,163,184,0.45)' },
+      { key: 'venus', name: 'الزهرة', icon: '🌕', type: 'planet_rendered', x: 180, y: -100, radius: 21, baseColor: '#fde047', glowColor: 'rgba(253,224,71,0.45)' },
+      { key: 'jupiter', name: 'المشتري', icon: '🪐', type: 'planet_rendered', x: 380, y: -280, radius: 36, baseColor: '#d97706', glowColor: 'rgba(217,119,6,0.45)', bands: true },
+      { key: 'uranus', name: 'أورانوس', icon: '💠', type: 'planet_rendered', x: -420, y: -320, radius: 25, baseColor: '#67e8f9', glowColor: 'rgba(103,232,249,0.45)' },
 
+      // 4. الظواهر الفلكية والسدم والمجرات موزعة بالتساوي دون تزاحم في الفضاء
+      { key: 'zodiacal', name: 'الضوء البروجي', icon: '✨', type: 'zodiacal_light', x: -650, y: -480, radius: 38 },
+      { key: 'cygnus', name: 'شريط الدجاجة', icon: '🌌', type: 'cygnus_ribbon', x: 220, y: -480, radius: 32 },
 
+      { key: 'blackhole', name: 'الثقب الأسود', icon: '🕳️', type: 'blackhole', x: 520, y: 380, radius: 34 },
+      { key: 'pulsar', name: 'النجم النابض', icon: '⚡', type: 'pulsar', x: -360, y: 380, radius: 28 },
+      { key: 'supernova', name: 'المستعر الأعظم', icon: '💥', type: 'supernova', x: -480, y: -60, radius: 38 },
+      { key: 'carina', name: 'سديم كارينا', icon: '🌌', type: 'carina_nebula', x: -720, y: 150, radius: 45 },
+      { key: 'pillars', name: 'أعمدة الخلق', icon: '🏛️', type: 'pillars_creation', x: 620, y: -380, radius: 42 },
+      { key: 'catseye', name: 'سديم عين القط', icon: '👁️', type: 'cats_eye_nebula', x: 680, y: -80, radius: 35 },
+      { key: 'rosette', name: 'سديم الوردة', icon: '🌹', type: 'rosette_nebula', x: 580, y: 620, radius: 42 },
+      { key: 'sombrero', name: 'مجرة السومبريرو', icon: '🛸', type: 'sombrero_galaxy', x: -40, y: 680, radius: 40 },
+      { key: 'butterfly', name: 'سديم الفراشة', icon: '🦋', type: 'butterfly_nebula', x: -580, y: 520, radius: 38 },
+      { key: 'veil', name: 'سديم الحجاب', icon: '🕸️', type: 'veil_nebula_deep', x: -750, y: -220, radius: 42 },
+      { key: 'hourglass', name: 'سديم الساعة الرملية', icon: '⏳', type: 'hourglass_nebula', x: 380, y: -680, radius: 38 },
+      { key: 'horsehead', name: 'سديم رأس الفرس', icon: '🐴', type: 'horsehead_nebula', x: -280, y: -650, radius: 40 },
+      { key: 'southern_ring', name: 'سديم الحلقة الجنوبي', icon: '💍', type: 'southern_ring', x: 740, y: 180, radius: 36 },
+      { key: 'whirlpool', name: 'مجرة الدوامة', icon: '🌀', type: 'whirlpool_galaxy', x: -750, y: 720, radius: 45 },
+      { key: 'trifid', name: 'سديم تريفيد', icon: '🌸', type: 'trifid_nebula', x: 720, y: 720, radius: 40 },
+      { key: 'gas_storms', name: 'عاصفة المشتري وسداسي زحل', icon: '🌪️', type: 'gas_giant_storms', x: -380, y: 780, radius: 38 },
+      { key: 'bubble', name: 'فقاعة الصابون الكونية', icon: '🫧', type: 'bubble_nebula', x: 30, y: -740, radius: 36 },
 
-
-      // 4. سدم هادئة
-      { type: 'nebula', x: -210, y: -180, radius: 320, color: 'rgba(56, 189, 248, 0.07)' },
-      { type: 'nebula', x: 260, y: 210, radius: 340, color: 'rgba(244, 114, 182, 0.06)' },
-      { type: 'nebula', x: 0, y: -380, radius: 350, color: 'rgba(14, 165, 233, 0.05)' },
-
-      // 5. ثقب أسود ونجم نابض ومستعر وحزام كويكبات
-      { type: 'blackhole', x: 380, y: 260, radius: 30 },
-      { type: 'pulsar', x: -310, y: 240 },
-      { type: 'supernova', x: -420, y: -80, radius: 70 },
-      { type: 'asteroid_field', x: 120, y: 380, count: 18 },
-
-      // 6. الأجرام السابقة
-      { type: 'carina_nebula', x: -680, y: -520, radius: 220 },
-      { type: 'pillars_creation', x: 680, y: -560, radius: 200 },
-      { type: 'cats_eye_nebula', x: 740, y: 40, radius: 100 },
-      { type: 'rosette_nebula', x: 620, y: 640, radius: 180 },
-      { type: 'sombrero_galaxy', x: -60, y: 780, radius: 170 },
-      { type: 'butterfly_nebula', x: -650, y: 520, radius: 150 },
-      { type: 'veil_nebula_deep', x: -740, y: -30, radius: 210 },
-
-      // 7. الأجرام السبعة الجديدة لملء الفضاء الموسّع بنسبة 40%
-      // 1. سديم الساعة الرملية المعكوسة (MyCn 18)
-      { type: 'hourglass_nebula', x: 1050, y: -900, radius: 160 },
-
-      // 2. سديم رأس الفرس في ضوء الأشعة تحت الحمراء (Horsehead Nebula)
-      { type: 'horsehead_nebula', x: -1100, y: -950, radius: 180 },
-
-      // 3. سديم الحلقة الجنوبي (Southern Ring Nebula)
-      { type: 'southern_ring', x: 1180, y: 250, radius: 150 },
-
-      // 4. مجرة الدوامة (Whirlpool Galaxy - M51)
-      { type: 'whirlpool_galaxy', x: -1150, y: 880, radius: 210 },
-
-      // 5. سديم تريفيد (Trifid Nebula - M20)
-      { type: 'trifid_nebula', x: 920, y: 1050, radius: 170 },
-
-      // 6. عاصفة كوكب المشتري وسداسي زحل (Jupiter Marbled & Saturn Hexagon)
-      { type: 'gas_giant_storms', x: -450, y: 1150, radius: 140 },
-
-      // 7. فقاعة الصابون الكونية (Bubble Nebula - NGC 7635)
-      { type: 'bubble_nebula', x: 420, y: -1150, radius: 150 },
-
-      // أحزمة كويكبات إضافية في الفضاء الجديد
-      { type: 'asteroid_field', x: -980, y: -300, count: 16 },
-      { type: 'asteroid_field', x: 950, y: -350, count: 16 }
+      // سدم هادئة وأحزمة كويكبات
+      { type: 'nebula', x: -210, y: -180, radius: 280, color: 'rgba(56, 189, 248, 0.05)' },
+      { type: 'nebula', x: 260, y: 210, radius: 280, color: 'rgba(244, 114, 182, 0.04)' },
+      { type: 'asteroid_field', x: 120, y: 380, count: 12 },
+      { type: 'asteroid_field', x: -550, y: -250, count: 12 },
+      { type: 'asteroid_field', x: 550, y: -280, count: 12 }
     ];
+
+
+
 
 
 
@@ -3662,7 +3782,8 @@
 
     function initCosmos() {
       bgStars = [];
-      const starCount = Math.floor((window.innerWidth * window.innerHeight) / 1400) + 380;
+      // زيادة كثافة النجوم الخلفية وتوزيعها على المساحة الشاسعة الجديدة
+      const starCount = Math.floor((window.innerWidth * window.innerHeight) / 900) + 650;
       for (let i = 0; i < starCount; i++) {
         bgStars.push({
           x: (Math.random() - 0.5) * SPACE_BOUND,
@@ -3677,65 +3798,75 @@
       }
 
       cosmicDust = [];
-      for (let i = 0; i < 40; i++) {
+      for (let i = 0; i < 65; i++) {
         cosmicDust.push({
           x: (Math.random() - 0.5) * SPACE_BOUND,
           y: (Math.random() - 0.5) * SPACE_BOUND,
-          radius: Math.random() * 18 + 6,
-          alpha: Math.random() * 0.02 + 0.008,
+          radius: Math.random() * 20 + 8,
+          alpha: Math.random() * 0.025 + 0.008,
           color: Math.random() > 0.5 ? 'rgba(56, 189, 248,' : 'rgba(236, 72, 153,'
         });
       }
 
-      // الأجرام المتحركة عبر الفضاء السحيق الموسّع
+      // زيادة عدد المذنبات السريعة المتنقلة عبر الفضاء
       comets = [
-        { x: -900, y: -700, vx: 1.2, vy: 0.8, length: 180, size: 3.5 },
-        { x: 1100, y: -900, vx: -0.9, vy: 1.1, length: 140, size: 2.8 },
-        { x: -1200, y: 800, vx: 1.1, vy: -0.7, length: 160, size: 3.0 },
-        { x: 700, y: 1100, vx: -1.0, vy: -0.9, length: 150, size: 3.2 }
+        { x: -1400, y: -900, vx: 1.3, vy: 0.8, length: 200, size: 3.5 },
+        { x: 1300, y: -1100, vx: -1.0, vy: 1.1, length: 160, size: 2.8 },
+        { x: -1500, y: 1000, vx: 1.2, vy: -0.7, length: 170, size: 3.0 },
+        { x: 900, y: 1300, vx: -1.1, vy: -0.9, length: 160, size: 3.2 },
+        { x: -600, y: 1400, vx: 0.9, vy: -1.2, length: 180, size: 3.4 },
+        { x: 1400, y: 400, vx: -1.4, vy: -0.6, length: 190, size: 3.1 },
+        { x: 200, y: -1500, vx: -0.8, vy: 1.3, length: 175, size: 3.3 }
       ];
 
-      // كويكبات متطايرة وتدور حول نفسها موزعة في المساحات الجديدة
+      // زيادة الكويكبات السابحة وتوزيعها حتى أبعد الأطراف
       window.driftingAsteroids = [
         { x: -350, y: 150, vx: 0.25, vy: -0.15, rot: 0, rotSpeed: 0.012, size: 6.5 },
         { x: 280, y: -220, vx: -0.18, vy: 0.22, rot: 0, rotSpeed: -0.015, size: 8 },
         { x: -120, y: -380, vx: 0.12, vy: 0.2, rot: 0, rotSpeed: 0.008, size: 5.5 },
         { x: 850, y: -750, vx: -0.22, vy: 0.14, rot: 0, rotSpeed: 0.016, size: 7.0 },
         { x: -950, y: 650, vx: 0.18, vy: -0.20, rot: 0, rotSpeed: -0.012, size: 8.5 },
-        { x: 750, y: 850, vx: -0.15, vy: -0.18, rot: 0, rotSpeed: 0.010, size: 6.0 }
+        { x: 750, y: 850, vx: -0.15, vy: -0.18, rot: 0, rotSpeed: 0.010, size: 6.0 },
+        { x: -1200, y: -450, vx: 0.20, vy: 0.12, rot: 0, rotSpeed: 0.014, size: 7.5 },
+        { x: 1250, y: -600, vx: -0.16, vy: 0.18, rot: 0, rotSpeed: -0.011, size: 8.0 },
+        { x: -650, y: 1100, vx: 0.14, vy: -0.16, rot: 0, rotSpeed: 0.013, size: 6.8 },
+        { x: 1100, y: 1150, vx: -0.19, vy: -0.15, rot: 0, rotSpeed: -0.014, size: 7.2 },
+        { x: -1300, y: 900, vx: 0.22, vy: -0.12, rot: 0, rotSpeed: 0.015, size: 6.0 },
+        { x: 450, y: -1250, vx: -0.12, vy: 0.21, rot: 0, rotSpeed: 0.009, size: 7.8 }
       ];
-
 
       // حطام فضائي وقمر اصطناعي يعبر المدار
       window.orbitingSatellite = { x: -500, y: -180, vx: 0.45, vy: 0.12, rot: 0 };
 
-      // جسيمات الرياح الشمسية والإشعاع الكوني
+      // مضاعفة جسيمات الرياح الشمسية والإشعاع الكوني
       window.solarWindParticles = [];
-      for (let w = 0; w < 35; w++) {
+      for (let w = 0; w < 70; w++) {
         window.solarWindParticles.push({
           x: (Math.random() - 0.5) * SPACE_BOUND,
           y: (Math.random() - 0.5) * SPACE_BOUND,
-          vx: Math.random() * 1.8 + 1.2,
-          vy: Math.random() * 0.4 - 0.2,
-          len: Math.random() * 22 + 10,
-          alpha: Math.random() * 0.25 + 0.08
+          vx: Math.random() * 2.2 + 1.2,
+          vy: Math.random() * 0.5 - 0.25,
+          len: Math.random() * 26 + 12,
+          alpha: Math.random() * 0.28 + 0.08
         });
       }
 
     }
 
     function spawnMeteor() {
-      if (Math.random() < 0.018 && meteors.length < 2) {
+      // رفع معدل ظهور الشهب بالسماء حتى 5 شهب متزامنة
+      if (Math.random() < 0.045 && meteors.length < 5) {
         meteors.push({
-          x: Math.random() * canvas.width * 1.4,
-          y: Math.random() * (canvas.height * 0.7),
-          length: Math.random() * 120 + 80,
-          speed: Math.random() * 8 + 7,
-          angle: (Math.PI / 4) + (Math.random() * 0.1 - 0.05),
+          x: Math.random() * canvas.width * 1.5,
+          y: Math.random() * (canvas.height * 0.8),
+          length: Math.random() * 130 + 85,
+          speed: Math.random() * 9 + 8,
+          angle: (Math.PI / 4) + (Math.random() * 0.12 - 0.06),
           alpha: 1
         });
       }
     }
+
 
     function animateUniverse() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -3744,27 +3875,33 @@
       const cy = canvas.height / 2;
       pulsarAngle += 0.025;
 
-      // 1. رسم الظواهر والأجرام الفلكية الكبرى
+      // 1. رسم الظواهر والأجرام الفلكية الكبرى دون أي اختفاء عند الزوم أوت
       for (let obj of celestialObjects) {
-        // مطابقة موضع الكواكب خلف النجوم مع موضع الكاميرا الفعلي للمجرة
         const screenX = cx + ((obj.x * sceneScale) + sceneX);
         const screenY = cy + ((obj.y * sceneScale) + sceneY);
 
+        // نطاق كشف واسع يضمن عدم اختفاء الكواكب أو أسمائها عند أي نسبة زوم
+        const viewMargin = Math.max(1200, 2400 * sceneScale);
+        if (screenX < -viewMargin || screenX > canvas.width + viewMargin || screenY < -viewMargin || screenY > canvas.height + viewMargin) {
+          obj._screenX = null;
+          obj._screenY = null;
+          continue;
+        }
 
-        if (screenX < -800 || screenX > canvas.width + 800 || screenY < -800 || screenY > canvas.height + 800) continue;
+        obj._screenX = screenX;
+        obj._screenY = screenY;
 
         if (obj.type === 'zodiacal_light') {
-          // ضوء بروجي شفاف جداً
           ctx.save();
           ctx.translate(screenX, screenY);
           ctx.rotate(-0.45);
-          const zodGrad = ctx.createRadialGradient(0, 0, 30 * sceneScale, 0, 0, 750 * sceneScale);
-          zodGrad.addColorStop(0, 'rgba(251, 191, 36, 0.04)');
-          zodGrad.addColorStop(0.4, 'rgba(56, 189, 248, 0.02)');
+          const zodGrad = ctx.createRadialGradient(0, 0, 20 * sceneScale, 0, 0, 360 * sceneScale);
+          zodGrad.addColorStop(0, 'rgba(251, 191, 36, 0.08)');
+          zodGrad.addColorStop(0.5, 'rgba(56, 189, 248, 0.03)');
           zodGrad.addColorStop(1, 'transparent');
-          ctx.scale(3.0, 0.8);
+          ctx.scale(2.5, 0.8);
           ctx.beginPath();
-          ctx.arc(0, 0, 750 * sceneScale, 0, Math.PI * 2);
+          ctx.arc(0, 0, 360 * sceneScale, 0, Math.PI * 2);
           ctx.fillStyle = zodGrad;
           ctx.fill();
           ctx.restore();
@@ -3779,98 +3916,301 @@
           ctx.fill();
         } 
         else if (obj.type === 'cygnus_ribbon') {
-          // شريط الدجاجة خافت بخطوط رقيقة
           ctx.save();
           ctx.translate(screenX, screenY);
           ctx.rotate(-0.38);
-
           ctx.beginPath();
-          ctx.moveTo(-160 * sceneScale, -40 * sceneScale);
-          ctx.bezierCurveTo(-60 * sceneScale, -75 * sceneScale, 50 * sceneScale, 60 * sceneScale, 170 * sceneScale, 20 * sceneScale);
-          ctx.strokeStyle = 'rgba(56, 189, 248, 0.22)';
-          ctx.lineWidth = 7 * sceneScale;
+          ctx.moveTo(-120 * sceneScale, -30 * sceneScale);
+          ctx.bezierCurveTo(-40 * sceneScale, -60 * sceneScale, 40 * sceneScale, 50 * sceneScale, 130 * sceneScale, 15 * sceneScale);
+          ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
+          ctx.lineWidth = 6 * sceneScale;
           ctx.lineCap = 'round';
-          ctx.stroke();
-
-          ctx.beginPath();
-          ctx.moveTo(-150 * sceneScale, -30 * sceneScale);
-          ctx.bezierCurveTo(-45 * sceneScale, -55 * sceneScale, 65 * sceneScale, 75 * sceneScale, 180 * sceneScale, 30 * sceneScale);
-          ctx.strokeStyle = 'rgba(244, 114, 182, 0.2)';
-          ctx.lineWidth = 4 * sceneScale;
           ctx.stroke();
           ctx.restore();
         }
-        else if (obj.type === 'planet_simple') {
-          // كواكب المنظومة الشمسية بتفاصيل وإضاءة
+        else if (obj.type === 'planet_rendered') {
           const pr = obj.radius * sceneScale;
           ctx.save();
-          
-          // تدرج كروي بسيط يعطي عمقاً للكوكب بدون إرهاق المعالج
-          const planetGrad = ctx.createRadialGradient(screenX - pr * 0.3, screenY - pr * 0.3, pr * 0.1, screenX, screenY, pr);
-          planetGrad.addColorStop(0, '#ffffff');
-          planetGrad.addColorStop(0.3, obj.color);
-          planetGrad.addColorStop(1, '#020617');
-          
+          const pGrad = ctx.createRadialGradient(screenX - pr * 0.35, screenY - pr * 0.35, pr * 0.08, screenX, screenY, pr);
+          pGrad.addColorStop(0, '#ffffff');
+          pGrad.addColorStop(0.35, obj.baseColor);
+          pGrad.addColorStop(0.8, obj.baseColor);
+          pGrad.addColorStop(1, '#020617');
           ctx.beginPath();
           ctx.arc(screenX, screenY, pr, 0, Math.PI * 2);
-          ctx.fillStyle = planetGrad;
+          ctx.fillStyle = pGrad;
+          ctx.shadowBlur = 12 * sceneScale;
+          ctx.shadowColor = obj.glowColor;
           ctx.fill();
-          
+
           if (obj.bands) {
-            ctx.save();
-            ctx.translate(screenX, screenY);
-            ctx.rotate(0.2);
-            ctx.strokeStyle = 'rgba(120, 53, 15, 0.4)';
-            ctx.lineWidth = 4 * sceneScale;
+            ctx.strokeStyle = 'rgba(120, 53, 15, 0.55)';
+            ctx.lineWidth = 3 * sceneScale;
             ctx.beginPath();
-            ctx.moveTo(-pr * 0.8, -pr * 0.2);
-            ctx.lineTo(pr * 0.8, -pr * 0.2);
-            ctx.moveTo(-pr * 0.9, pr * 0.2);
-            ctx.lineTo(pr * 0.9, pr * 0.2);
+            ctx.arc(screenX, screenY, pr * 0.7, 0.2, Math.PI - 0.2);
             ctx.stroke();
-            ctx.restore();
           }
           ctx.restore();
         }
-
         else if (obj.type === 'mars_interactive') {
-          // كوكب المريخ التفاعلي: نطاق لمس ملاصق لهيكل الكوكب ويكبر ويصغر معه بدقة
           const mr = obj.radius * sceneScale;
-          obj._screenX = screenX;
-          obj._screenY = screenY;
-          obj._screenR = mr * 1.38;
-
-
-
-
           ctx.save();
-          // هالة غازية حمراء محيطة
           ctx.beginPath();
-          ctx.arc(screenX, screenY, mr * 1.35, 0, Math.PI * 2);
-          ctx.fillStyle = 'rgba(239, 68, 68, 0.12)';
+          ctx.arc(screenX, screenY, mr * 1.25, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(239, 68, 68, 0.16)';
           ctx.fill();
 
-          // تدرج كروي واقعي لتضاريس المريخ
           const mGrad = ctx.createRadialGradient(screenX - mr * 0.35, screenY - mr * 0.35, mr * 0.08, screenX, screenY, mr);
           mGrad.addColorStop(0, '#fca5a5');
-          mGrad.addColorStop(0.3, '#ef4444');
-          mGrad.addColorStop(0.7, '#b91c1c');
-          mGrad.addColorStop(1, '#450a0a');
+          mGrad.addColorStop(0.25, '#ef4444');
+          mGrad.addColorStop(0.65, '#b91c1c');
+          mGrad.addColorStop(0.9, '#7f1d1d');
+          mGrad.addColorStop(1, '#300707');
           ctx.beginPath();
           ctx.arc(screenX, screenY, mr, 0, Math.PI * 2);
           ctx.fillStyle = mGrad;
           ctx.shadowBlur = 18 * sceneScale;
-          ctx.shadowColor = 'rgba(239, 68, 68, 0.5)';
+          ctx.shadowColor = 'rgba(239, 68, 68, 0.55)';
           ctx.fill();
 
-          // غطاء جليدي قطبي مميز للمريخ
+          ctx.strokeStyle = 'rgba(69, 10, 10, 0.65)';
+          ctx.lineWidth = 2.5 * sceneScale;
           ctx.beginPath();
-          ctx.arc(screenX, screenY - mr * 0.72, mr * 0.28, 0, Math.PI * 2);
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+          ctx.arc(screenX - mr * 0.1, screenY + mr * 0.1, mr * 0.6, 0.2, Math.PI * 0.6);
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.ellipse(screenX, screenY - mr * 0.76, mr * 0.32, mr * 0.14, 0, 0, Math.PI * 2);
+          ctx.fillStyle = '#ffffff';
+          ctx.shadowBlur = 6 * sceneScale;
+          ctx.shadowColor = '#ffffff';
           ctx.fill();
           ctx.restore();
         }
-        else if (obj.type === 'neptune_interactive') {
+        else if (obj.type === 'blackhole') {
+          const r = obj.radius * sceneScale;
+          ctx.save();
+          ctx.translate(screenX, screenY);
+          const diskGrad = ctx.createRadialGradient(0, 0, r * 0.8, 0, 0, r * 2.2);
+          diskGrad.addColorStop(0, 'rgba(251, 191, 36, 0.5)');
+          diskGrad.addColorStop(0.5, 'rgba(249, 115, 22, 0.3)');
+          diskGrad.addColorStop(1, 'transparent');
+          ctx.scale(2.2, 0.55);
+          ctx.beginPath();
+          ctx.arc(0, 0, r * 2.2, 0, Math.PI * 2);
+          ctx.fillStyle = diskGrad;
+          ctx.fill();
+          ctx.restore();
+
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, r, 0, Math.PI * 2);
+          ctx.fillStyle = '#000000';
+          ctx.shadowBlur = 10 * sceneScale;
+          ctx.shadowColor = 'rgba(251, 191, 36, 0.5)';
+          ctx.fill();
+        }
+        else if (obj.type === 'pulsar') {
+          const beamLen = 90 * sceneScale;
+          ctx.save();
+          ctx.translate(screenX, screenY);
+          ctx.rotate(pulsarAngle);
+          ctx.fillStyle = 'rgba(56, 189, 248, 0.4)';
+          ctx.fillRect(-1.5, -beamLen, 3, beamLen * 2);
+          ctx.restore();
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, Math.max(3, 4.5 * sceneScale), 0, Math.PI * 2);
+          ctx.fillStyle = '#ffffff';
+          ctx.shadowBlur = 12 * sceneScale;
+          ctx.shadowColor = '#38bdf8';
+          ctx.fill();
+        }
+        else if (obj.type === 'supernova') {
+          const sr = obj.radius * sceneScale;
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, sr, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(251, 146, 60, 0.4)';
+          ctx.lineWidth = 2 * sceneScale;
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, sr * 0.65, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(239, 68, 68, 0.2)';
+          ctx.fill();
+          ctx.restore();
+        }
+        else if (obj.type === 'carina_nebula') {
+          const cr = obj.radius * sceneScale;
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, cr * 1.1, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(244, 114, 182, 0.18)';
+          ctx.shadowBlur = 16 * sceneScale;
+          ctx.shadowColor = 'rgba(244, 114, 182, 0.4)';
+          ctx.fill();
+          ctx.restore();
+        }
+        else if (obj.type === 'pillars_creation') {
+          const pr = obj.radius * sceneScale;
+          ctx.save();
+          ctx.translate(screenX, screenY);
+          ctx.fillStyle = 'rgba(68, 48, 34, 0.7)';
+          ctx.fillRect(-pr * 0.3, -pr * 0.6, pr * 0.22, pr * 1.1);
+          ctx.fillRect(pr * 0.05, -pr * 0.8, pr * 0.25, pr * 1.3);
+          ctx.restore();
+        }
+        else if (obj.type === 'cats_eye_nebula') {
+          const er = obj.radius * sceneScale;
+          ctx.save();
+          ctx.strokeStyle = 'rgba(16, 185, 129, 0.45)';
+          ctx.lineWidth = 2.5 * sceneScale;
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, er, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.fillStyle = '#6ee7b7';
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, er * 0.3, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+        else if (obj.type === 'rosette_nebula') {
+          const rr = obj.radius * sceneScale;
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, rr, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(225, 29, 72, 0.22)';
+          ctx.shadowBlur = 14 * sceneScale;
+          ctx.shadowColor = '#e11d48';
+          ctx.fill();
+          ctx.restore();
+        }
+        else if (obj.type === 'sombrero_galaxy') {
+          const sr = obj.radius * sceneScale;
+          ctx.save();
+          ctx.translate(screenX, screenY);
+          ctx.rotate(-0.15);
+          ctx.scale(2.2, 0.65);
+          ctx.beginPath();
+          ctx.arc(0, 0, sr, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.65)';
+          ctx.fill();
+          ctx.restore();
+        }
+        else if (obj.type === 'butterfly_nebula') {
+          const br = obj.radius * sceneScale;
+          ctx.save();
+          ctx.beginPath();
+          ctx.ellipse(screenX - br * 0.4, screenY, br * 0.6, br * 0.35, 0.4, 0, Math.PI * 2);
+          ctx.ellipse(screenX + br * 0.4, screenY, br * 0.6, br * 0.35, -0.4, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(192, 132, 252, 0.25)';
+          ctx.fill();
+          ctx.restore();
+        }
+        else if (obj.type === 'veil_nebula_deep') {
+          const vr = obj.radius * sceneScale;
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, vr, 0, Math.PI);
+          ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+          ctx.lineWidth = 3 * sceneScale;
+          ctx.stroke();
+          ctx.restore();
+        }
+        else if (obj.type === 'hourglass_nebula') {
+          const hr = obj.radius * sceneScale;
+          ctx.save();
+          ctx.translate(screenX, screenY);
+          ctx.strokeStyle = 'rgba(249, 115, 22, 0.5)';
+          ctx.lineWidth = 2.5 * sceneScale;
+          ctx.beginPath();
+          ctx.ellipse(0, -hr * 0.4, hr * 0.4, hr * 0.3, 0, 0, Math.PI * 2);
+          ctx.ellipse(0, hr * 0.4, hr * 0.4, hr * 0.3, 0, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+        }
+        else if (obj.type === 'horsehead_nebula') {
+          const hhr = obj.radius * sceneScale;
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, hhr, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(225, 29, 72, 0.2)';
+          ctx.fill();
+          ctx.fillStyle = '#1e130c';
+          ctx.fillRect(screenX - hhr * 0.2, screenY - hhr * 0.4, hhr * 0.4, hhr * 0.8);
+          ctx.restore();
+        }
+        else if (obj.type === 'southern_ring') {
+          const srr = obj.radius * sceneScale;
+          ctx.save();
+          ctx.strokeStyle = 'rgba(56, 189, 248, 0.45)';
+          ctx.lineWidth = 3 * sceneScale;
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, srr, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+        }
+        else if (obj.type === 'whirlpool_galaxy') {
+          const wr = obj.radius * sceneScale;
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, wr, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+          ctx.lineWidth = 2 * sceneScale;
+          ctx.stroke();
+          ctx.restore();
+        }
+        else if (obj.type === 'trifid_nebula') {
+          const tr = obj.radius * sceneScale;
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(screenX - tr * 0.2, screenY, tr * 0.5, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(225, 29, 72, 0.25)';
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(screenX + tr * 0.2, screenY, tr * 0.45, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(56, 189, 248, 0.25)';
+          ctx.fill();
+          ctx.restore();
+        }
+        else if (obj.type === 'gas_giant_storms') {
+          const gr = obj.radius * sceneScale;
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, gr * 0.7, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(217, 119, 6, 0.35)';
+          ctx.fill();
+          ctx.restore();
+        }
+        else if (obj.type === 'bubble_nebula') {
+          const bbr = obj.radius * sceneScale;
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, bbr * 0.6, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(56, 189, 248, 0.65)';
+          ctx.lineWidth = 2 * sceneScale;
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // إظهار اسم الكوكب بدقة عند الزوم المتوسط فما فوق وإخفاء اسم النجمة البلورية حتى تظهر هي
+        if (obj.name && sceneScale >= 0.52) {
+          if (obj.type === 'crystal_star' && (!discoveredSecrets.saturn || discoveredSecrets.crystalDestroyed)) {
+            // لا ترسم اسمها إطلاقاً ما دامت مخفية
+          } else {
+            ctx.save();
+            ctx.font = `bold ${Math.max(11, 13 * Math.sqrt(sceneScale))}px Tajawal, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#f8fafc';
+            ctx.shadowBlur = 6;
+            ctx.shadowColor = '#000000';
+            const labelY = screenY + ((obj.radius || 24) * sceneScale) + (16 * sceneScale);
+            ctx.fillText(obj.name, screenX, labelY);
+            ctx.restore();
+          }
+        }
+
+
+        if (obj.type === 'neptune_interactive') {
+
           // كوكب نبتون التفاعلي: نطاق لمس ملاصق لهيكل الكوكب وحلقته ويكبر ويصغر معه بدقة
           const nr = obj.radius * sceneScale;
           obj._screenX = screenX;
