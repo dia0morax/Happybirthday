@@ -583,15 +583,31 @@
       animation: floatCenter 8s ease-in-out infinite alternate;
     }
 
-    .memory-img {
+    /* حاوية مخصصة للصور الطولية مع الحفاظ على الأبعاد الحقيقية وإمكانية التمرير */
+    .memory-img-container {
       width: 100%;
-      max-height: 260px;
-      object-fit: cover;
+      max-height: 380px;
+      overflow: auto;
       border-radius: 20px;
-      margin-bottom: 22px;
+      margin-bottom: 20px;
       border: 1px solid rgba(56, 189, 248, 0.3);
       box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65), 0 0 20px rgba(56, 189, 248, 0.2);
+      background: rgba(3, 7, 18, 0.6);
+      display: none;
+      text-align: center;
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent-cyan) transparent;
+      -webkit-overflow-scrolling: touch;
     }
+    .memory-img {
+      width: auto;
+      max-width: 100%;
+      height: auto;
+      display: inline-block;
+      border-radius: 14px;
+      object-fit: contain;
+    }
+
 
     .memory-title {
       font-family: 'Cinzel Decorative', 'Tajawal', sans-serif;
@@ -970,12 +986,44 @@
       margin-bottom: 18px !important;
     }
 
-    /* أنماط خلفيات الكواكب بدون تحميل مسبق ثقيل */
+    /* أنماط خلفيات الكواكب وتأثير حركة الكاميرا لكوكب كيبلر-186 إف */
     .vn-container.mode-saturn {
       background-position: center center;
       background-size: cover;
       background-repeat: no-repeat;
     }
+
+    /* طبقة خلفية المشهد السينمائي مع حركة Ken Burns البطيئة والناعمة */
+    #keplerCinematicBg {
+      position: absolute;
+      inset: -5%;
+      width: 110%;
+      height: 110%;
+      background-size: cover;
+      background-position: center center;
+      z-index: 0;
+      pointer-events: none;
+      transition: background-image 1.2s ease-in-out;
+      animation: kenBurnsPanZoom 24s ease-in-out infinite alternate;
+      will-change: transform;
+    }
+
+    @keyframes kenBurnsPanZoom {
+      0% { transform: scale(1) translate(0, 0); }
+      50% { transform: scale(1.08) translate(-1.5%, -1%); }
+      100% { transform: scale(1.15) translate(1.5%, 1%); }
+    }
+
+    /* كانفاس الألعاب النارية الكونية الشفاف فوق المشهد */
+    #keplerFireworksCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
 
     .vn-container.mode-neptune {
       background-position: center center;
@@ -1819,6 +1867,8 @@
   <audio id="specialAudio" loop preload="auto"></audio>
   <audio id="saturnAudio" loop preload="auto" src="https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/dumbways.mp3"></audio>
   <audio id="neptuneAudio" loop preload="auto" src="https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/never%20meant%20to%20belong(MP3_320K).mp3"></audio>
+  <audio id="keplerAudio" loop preload="auto" src="https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/somy.mp3"></audio>
+
 
 
 
@@ -1886,8 +1936,11 @@
   <div class="modal-overlay" id="memoryModal">
     <div class="glass-card">
       <button class="modal-close-btn" id="closeMemoryBtn">✕</button>
-      <img id="memoryModalImg" src="" alt="Memory Image" class="memory-img" style="display: none;">
+      <div class="memory-img-container" id="memoryImgWrapper">
+        <img id="memoryModalImg" src="" alt="Memory Image" class="memory-img">
+      </div>
       <h3 class="memory-title" id="memoryModalTitle">✨ عنوان النجمة</h3>
+
       
       <div class="memory-message-container">
         <div class="memory-message" id="memoryModalMessage">هنا الرسالة الخاصة...</div>
@@ -1932,7 +1985,8 @@
               💡 تلميح
             </button>
           </div>
-          <b id="secretsProgressText">0 / 4</b>
+          <b id="secretsProgressText">0 / 5</b>
+
         </div>
       </div>
 
@@ -1941,8 +1995,13 @@
       <div class="progress-hint-note">
         ✨ هذه نسبة إنهائكِ للتجربة.. هناك أشياء وأجرام سرية مخفية في الفضاء بانتظار اكتشافكِ!
       </div>
+
+      <button id="resetJourneyBtn" style="margin-top: 16px; width: 100%; padding: 10px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 14px; color: #fca5a5; font-size: 0.95rem; font-weight: bold; cursor: pointer; font-family: 'Tajawal', sans-serif; transition: all 0.2s;">
+        <i class="fa-solid fa-trash-arrow-up"></i> إعادة التجربة من البداية
+      </button>
     </div>
   </div>
+
 
   <!-- نافذة تأكيد الدخول للكوكب -->
   <div class="modal-overlay" id="planetConfirmModal">
@@ -2024,8 +2083,12 @@
 
   <!-- نافذة الكواكب والفيجول نوفل -->
   <div class="vn-container" id="vnContainer">
+    <!-- خلفية الكين بيرنز وكانفاس الألعاب النارية الاحتفالية لكوكب كيبلر -->
+    <div id="keplerCinematicBg" style="display: none;"></div>
+    <canvas id="keplerFireworksCanvas" style="display: none;"></canvas>
 
     <!-- شريط اسم الكوكب في الزاوية -->
+
     <div class="vn-planet-badge" id="vnPlanetBadge">
       <span class="vn-badge-icon" id="vnBadgeIcon">🪐</span>
       <span class="vn-badge-name" id="vnBadgeName">كوكب زحل</span>
@@ -2350,11 +2413,17 @@
       }
     }
 
+    // صور كوكب كيبلر-186 إف الاحتفالي
+    const KEPLER_SCENE_1 = "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/watermark-removed-8178.png";
+    const KEPLER_SCENE_2 = "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/watermark-removed-8179.png";
+
     // قاعدة بيانات الخلفيات الشاملة لكافة الأجرام والمشاهد
     const PLANET_BG_MAP = {
       'saturn': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8135%20(1).png",
       'mars': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8136.png",
       'neptune': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8137.png",
+      'kepler': KEPLER_SCENE_1,
+
       'mercury': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8078.png",
       'venus': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8079.png",
       'jupiter': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8080.png",
@@ -2905,7 +2974,25 @@
         }
       }
 
-      // 5. فحص باقي الأجرام والكواكب الـ 21 التفاعلية الجديدة
+      // 5. كوكب كيبلر-186 إف (السر الخامس والأخير - احتفال عيد الميلاد)
+      const kepler = celestialObjects.find(o => o.type === 'kepler_interactive');
+      const allFourDone = discoveredSecrets.saturn && discoveredSecrets.crystalDestroyed && discoveredSecrets.neptune && discoveredSecrets.mars;
+      if (kepler && kepler._screenX && allFourDone) {
+        const dist = Math.hypot(clientX - kepler._screenX, clientY - kepler._screenY);
+        if (dist <= kepler._screenR) {
+          playStarChime();
+          const hasVisitedKepler = !!discoveredSecrets.kepler;
+          askToEnterPlanet("👑", "كوكب كيبلر-186 إف", () => {
+            launchPlanetLoadingTransition('kepler', "كوكب كيبلر-186 إف", () => {
+              startKeplerVisualNovel();
+            });
+          }, hasVisitedKepler);
+          return true;
+        }
+      }
+
+      // 6. فحص باقي الأجرام والكواكب الـ 21 التفاعلية الجديدة
+
       for (let obj of celestialObjects) {
         if (obj.key && CELESTIAL_MONOLOGUES[obj.key] && obj._screenX) {
           const hitRadius = Math.max(30, (obj.radius || 25) * sceneScale * 1.3);
@@ -2980,11 +3067,14 @@
       } else if (!discoveredSecrets.neptune) {
         return "🔵 <b>الخطوة الثالثة:</b> الختم كُسر الآن وتدفقت الحرارة.. اهبطي على كوكب نيبتون الأزرق لتحرير سكانه واللقاء بالزعيم آزورا!";
       } else if (!discoveredSecrets.mars) {
-        return "🔴 <b>الخطوة الأخيرة:</b> تم إنقاذ نيبتون وانتشر الخبر بالمجرة! طيري إلى كوكب المريخ الأحمر لرؤية الفضائي وخاله وتلقي التهنئة الختامية!";
+        return "🔴 <b>الخطوة الرابعة:</b> تم إنقاذ نيبتون وانتشر الخبر بالمجرة! طيري إلى كوكب المريخ الأحمر لرؤية الفضائي وخاله وتلقي التهنئة الختامية!";
+      } else if (!discoveredSecrets.kepler) {
+        return "👑 <b>السر الخامس والأخير:</b> لقد فُتحت الآن بوابة كوكب (كيبلر-186 إف) الزمردي المتوج! توجهي إليه لتشهدي أكبر احتفال كوني بعيد ميلادكِ مع كعكة النجوم والألعاب النارية!";
       } else {
-        return "🎉 <b>عاش البطلة!</b> لقد أنجزتِ جميع أسرار المجرة الأربعة وحررتِ الكواكب بالكامل!";
+        return "🎉 <b>ألف مبروك يا بطلة المجرة!</b> لقد أتممتِ جميع أسرار المجرة الخمسة وحضرتِ احتفال ميلادكِ الأسطوري!";
       }
     }
+
 
     if (openHintsBtn) {
       openHintsBtn.addEventListener('click', (e) => {
@@ -3206,7 +3296,170 @@
       if (vnShowUiBtn) vnShowUiBtn.style.display = 'none';
     }
 
+    // ==========================================
+    // محرك الألعاب النارية الكونية لكوكب كيبلر
+    // ==========================================
+    let fwCanvas = null;
+    let fwCtx = null;
+    let fwAnimationId = null;
+    let fireworksParticles = [];
+
+    function initFireworksEngine() {
+      fwCanvas = document.getElementById('keplerFireworksCanvas');
+      if (!fwCanvas) return;
+      fwCtx = fwCanvas.getContext('2d');
+      fwCanvas.width = window.innerWidth;
+      fwCanvas.height = window.innerHeight;
+      fireworksParticles = [];
+    }
+
+    function createFireworkRocket() {
+      if (!fwCanvas) return;
+      const x = Math.random() * (fwCanvas.width * 0.8) + (fwCanvas.width * 0.1);
+      const y = Math.random() * (fwCanvas.height * 0.35) + 60;
+      const colors = ['#f472b6', '#38bdf8', '#fbbf24', '#34d399', '#c084fc', '#ffffff'];
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      const count = 38;
+
+      for (let i = 0; i < count; i++) {
+        const angle = (Math.PI * 2 / count) * i;
+        const speed = Math.random() * 4.2 + 2.0;
+        fireworksParticles.push({
+          x: x,
+          y: y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          alpha: 1.0,
+          color: color,
+          size: Math.random() * 2.8 + 1.8,
+          decay: Math.random() * 0.018 + 0.014
+        });
+      }
+    }
+
+    function startFireworksLoop() {
+      initFireworksEngine();
+      if (!fwCanvas) return;
+      fwCanvas.style.display = 'block';
+
+      let lastLaunch = 0;
+      function loop(now) {
+        if (!fwCtx) return;
+        fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
+
+        if (now - lastLaunch > 750) {
+          createFireworkRocket();
+          lastLaunch = now;
+        }
+
+        for (let i = fireworksParticles.length - 1; i >= 0; i--) {
+          const p = fireworksParticles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.045; // جاذبية خفيفة
+          p.alpha -= p.decay;
+
+          if (p.alpha <= 0) {
+            fireworksParticles.splice(i, 1);
+            continue;
+          }
+
+          fwCtx.save();
+          fwCtx.globalAlpha = p.alpha;
+          fwCtx.fillStyle = p.color;
+          fwCtx.shadowBlur = 10;
+          fwCtx.shadowColor = p.color;
+          fwCtx.beginPath();
+          fwCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          fwCtx.fill();
+          fwCtx.restore();
+        }
+
+        fwAnimationId = requestAnimationFrame(loop);
+      }
+      fwAnimationId = requestAnimationFrame(loop);
+    }
+
+    function stopFireworksLoop() {
+      if (fwAnimationId) {
+        cancelAnimationFrame(fwAnimationId);
+        fwAnimationId = null;
+      }
+      if (fwCanvas) {
+        fwCanvas.style.display = 'none';
+        if (fwCtx) fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
+      }
+      fireworksParticles = [];
+    }
+
+    // نصوص حوارات كوكب كيبلر-186 إف الاحتفالي والشرائح
+    const keplerDialogue = [
+      {
+        speaker: "حشود المجرة",
+        isAlien: true,
+        bg: KEPLER_SCENE_1,
+        text: "🎉 [الحشود تهتف باسمكِ في كل أرجاء الكوكب] نورتينا يا بطلة المجرة سومي! مرحباً بكِ في أرض السلام!"
+      },
+      {
+        speaker: "سكان كيبلر",
+        isAlien: true,
+        bg: KEPLER_SCENE_1,
+        text: "كل مخلوق في هذا الكون مدين لشجاعتكِ ولطافتكِ.. اليوم أشرقت شمس المجرة بيوم ميلادكِ السعيد!"
+      },
+      {
+        speaker: "الفضائي (زحل)",
+        isAlien: true,
+        bg: KEPLER_SCENE_2,
+        text: "احم.. حتى أنا جئت لأجلكِ.. هذه كعكة عيد ميلاد فضائية مصنوعة بحب ونجوم لا تنطفئ أبداً!"
+      },
+      {
+        speaker: "سومي",
+        isAlien: false,
+        bg: KEPLER_SCENE_2,
+        text: "عزززةةة شكددد يجننن! 🥹 كيكتي الفضائية وأحلى احتفال بالكون كله.. دودي شكراً لأنك صنعت لي هذا العالم الساحر! 💕"
+      }
+    ];
+
+    const keplerAudio = document.getElementById('keplerAudio');
+    if (keplerAudio) keplerAudio.loop = true;
+
+    function startKeplerVisualNovel() {
+      resetVnUiState();
+      isVNActive = true;
+      vnCurrentStory = 'kepler';
+      vnLinearList = keplerDialogue;
+      vnLinearIndex = 0;
+
+      // كتم الأصوات الأخرى وتشغيل الموسيقى الاحتفالية بتكرار مستمر
+      fadeAudio(ambientAudio, 0, 800);
+      if (isSpecialPlaying) fadeAudio(specialAudio, 0, 800);
+      if (saturnAudio) saturnAudio.pause();
+      if (neptuneAudio) neptuneAudio.pause();
+
+      if (keplerAudio) {
+        keplerAudio.currentTime = 0;
+        keplerAudio.volume = 0.95;
+        keplerAudio.play().catch(e => console.log(e));
+      }
+
+      const vnContainer = document.getElementById('vnContainer');
+      vnContainer.className = 'vn-container active mode-kepler';
+      document.getElementById('vnChoices').style.display = 'none';
+
+      const cinematicBg = document.getElementById('keplerCinematicBg');
+      if (cinematicBg) {
+        cinematicBg.style.display = 'block';
+        cinematicBg.style.backgroundImage = `url('${KEPLER_SCENE_1}')`;
+      }
+
+      // تشغيل كانفاس الألعاب النارية
+      startFireworksLoop();
+
+      playLinearStep();
+    }
+
     function exitSaturnVisualNovel() {
+
       resetVnUiState();
       const vnContainer = document.getElementById('vnContainer');
       vnContainer.classList.add('leaving');
@@ -3223,14 +3476,26 @@
         setTimeout(() => { neptuneAudio.pause(); neptuneAudio.currentTime = 0; }, 650);
       }
 
+      // إيقاف موسيقى وألعاب نارية كيبلر وإعادة الخلفية للوضع الطبيعي
+      if (keplerAudio) {
+        fadeAudio(keplerAudio, 0, 600);
+        setTimeout(() => { keplerAudio.pause(); keplerAudio.currentTime = 0; }, 650);
+      }
+      stopFireworksLoop();
+      const cinematicBg = document.getElementById('keplerCinematicBg');
+      if (cinematicBg) cinematicBg.style.display = 'none';
+
       setTimeout(() => {
         isVNActive = false;
-        vnContainer.classList.remove('active', 'leaving', 'mode-saturn', 'mode-neptune', 'mode-mars');
+        vnContainer.classList.remove('active', 'leaving', 'mode-saturn', 'mode-neptune', 'mode-mars', 'mode-kepler');
         fadeAudio(ambientAudio, 0.6, 1200);
 
+        if (vnCurrentStory === 'kepler') {
+          discoveredSecrets.kepler = true;
+          persistSecrets();
+          showToast("👑✨ اكتمل السر الخامس والأخير! احتفال ميلاد بطلة المجرة مستمر!");
+        } else if (vnCurrentStory === 'saturn') {
 
-
-        if (vnCurrentStory === 'saturn') {
           discoveredSecrets.saturn = true;
           persistSecrets();
           showToast("🪐✨ تم إنهاء مغامرة زحل! ظهرت النجمة البلورية الذهبية قرب مدار نيبتون...");
@@ -3350,6 +3615,14 @@
             </div>
           </div>
         `;
+      } else if (vnCurrentStory === 'kepler') {
+        updatePlanetBadge("👑", "كوكب الاحتفال الأبدي: كيبلر-186 إف", "rgba(52, 211, 153, 0.6)");
+        spriteEl.innerHTML = '';
+        // تبديل خلفية الشريحة تلقائياً مع حركة الكين بيرنز
+        const cinematicBg = document.getElementById('keplerCinematicBg');
+        if (cinematicBg && item.bg) {
+          cinematicBg.style.backgroundImage = `url('${item.bg}')`;
+        }
       } else {
         // جميع الأجرام والكواكب الجديدة: إبقاء المشهد نقياً وكاملاً ورؤية خلفية الكوكب بوضوح
         const objDef = celestialObjects.find(o => o.key === vnCurrentStory);
@@ -3360,6 +3633,7 @@
         }
         spriteEl.innerHTML = '';
       }
+
 
       typeCustomVnText(item.speaker, item.text, item.isAlien, () => {
         document.getElementById('vnNextIndicator').style.display = 'block';
@@ -3526,12 +3800,14 @@
       const totalStars = appConfig.stars.length;
       const readStars = document.querySelectorAll('.star-node.is-read').length;
       
-      // 1. الأسرار الكبرى الأربعة (زحل، النجمة البلورية، نيبتون، المريخ)
-      const totalSecrets = 4;
+      // 1. الأسرار الكبرى الخمسة (زحل، النجمة البلورية، نيبتون، المريخ، كيبلر-186 إف)
+      const totalSecrets = 5;
       const secretsFound = (discoveredSecrets.saturn ? 1 : 0) + 
                            (discoveredSecrets.crystalDestroyed ? 1 : 0) + 
                            (discoveredSecrets.neptune ? 1 : 0) + 
-                           (discoveredSecrets.mars ? 1 : 0);
+                           (discoveredSecrets.mars ? 1 : 0) +
+                           (discoveredSecrets.kepler ? 1 : 0);
+
 
       // 2. الكواكب والمشاهد المستكشفة (22 كوكب وجرم)
       const totalScenes = Object.keys(CELESTIAL_MONOLOGUES).length;
@@ -3573,6 +3849,23 @@
     progressModal.addEventListener('click', (e) => {
       if (e.target === progressModal) progressModal.classList.remove('active');
     });
+
+    // زر إعادة التجربة ومسح التقدم بالكامل مع التحذير الأحمر
+    const resetJourneyBtn = document.getElementById('resetJourneyBtn');
+    if (resetJourneyBtn) {
+      resetJourneyBtn.addEventListener('click', () => {
+        const confirmed = confirm("⚠️ تحذير: سيتم مسح جميع تقدمكِ في المجرة وإعادة استكشاف النجوم والأسرار والكواكب من البداية!\n\nهل أنتِ متأكدة؟");
+        if (confirmed) {
+          try {
+            localStorage.removeItem('sky_secrets_state');
+            localStorage.removeItem('sky_visited_scenes');
+            localStorage.removeItem('sky_read_stars');
+          } catch(e){}
+          location.reload();
+        }
+      });
+    }
+
 
     // زوم عجلة الماوس حتى 0.18
     window.addEventListener('wheel', (e) => {
@@ -3692,25 +3985,35 @@
     let pulsarAngle = 0;
 
 
-    // مسح وتصفير تقدم الأحداث تلقائياً عند أي رفرش لتبدأ التجربة دائماً من الصفر
-    try {
-      localStorage.removeItem('sky_secrets_state');
-    } catch(e){}
-
-    // تتبع استكشاف الأحداث والأسرار والمشاهد
+    // استرجاع التقدم المحفوظ دائماً من ذاكرة المتصفح بما فيها سر كيبلر الخامس
     let discoveredSecrets = { 
       saturn: false, 
       crystalDestroyed: false, 
       neptune: false, 
-      mars: false 
+      mars: false,
+      kepler: false
     };
 
-    // سجل الكواكب والمشاهد التي تمت زيارتها خلال الجلسة الحالية
-    let visitedScenes = {};
+    try {
+      const savedSec = localStorage.getItem('sky_secrets_state');
+      if (savedSec) discoveredSecrets = Object.assign(discoveredSecrets, JSON.parse(savedSec));
+    } catch(e){}
 
+    let visitedScenes = {};
+    try {
+      const savedScenes = localStorage.getItem('sky_visited_scenes');
+      if (savedScenes) visitedScenes = JSON.parse(savedScenes) || {};
+    } catch(e){}
+
+    // حفظ التقدم بشكل دائم ومستمر في المتصفح
     function persistSecrets() {
+      try {
+        localStorage.setItem('sky_secrets_state', JSON.stringify(discoveredSecrets));
+        localStorage.setItem('sky_visited_scenes', JSON.stringify(visitedScenes));
+      } catch(e){}
       updateProgressStats();
     }
+
 
 
 
@@ -3720,10 +4023,12 @@
       // 1. كوكب زحل بمكان واسع وهادئ في الشمال الغربي بدون أي كواكب قريبة لتزاحمه
       { key: 'saturn', name: 'زحل', icon: '🪐', type: 'saturn_interactive', x: -680, y: -680, radius: 42 },
 
-      // 2. الكواكب الأساسية والنجمة البلورية
+      // 2. الكواكب الأساسية والنجمة البلورية وكوكب كيبلر-186 إف الأسطوري
       { key: 'mars', name: 'المريخ', icon: '🔴', type: 'mars_interactive', x: -180, y: 190, radius: 32 },
       { key: 'neptune', name: 'نيبتون', icon: '🔵', type: 'neptune_interactive', x: 280, y: 250, radius: 34 },
       { key: 'crystal', name: 'النجمة البلورية', icon: '✨', type: 'crystal_star', x: 380, y: 200, radius: 24 },
+      { key: 'kepler', name: 'كيبلر-186 إف', icon: '👑', type: 'kepler_interactive', x: 0, y: -360, radius: 38 },
+
 
       // 3. كواكب المنظومة الشمسية موزعة بأناقة
       { key: 'mercury', name: 'عطارد', icon: '🌑', type: 'planet_rendered', x: -210, y: -80, radius: 16, baseColor: '#94a3b8', glowColor: 'rgba(148,163,184,0.45)' },
@@ -4191,11 +4496,63 @@
           ctx.restore();
         }
 
-        // إظهار اسم الكوكب بدقة عند الزوم المتوسط فما فوق وإخفاء اسم النجمة البلورية حتى تظهر هي
+        // رسم كوكب كيبلر-186 إف التفاعلي الأسطوري (السر الخامس والأخير)
+        if (obj.type === 'kepler_interactive') {
+          // لا يظهر إلا بعد إنهاء الأسرار الأربعة بالكامل
+          const allFourDone = discoveredSecrets.saturn && discoveredSecrets.crystalDestroyed && discoveredSecrets.neptune && discoveredSecrets.mars;
+          if (!allFourDone) {
+            obj._screenX = null;
+            obj._screenY = null;
+            continue;
+          }
+          const kr = obj.radius * sceneScale;
+          obj._screenX = screenX;
+          obj._screenY = screenY;
+          obj._screenR = kr * 1.5;
+
+          ctx.save();
+          // هالة ذهبية زمردية متموجة ومهيبة
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, kr * 1.6, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(52, 211, 153, 0.22)';
+          ctx.shadowBlur = 30 * sceneScale;
+          ctx.shadowColor = '#34d399';
+          ctx.fill();
+
+          // تدرج كروي خلاب لكوكب كيبلر المأهول
+          const kGrad = ctx.createRadialGradient(screenX - kr * 0.35, screenY - kr * 0.35, kr * 0.1, screenX, screenY, kr);
+          kGrad.addColorStop(0, '#fef08a');
+          kGrad.addColorStop(0.3, '#34d399');
+          kGrad.addColorStop(0.7, '#059669');
+          kGrad.addColorStop(1, '#064e3b');
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, kr, 0, Math.PI * 2);
+          ctx.fillStyle = kGrad;
+          ctx.fill();
+
+          // حلقات غبار ذهبية رقيقة حوله
+          ctx.save();
+          ctx.translate(screenX, screenY);
+          ctx.rotate(-0.25);
+          ctx.scale(2.2, 0.45);
+          ctx.beginPath();
+          ctx.arc(0, 0, kr * 1.55, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(251, 191, 36, 0.65)';
+          ctx.lineWidth = 2.5 * sceneScale;
+          ctx.stroke();
+          ctx.restore();
+          ctx.restore();
+        }
+
+        // إظهار اسم الكوكب بدقة عند الزوم المتوسط وإخفاء الأسماء للكواكب السرية غير المكتشفة بعد
         if (obj.name && sceneScale >= 0.52) {
+          const allFourDone = discoveredSecrets.saturn && discoveredSecrets.crystalDestroyed && discoveredSecrets.neptune && discoveredSecrets.mars;
           if (obj.type === 'crystal_star' && (!discoveredSecrets.saturn || discoveredSecrets.crystalDestroyed)) {
             // لا ترسم اسمها إطلاقاً ما دامت مخفية
+          } else if (obj.type === 'kepler_interactive' && !allFourDone) {
+            // لا ترسم اسمه إطلاقاً ما دام لم يفتح بعد
           } else {
+
             ctx.save();
             ctx.font = `bold ${Math.max(11, 13 * Math.sqrt(sceneScale))}px Tajawal, sans-serif`;
             ctx.textAlign = 'center';
@@ -4204,9 +4561,19 @@
             ctx.shadowColor = '#000000';
             const labelY = screenY + ((obj.radius || 24) * sceneScale) + (16 * sceneScale);
             ctx.fillText(obj.name, screenX, labelY);
+
+            // كتابة "تم اكتشافه" بالأحمر فقط للكواكب والظواهر الجديدة المستكشفة (باستثناء زحل والمريخ ونيبتون والنجمة)
+            const isProtectedSecret = (obj.key === 'saturn' || obj.key === 'mars' || obj.key === 'neptune' || obj.key === 'crystal');
+            if (!isProtectedSecret && visitedScenes[obj.key]) {
+              ctx.font = `bold ${Math.max(9, 10 * Math.sqrt(sceneScale))}px Tajawal, sans-serif`;
+              ctx.fillStyle = '#ef4444';
+              ctx.shadowColor = 'rgba(239, 68, 68, 0.7)';
+              ctx.fillText("تم اكتشافه", screenX, labelY + (14 * sceneScale));
+            }
             ctx.restore();
           }
         }
+
 
 
         if (obj.type === 'neptune_interactive') {
@@ -5115,11 +5482,13 @@
 
         const starEl = document.createElement('div');
         const hasSong = star.songUrl && star.songUrl.trim() !== "";
-        starEl.className = 'star-node' + (hasSong ? ' has-special-song' : '');
+        const isRead = readStarsSet.has(String(star.id));
+        starEl.className = 'star-node' + (hasSong ? ' has-special-song' : '') + (isRead ? ' is-read' : '');
 
         starEl.style.left = star.x + 'px';
         starEl.style.top = star.y + 'px';
         starEl.dataset.id = star.id;
+
 
         const color = STAR_COLOR_PALETTES[(star.id || index) % STAR_COLOR_PALETTES.length];
 
@@ -5369,26 +5738,41 @@
 
     let currentOpenStarElement = null;
 
+    // استرجاع قائمة النجوم المقروءة المحفوظة دائماً
+    let readStarsSet = new Set();
+    try {
+      const savedRead = localStorage.getItem('sky_read_stars');
+      if (savedRead) readStarsSet = new Set(JSON.parse(savedRead));
+    } catch(e){}
+
     function openMemoryModal(star, starElement) {
       currentOpenStarElement = starElement;
 
-      // تحويل النجمة فوراً إلى اللون الرمادي وتصغير حجمها
+      // تحويل النجمة إلى رمادية وتخزينها دائماً في ذاكرة المتصفح
       if (currentOpenStarElement) {
         currentOpenStarElement.classList.add('is-read');
+        readStarsSet.add(String(star.id));
+        try {
+          localStorage.setItem('sky_read_stars', JSON.stringify(Array.from(readStarsSet)));
+        } catch(e){}
         updateProgressStats();
       }
-
 
       memoryModalTitle.textContent = star.title;
       memoryModalMessage.textContent = star.message;
       memoryModalMessage.scrollTop = 0; // إعادة التمرير للأعلى
 
+      const imgWrapper = document.getElementById('memoryImgWrapper');
       if (star.image && star.image.trim() !== "") {
         memoryModalImg.src = star.image;
-        memoryModalImg.style.display = 'block';
+        if (imgWrapper) {
+          imgWrapper.style.display = 'block';
+          imgWrapper.scrollTop = 0;
+        }
       } else {
-        memoryModalImg.style.display = 'none';
+        if (imgWrapper) imgWrapper.style.display = 'none';
       }
+
 
       // خفض صوت الفضاء المحيط تلقائياً عند فتح أي نجمة حتى لو لم تكن تحتوي على أغنية
       fadeAudio(ambientAudio, 0.06, 1200);
