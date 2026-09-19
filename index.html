@@ -27,9 +27,25 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      user-select: none;
-      -webkit-user-select: none;
+      user-select: none !important;
+      -webkit-user-select: none !important;
+      -moz-user-select: none !important;
+      -ms-user-select: none !important;
+      -webkit-tap-highlight-color: transparent !important;
+      -webkit-touch-callout: none !important;
     }
+
+    /* حماية إضافية لحاوية ونصوص الفيجول نوفل لمنع التظليل الأزرق نهائياً */
+    .vn-dialogue-wrapper,
+    .vn-dialogue-box,
+    .vn-text,
+    .vn-name-plate {
+      user-select: none !important;
+      -webkit-user-select: none !important;
+      -webkit-tap-highlight-color: transparent !important;
+      outline: none !important;
+    }
+
 
     body, html {
       width: 100%;
@@ -862,22 +878,96 @@
       transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
       overflow: hidden;
     }
-    /* أنماط خلفيات الكواكب */
+    /* شاشة انتظار وتحميل الكواكب السلسة والخفيفة */
+    #planetLoadingScreen {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, #080d1a 0%, #02040a 100%);
+      z-index: 2500;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+    #planetLoadingScreen.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .ship-warp-box {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .warp-ship-icon {
+      font-size: clamp(3.8rem, 8vw, 5.2rem);
+      filter: drop-shadow(0 0 25px rgba(56, 189, 248, 0.8));
+      animation: warpShipFly 1.2s ease-in-out infinite alternate;
+    }
+    .warp-thrust-flame {
+      width: 14px;
+      height: 38px;
+      background: linear-gradient(180deg, #38bdf8, #ec4899, transparent);
+      border-radius: 50%;
+      margin-top: -8px;
+      filter: blur(1.5px);
+      animation: thrustPulse 0.3s infinite alternate;
+    }
+    .warp-loading-title {
+      font-family: 'Amiri', serif;
+      font-size: 1.45rem;
+      color: #f8fafc;
+      letter-spacing: 1px;
+      margin-bottom: 18px;
+      text-shadow: 0 0 16px var(--accent-cyan);
+    }
+    .warp-bar-wrapper {
+      width: min(80vw, 360px);
+      height: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+    }
+    .warp-bar-inner {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #38bdf8, #f472b6, #fbbf24);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.8);
+      border-radius: 20px;
+      transition: width 0.2s linear;
+    }
+    @keyframes warpShipFly {
+      0% { transform: translateY(0px) scale(0.96); }
+      100% { transform: translateY(-12px) scale(1.04); }
+    }
+    @keyframes thrustPulse {
+      0% { transform: scaleY(0.7); opacity: 0.65; }
+      100% { transform: scaleY(1.35); opacity: 1; }
+    }
+
+    /* أنماط خلفيات الكواكب بدون تحميل مسبق ثقيل */
     .vn-container.mode-saturn {
-      background: 
-        radial-gradient(ellipse 120% 70% at 50% 15%, rgba(251, 191, 36, 0.28) 0%, transparent 60%),
-        radial-gradient(circle at 50% -10%, #78350f 0%, #1e1b4b 45%, #020617 90%);
+      background-position: center center;
+      background-size: cover;
+      background-repeat: no-repeat;
     }
     .vn-container.mode-neptune {
-      background: 
-        radial-gradient(ellipse 120% 70% at 50% 15%, rgba(56, 189, 248, 0.35) 0%, transparent 65%),
-        radial-gradient(circle at 50% -10%, #0369a1 0%, #082f49 45%, #020617 90%);
+      background-position: center center;
+      background-size: cover;
+      background-repeat: no-repeat;
     }
     .vn-container.mode-mars {
-      background: 
-        radial-gradient(ellipse 120% 70% at 50% 15%, rgba(239, 68, 68, 0.35) 0%, transparent 65%),
-        radial-gradient(circle at 50% -10%, #991b1b 0%, #450a0a 45%, #020617 90%);
+      background-position: center center;
+      background-size: cover;
+      background-repeat: no-repeat;
     }
+
 
     .vn-container.active {
       opacity: 1;
@@ -891,31 +981,102 @@
       filter: blur(16px);
       transition: opacity 0.65s cubic-bezier(0.7, 0, 0.84, 0), transform 0.65s cubic-bezier(0.7, 0, 0.84, 0), filter 0.65s ease;
     }
-    /* حلقات زحل وأجواء الكوكب الساحرة في الخلفية */
-    .vn-container::before {
-      content: '';
-      position: absolute;
-      top: 18%;
-      left: 50%;
-      transform: translate(-50%, -50%) rotate(-14deg);
-      width: min(150vw, 1100px);
-      height: min(34vw, 240px);
-      border-radius: 50%;
-      border: min(3.8vw, 28px) double rgba(251, 191, 36, 0.4);
-      box-shadow: 
-        0 0 70px rgba(251, 191, 36, 0.3),
-        inset 0 0 60px rgba(245, 158, 11, 0.35);
-      pointer-events: none;
-      z-index: 1;
-    }
+
+    /* إزالة التعتيم بالكامل لتبقى الخلفيات ناصعة بألوانها الأصلية الحقيقية */
+    .vn-container::before,
     .vn-container::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 50% 100%, rgba(15, 23, 42, 0.85) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 2;
+      display: none !important;
     }
+
+    /* زر إعادة الحوار موضوع بأناقة أسفل شريط اسم الكوكب مباشرة */
+    .vn-replay-btn {
+      position: absolute;
+      top: 75px;
+      right: 24px;
+      background: rgba(15, 23, 42, 0.85);
+      color: var(--accent-gold);
+      border: 1px solid rgba(251, 191, 36, 0.4);
+      padding: 6px 14px;
+      border-radius: 16px;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 0.85rem;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 15;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .vn-replay-btn:hover {
+      background: rgba(251, 191, 36, 0.25);
+      color: #fff;
+      transform: translateY(-2px) scale(1.04);
+      border-color: var(--accent-gold);
+    }
+
+    /* أزرار وتأثير إخفاء صندوق الحوار لرؤية المشهد بالكامل */
+    .btn-hide-ui {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #cbd5e1;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.85rem;
+      margin-right: 10px;
+      transition: all 0.2s ease;
+      vertical-align: middle;
+    }
+    .btn-hide-ui:hover {
+      background: rgba(255, 255, 255, 0.25);
+      color: #fff;
+      transform: scale(1.1);
+    }
+    .vn-dialogue-wrapper.ui-hidden {
+      opacity: 0 !important;
+      pointer-events: none !important;
+      transform: translateY(30px);
+    }
+    .vn-dialogue-wrapper {
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    /* زر صغير شفاف يظهر عند إخفاء الحوار لإعادته دون حجب الرؤية */
+    #vnShowUiBtn {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid var(--accent-cyan);
+      color: var(--accent-cyan);
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+      z-index: 20;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    #vnShowUiBtn:hover {
+      background: rgba(56, 189, 248, 0.25);
+      color: #fff;
+      transform: translateX(-50%) scale(1.05);
+    }
+
+
     /* شريط اسم الكوكب في الزاوية */
     .vn-planet-badge {
       position: absolute;
@@ -996,59 +1157,93 @@
       filter: drop-shadow(0 0 10px #38bdf8);
     }
 
-    /* مشهد المريخ مع الخال النائم */
+    /* مشهد المريخ مع خال الفضائي النائم */
     .mars-scene-cast {
       display: flex;
       align-items: flex-end;
       justify-content: center;
       position: relative;
-      width: 260px;
-      height: 220px;
+      width: 320px;
+      height: 250px;
     }
     .sleeping-uncle {
       position: absolute;
-      right: -35px;
-      bottom: 20px;
-      width: 100px;
-      height: 130px;
-      background: #7f1d1d;
-      border-radius: 50% 50% 40% 40%;
-      opacity: 0.75;
-      transform: rotate(14deg) scale(0.85);
-      z-index: 1;
+      right: -45px;
+      bottom: 15px;
+      width: 140px;
+      height: 175px;
+      background: radial-gradient(circle at 40% 30%, #dc2626, #7f1d1d 70%, #450a0a 100%) !important;
+      border: 3.5px solid #f87171 !important;
+      border-radius: 50% 50% 44% 44% / 55% 55% 45% 45%;
+      box-shadow: 0 0 35px rgba(239, 68, 68, 0.75), inset -10px -10px 20px rgba(0,0,0,0.8) !important;
+      opacity: 1 !important;
+      filter: none !important;
+      transform: rotate(12deg);
+      z-index: 2;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
+
+    /* عيون الخال المغمضة النائمة بوضوح */
     .sleeping-eyes {
-      margin-top: 36px;
-      width: 60%;
+      margin-top: 50px;
+      width: 65%;
       display: flex;
       justify-content: space-between;
+      padding: 0 4px;
     }
     .sleeping-eyes::before,
     .sleeping-eyes::after {
       content: '';
-      width: 18px;
-      height: 4px;
-      background: #000;
-      border-radius: 2px;
+      width: 28px;
+      height: 6px;
+      background: #0f172a;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+    /* فم الشخير المفتوح */
+    .sleeping-mouth {
+      width: 22px;
+      height: 14px;
+      background: #1e1b4b;
+      border: 2px solid #000;
+      border-radius: 50%;
+      margin-top: 14px;
+    }
+    /* علامات الشخير ZZZ المتوهجة والعملاقة */
+    .sleep-zzz-container {
+      position: absolute;
+      top: -55px;
+      right: -15px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      pointer-events: none;
+      z-index: 10;
     }
     .sleep-zzz {
-      position: absolute;
-      top: -30px;
-      right: -10px;
-      font-family: 'Cinzel Decorative', sans-serif;
-      font-weight: 700;
-      color: #fca5a5;
-      font-size: 1.4rem;
-      animation: floatZzz 2.2s infinite ease-in;
+      font-family: 'Cinzel Decorative', 'Tajawal', cursive, sans-serif;
+      font-weight: 900;
+      color: #fef08a;
+      text-shadow: 
+        0 0 8px #ef4444,
+        0 0 16px #ef4444,
+        0 0 24px #fbbf24;
+      line-height: 0.9;
+      animation: floatZzz 2.4s infinite ease-in-out;
     }
+    .sleep-zzz.z1 { font-size: 1.4rem; animation-delay: 0s; }
+    .sleep-zzz.z2 { font-size: 2.1rem; animation-delay: 0.6s; margin-right: 12px; }
+    .sleep-zzz.z3 { font-size: 3.0rem; animation-delay: 1.2s; margin-right: 24px; }
+
     @keyframes floatZzz {
-      0% { opacity: 0; transform: translateY(10px) scale(0.7); }
-      50% { opacity: 1; transform: translateY(-10px) scale(1.1); }
-      100% { opacity: 0; transform: translateY(-30px) scale(1.4); }
+      0% { opacity: 0; transform: translateY(15px) scale(0.6); }
+      40% { opacity: 1; transform: translateY(-5px) scale(1.05); }
+      80% { opacity: 0.8; transform: translateY(-30px) scale(1.25); }
+      100% { opacity: 0; transform: translateY(-50px) scale(1.4); }
     }
+
 
     .vn-close-btn:hover {
       background: rgba(239, 68, 68, 0.85);
@@ -1603,6 +1798,8 @@
   <audio id="ambientAudio" loop preload="auto"></audio>
   <audio id="specialAudio" loop preload="auto"></audio>
   <audio id="saturnAudio" loop preload="auto" src="https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/dumbways.mp3"></audio>
+  <audio id="neptuneAudio" loop preload="auto" src="https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/never%20meant%20to%20belong(MP3_320K).mp3"></audio>
+
 
 
   <!-- نافذة تسجيل الدخول الفاخرة (الخطوة الأولى) -->
@@ -1788,8 +1985,21 @@
   </div>
 
 
+  <!-- شاشة الانتقال والتحميل الفضائي قبل دخول الكواكب -->
+  <div id="planetLoadingScreen">
+    <div class="ship-warp-box">
+      <div class="warp-ship-icon">🛸</div>
+      <div class="warp-thrust-flame"></div>
+    </div>
+    <div class="warp-loading-title" id="warpLoadingText">جاري تشغيل محركات البلازما والهبوط...</div>
+    <div class="warp-bar-wrapper">
+      <div class="warp-bar-inner" id="warpBarInner"></div>
+    </div>
+  </div>
+
   <!-- نافذة الكواكب والفيجول نوفل -->
   <div class="vn-container" id="vnContainer">
+
     <!-- شريط اسم الكوكب في الزاوية -->
     <div class="vn-planet-badge" id="vnPlanetBadge">
       <span class="vn-badge-icon" id="vnBadgeIcon">🪐</span>
@@ -1800,21 +2010,39 @@
       <i class="fa-solid fa-person-walking-arrow-right"></i> العودة للفضاء
     </button>
 
+    <button class="vn-replay-btn" id="vnReplayBtn" title="إعادة الحوار من البداية">
+      <i class="fa-solid fa-rotate-left"></i>
+      <span>إعادة الحوار</span>
+    </button>
+
+
     <div class="vn-scene" id="vnSceneArea">
       <div class="vn-alien-sprite" id="vnAlienSprite"></div>
     </div>
 
 
 
-    <div class="vn-dialogue-wrapper">
-      <div class="vn-name-plate" id="vnName">الفضائي</div>
+    <div class="vn-dialogue-wrapper" id="vnDialogueWrapper">
+      <div class="vn-name-plate">
+        <span id="vnName">الفضائي</span>
+        <button class="btn-hide-ui" id="vnHideUiBtn" title="إخفاء الحوار لرؤية الكوكب">
+          <i class="fa-solid fa-eye-slash"></i>
+        </button>
+      </div>
       <div class="vn-dialogue-box">
         <p class="vn-text" id="vnText"></p>
         <div class="vn-next-indicator" id="vnNextIndicator">▼ اضغطي للمتابعة ▼</div>
       </div>
       <div class="vn-choices-container" id="vnChoices"></div>
     </div>
+
+    <!-- زر صغير يظهر عند إخفاء النصوص لإعادتها فوراً -->
+    <button id="vnShowUiBtn">
+      <i class="fa-solid fa-eye"></i>
+      <span>إظهار الحوار</span>
+    </button>
   </div>
+
 
 
   <!-- لوحة تحكم واستوديو المطور (Admin Drawer) -->
@@ -2097,11 +2325,21 @@
       }
     }
 
+    // روابط صور الكواكب - تُحمّل فقط عند الحاجة لتوفير البيانات والتخلص من اللاق تماماً
+    const PLANET_BG_MAP = {
+      'saturn': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8135%20(1).png",
+      'mars': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8136.png",
+      'neptune': "https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/%D8%A7%D9%84%D9%81%D8%B6%D8%A7%D8%A1/watermark-removed-8137.png"
+    };
+
     function setupAudioSources() {
       ambientAudio.src = R2_AMBIENT_URL;
       ambientAudio.volume = 0.6;
       specialAudio.volume = 0.9;
     }
+
+
+
 
     function startMusicExperience() {
       initWebAudio();
@@ -2427,12 +2665,65 @@
       planetConfirmModal.classList.add('active');
     }
 
+    // دالة الانتقال والتحميل الفضائي الذكية
+    function launchPlanetLoadingTransition(planetKey, planetName, onReady) {
+      const loader = document.getElementById('planetLoadingScreen');
+      const bar = document.getElementById('warpBarInner');
+      const title = document.getElementById('warpLoadingText');
+      
+      title.textContent = `جاري الهبوط على ${planetName}...`;
+      bar.style.width = '0%';
+      loader.classList.add('active');
+
+      // تخفيف الفضاء في الخلفية بإيقاف التأثيرات اللحظية
+      isDraggingScene = false;
+
+      // تحميل صورة خلفية الكوكب المحددة فقط أثناء شاشة الانتظار
+      const img = new Image();
+      const targetBg = PLANET_BG_MAP[planetKey] || '';
+      if (targetBg) img.src = targetBg;
+
+      const startTime = performance.now();
+      const minDuration = 2000; // ثانيتان على الأقل كما طلبت
+
+      let progressInterval = setInterval(() => {
+        const elapsed = performance.now() - startTime;
+        const pct = Math.min(95, Math.round((elapsed / minDuration) * 95));
+        bar.style.width = pct + '%';
+      }, 50);
+
+      function finalizeTransition() {
+        clearInterval(progressInterval);
+        bar.style.width = '100%';
+        
+        setTimeout(() => {
+          loader.classList.remove('active');
+          const vn = document.getElementById('vnContainer');
+          if (targetBg) vn.style.backgroundImage = `url('${targetBg}')`;
+          if (onReady) onReady();
+        }, 320);
+      }
+
+      // التحقق من اكتمال الثواني وتحميل الصورة معاً
+      setTimeout(() => {
+        if (img.complete || !targetBg) {
+          finalizeTransition();
+        } else {
+          img.onload = finalizeTransition;
+          img.onerror = finalizeTransition;
+          // حد أقصى للانتظار حتى لا يعلق المستخدم إن كان النت بطيئاً
+          setTimeout(finalizeTransition, 1500);
+        }
+      }, minDuration);
+    }
+
     if (confirmEnterPlanetBtn) {
       confirmEnterPlanetBtn.addEventListener('click', () => {
         planetConfirmModal.classList.remove('active');
         if (pendingPlanetAction) pendingPlanetAction();
       });
     }
+
     if (cancelEnterPlanetBtn) {
       cancelEnterPlanetBtn.addEventListener('click', () => {
         planetConfirmModal.classList.remove('active');
@@ -2462,8 +2753,16 @@
         if (dist <= saturn._screenR) {
           playStarChime();
           askToEnterPlanet("🪐", "كوكب زحل", () => {
-            vnCurrentStory = 'saturn';
-            startSaturnVisualNovel();
+            launchPlanetLoadingTransition('saturn', "كوكب زحل", () => {
+              if (discoveredSecrets.saturn) {
+                startLinearVN('mode-saturn', [
+                  { speaker: "الراوي", isAlien: true, text: "لقد انتهت جميع الحوارات وسومي غادرت الكوكب." }
+                ], 'completed_saturn');
+              } else {
+                vnCurrentStory = 'saturn';
+                startSaturnVisualNovel();
+              }
+            });
           });
           return true;
         }
@@ -2476,13 +2775,19 @@
         if (dist <= neptune._screenR) {
           playStarChime();
           askToEnterPlanet("🔵", "كوكب نيبتون", () => {
-            if (!discoveredSecrets.crystalDestroyed) {
-              startLinearVN('mode-neptune', [
-                { speaker: "سومي", isAlien: false, text: "واه فاضي بس هدوء رهيب، حرجعله بعدين يمكن الكي احد." }
-              ], 'mono_neptune');
-            } else {
-              startLinearVN('mode-neptune', neptuneDialogue, 'neptune');
-            }
+            launchPlanetLoadingTransition('neptune', "كوكب نيبتون", () => {
+              if (discoveredSecrets.neptune) {
+                startLinearVN('mode-neptune', [
+                  { speaker: "الراوي", isAlien: true, text: "لقد انتهت جميع الحوارات وسومي غادرت الكوكب." }
+                ], 'completed_neptune');
+              } else if (!discoveredSecrets.crystalDestroyed) {
+                startLinearVN('mode-neptune', [
+                  { speaker: "سومي", isAlien: false, text: "واه فاضي بس هدوء رهيب، حرجعله بعدين يمكن الكي احد." }
+                ], 'mono_neptune');
+              } else {
+                startLinearVN('mode-neptune', neptuneDialogue, 'neptune');
+              }
+            });
           });
           return true;
         }
@@ -2495,20 +2800,54 @@
         if (dist <= mars._screenR) {
           playStarChime();
           askToEnterPlanet("🔴", "كوكب المريخ", () => {
-            if (!discoveredSecrets.neptune) {
-              startLinearVN('mode-mars', [
-                { speaker: "سماء (سومي)", isAlien: false, text: "اوه شكله خال الفضائي الي اشغل جدنا بفزعته واربعة وعشرين ساعة نايم، خلي ارجع بعدين." }
-              ], 'mono_mars');
-            } else {
-              startLinearVN('mode-mars', marsDialogue, 'mars');
-            }
+            launchPlanetLoadingTransition('mars', "كوكب المريخ", () => {
+              if (discoveredSecrets.mars) {
+                startLinearVN('mode-mars', [
+                  { speaker: "الراوي", isAlien: true, text: "لقد انتهت جميع الحوارات وسومي غادرت الكوكب." }
+                ], 'completed_mars');
+              } else if (!discoveredSecrets.neptune) {
+                startLinearVN('mode-mars', [
+                  { speaker: "سماء (سومي)", isAlien: false, text: "اوه شكله خال الفضائي الي اشغل جدنا بفزعته واربعة وعشرين ساعة نايم، خلي ارجع بعدين." }
+                ], 'mono_mars');
+              } else {
+                startLinearVN('mode-mars', marsDialogue, 'mars');
+              }
+            });
           });
           return true;
         }
       }
 
+
       return false;
     }
+
+    // زر إعادة الحوار من البداية
+    const vnReplayBtn = document.getElementById('vnReplayBtn');
+    if (vnReplayBtn) {
+      vnReplayBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        clearInterval(vnInterval);
+
+        if (vnCurrentStory === 'saturn' || vnCurrentStory === 'completed_saturn') {
+          vnCurrentStory = 'saturn';
+          startSaturnVisualNovel();
+        } else if (vnCurrentStory === 'neptune' || vnCurrentStory === 'completed_neptune') {
+          startLinearVN('mode-neptune', neptuneDialogue, 'neptune');
+        } else if (vnCurrentStory === 'mars' || vnCurrentStory === 'completed_mars') {
+          startLinearVN('mode-mars', marsDialogue, 'mars');
+        } else if (vnCurrentStory === 'mono_neptune') {
+          startLinearVN('mode-neptune', [
+            { speaker: "سومي", isAlien: false, text: "واه فاضي بس هدوء رهيب، حرجعله بعدين يمكن الكي احد." }
+          ], 'mono_neptune');
+        } else if (vnCurrentStory === 'mono_mars') {
+          startLinearVN('mode-mars', [
+            { speaker: "سماء (سومي)", isAlien: false, text: "اوه شكله خال الفضائي الي اشغل جدنا بفزعته واربعة وعشرين ساعة نايم، خلي ارجع بعدين." }
+          ], 'mono_mars');
+        }
+      });
+    }
+
 
     // إدارة نافذة تلميحات الأسرار
     const hintsModal = document.getElementById('hintsModal');
@@ -2571,16 +2910,33 @@
     });
 
     // رصد لمس الكواكب فوري ودقيق بنهاية اللمسة وبدون تداخل مع سحب الخريطة
+    // تسجيل نقطة بداية ونهاية اللمس لمنع الدخول للكواكب أثناء سحب وتحريك الشاشة
+    let touchOriginScreenX = 0;
+    let touchOriginScreenY = 0;
+    let touchStartTime = 0;
+
+    window.addEventListener('touchstart', (e) => {
+      if (e.touches && e.touches.length === 1) {
+        touchOriginScreenX = e.touches[0].clientX;
+        touchOriginScreenY = e.touches[0].clientY;
+        touchStartTime = performance.now();
+      }
+    }, { passive: true });
+
     window.addEventListener('touchend', (e) => {
-      if (e.target.closest('.star-node') || e.target.closest('#adminStudioDrawer') || e.target.closest('.modal-overlay') || e.target.closest('#zoomControls') || e.target.closest('.vn-container')) return;
+      if (e.target.closest('.star-node') || e.target.closest('#adminStudioDrawer') || e.target.closest('.modal-overlay') || e.target.closest('#zoomControls') || e.target.closest('.vn-container') || e.target.closest('#planetLoadingScreen')) return;
       if (e.changedTouches && e.changedTouches.length === 1) {
         const touch = e.changedTouches[0];
-        const tapDistance = Math.hypot(touch.clientX - (startDragX + sceneX), touch.clientY - (startDragY + sceneY));
-        if (tapDistance < 18) {
+        const moveDist = Math.hypot(touch.clientX - touchOriginScreenX, touch.clientY - touchOriginScreenY);
+        const duration = performance.now() - touchStartTime;
+
+        // لا يُعتبر نقراً إلا إذا كان لمسة سريعة موضعية دون أي سحب للشاشة (أقل من 7 بكسل ومدة قصيرة)
+        if (moveDist < 7 && duration < 320) {
           handlePlanetInteraction(touch.clientX, touch.clientY);
         }
       }
     }, { passive: true });
+
 
 
 
@@ -2639,7 +2995,9 @@
     if (saturnAudio) saturnAudio.loop = true;
 
     function startSaturnVisualNovel() {
+      resetVnUiState();
       isVNActive = true;
+
       fadeAudio(ambientAudio, 0, 800);
       if(isSpecialPlaying) fadeAudio(specialAudio, 0, 800);
       
@@ -2709,7 +3067,32 @@
     let vnLinearList = [];
     let vnLinearIndex = 0;
 
+    // إدارة إخفاء وإظهار الحوارات لرؤية الكواكب بالكامل
+    const vnDialogueWrapper = document.getElementById('vnDialogueWrapper');
+    const vnHideUiBtn = document.getElementById('vnHideUiBtn');
+    const vnShowUiBtn = document.getElementById('vnShowUiBtn');
+
+    if (vnHideUiBtn && vnShowUiBtn && vnDialogueWrapper) {
+      vnHideUiBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        vnDialogueWrapper.classList.add('ui-hidden');
+        vnShowUiBtn.style.display = 'inline-flex';
+      });
+
+      vnShowUiBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        vnDialogueWrapper.classList.remove('ui-hidden');
+        vnShowUiBtn.style.display = 'none';
+      });
+    }
+
+    function resetVnUiState() {
+      if (vnDialogueWrapper) vnDialogueWrapper.classList.remove('ui-hidden');
+      if (vnShowUiBtn) vnShowUiBtn.style.display = 'none';
+    }
+
     function exitSaturnVisualNovel() {
+      resetVnUiState();
       const vnContainer = document.getElementById('vnContainer');
       vnContainer.classList.add('leaving');
 
@@ -2719,10 +3102,17 @@
         setTimeout(() => { saturnAudio.pause(); saturnAudio.currentTime = 0; }, 650);
       }
 
+      // إيقاف موسيقى نيبتون عند الخروج
+      if (neptuneAudio) {
+        fadeAudio(neptuneAudio, 0, 600);
+        setTimeout(() => { neptuneAudio.pause(); neptuneAudio.currentTime = 0; }, 650);
+      }
+
       setTimeout(() => {
         isVNActive = false;
         vnContainer.classList.remove('active', 'leaving', 'mode-saturn', 'mode-neptune', 'mode-mars');
-        fadeAudio(ambientAudio, 0.6, 1500);
+        fadeAudio(ambientAudio, 0.6, 1200);
+
 
 
         if (vnCurrentStory === 'saturn') {
@@ -2742,15 +3132,37 @@
     }
 
 
+    const neptuneAudio = document.getElementById('neptuneAudio');
+    if (neptuneAudio) neptuneAudio.loop = true;
+
     // تشغيل حوار خطي متسلسل (لنيبتون والمريخ ومونولوج سومي)
     function startLinearVN(modeClass, list, storyKey, spriteChar = '👽') {
+      resetVnUiState();
       isVNActive = true;
+
       vnCurrentStory = storyKey;
       vnLinearList = list;
       vnLinearIndex = 0;
 
-      fadeAudio(ambientAudio, 0, 1000);
-      if(isSpecialPlaying) fadeAudio(specialAudio, 0, 1000);
+      if(isSpecialPlaying) fadeAudio(specialAudio, 0, 800);
+
+      // إدارة الموسيقى بحسب الكوكب
+      if (modeClass === 'mode-mars') {
+        // كوكب المريخ: إبقاء موسيقى الفضاء الخلفية مستمرة تماماً بدون كتم
+        if (ambientAudio.paused && !isMuted) ambientAudio.play().catch(e => console.log(e));
+        ambientAudio.volume = 0.6;
+        if (neptuneAudio) neptuneAudio.pause();
+      } else if (modeClass === 'mode-neptune') {
+        // كوكب نيبتون: خفض موسيقى الفضاء وتشغيل موسيقى نيبتون الخاصة مع التكرار
+        fadeAudio(ambientAudio, 0, 800);
+        if (neptuneAudio) {
+          neptuneAudio.currentTime = 0;
+          neptuneAudio.volume = 0.85;
+          neptuneAudio.play().catch(e => console.log(e));
+        }
+      } else {
+        fadeAudio(ambientAudio, 0, 800);
+      }
 
       const vnContainer = document.getElementById('vnContainer');
       vnContainer.className = 'vn-container active ' + modeClass;
@@ -2758,6 +3170,7 @@
 
       playLinearStep();
     }
+
 
     function playLinearStep() {
       if (vnLinearIndex >= vnLinearList.length) {
@@ -2786,32 +3199,39 @@
         `;
       } else if (vnCurrentStory === 'mars') {
         updatePlanetBadge("🔴", "الكوكب الأحمر: المريخ", "rgba(239, 68, 68, 0.5)");
-        // مشهد الفضائي وبجانبه خاله النائم ورموز ZZZ
+        // مشهد الفضائي وبجانبه خاله النائم وعلامات ZZZ الواضحة جداً
         spriteEl.innerHTML = `
           <div class="mars-scene-cast">
             <div class="sleeping-uncle">
-              <div class="sleep-zzz">Zzz..</div>
+              <div class="sleep-zzz-container">
+                <span class="sleep-zzz z3">Z</span>
+                <span class="sleep-zzz z2">Z</span>
+                <span class="sleep-zzz z1">Z</span>
+              </div>
               <div class="sleeping-eyes"></div>
-              <div style="width:14px; height:8px; border-bottom:2px solid #000; border-radius:50%; margin-top:8px;"></div>
+              <div class="sleeping-mouth"></div>
             </div>
-            <div class="vn-alien-sprite" style="position:relative; z-index:3; transform:scale(0.92);">
+            <div class="vn-alien-sprite" style="position:relative; z-index:3; transform:scale(0.95); margin-left:-25px;">
               ${renderAlienSpriteHtml()}
             </div>
           </div>
         `;
       } else if (vnCurrentStory === 'mono_neptune') {
         updatePlanetBadge("🔵", "العملاق الجليدي: كوكب نيبتون", "rgba(56, 189, 248, 0.5)");
-        // كوكب نيبتون فارغ تماماً وهدوء جليدي دون أي كائن
         spriteEl.innerHTML = '';
       } else if (vnCurrentStory === 'mono_mars') {
         updatePlanetBadge("🔴", "الكوكب الأحمر: المريخ", "rgba(239, 68, 68, 0.5)");
-        // كوكب المريخ في البداية: خال الفضائي فقط نائم بمفرده ولا يوجد الفضائي معه
+        // كوكب المريخ في البداية: خال الفضائي فقط نائم بمفرده بحجم بارز وشخير واضح جداً في المنتصف
         spriteEl.innerHTML = `
-          <div class="mars-scene-cast" style="justify-content: center;">
-            <div class="sleeping-uncle" style="position: relative; right: auto; bottom: auto; transform: rotate(4deg) scale(1.1);">
-              <div class="sleep-zzz">Zzz..</div>
+          <div class="mars-scene-cast" style="justify-content: center; width: 100%;">
+            <div class="sleeping-uncle" style="position: relative; right: auto; bottom: 10px; transform: scale(1.35) rotate(6deg);">
+              <div class="sleep-zzz-container" style="top: -65px; right: -25px;">
+                <span class="sleep-zzz z3">Z</span>
+                <span class="sleep-zzz z2">Z</span>
+                <span class="sleep-zzz z1">Z</span>
+              </div>
               <div class="sleeping-eyes"></div>
-              <div style="width:14px; height:8px; border-bottom:2px solid #000; border-radius:50%; margin-top:8px;"></div>
+              <div class="sleeping-mouth"></div>
             </div>
           </div>
         `;
@@ -2820,12 +3240,11 @@
         spriteEl.innerHTML = '';
       }
 
-
-
       typeCustomVnText(item.speaker, item.text, item.isAlien, () => {
         document.getElementById('vnNextIndicator').style.display = 'block';
       });
     }
+
 
     function typeCustomVnText(speakerName, text, isAlien, onComplete) {
       clearInterval(vnInterval);
@@ -2844,10 +3263,18 @@
         spriteEl.style.opacity = '1';
         spriteEl.style.transform = 'translateY(-6px) scale(1.04)';
       } else {
-        spriteEl.style.filter = 'drop-shadow(0 0 10px rgba(0,0,0,0.6)) grayscale(100%) brightness(0.4)';
-        spriteEl.style.opacity = '0.4';
-        spriteEl.style.transform = 'translateY(10px) scale(0.94)';
+        // إذا كان المشهد لكوكب المريخ وفيه الخال النائم، يبقى واضحاً 100% ولا يخفت أبداً
+        if (vnCurrentStory === 'mono_mars' || vnCurrentStory === 'mars') {
+          spriteEl.style.filter = 'drop-shadow(0 0 25px rgba(239, 68, 68, 0.6)) grayscale(0%) brightness(1)';
+          spriteEl.style.opacity = '1';
+          spriteEl.style.transform = 'none';
+        } else {
+          spriteEl.style.filter = 'drop-shadow(0 0 10px rgba(0,0,0,0.6)) grayscale(100%) brightness(0.4)';
+          spriteEl.style.opacity = '0.4';
+          spriteEl.style.transform = 'translateY(10px) scale(0.94)';
+        }
       }
+
 
       let i = 0;
       vnIsTyping = true;
@@ -4706,6 +5133,14 @@
 
     let currentLoggedInUser = '';
 
+    function triggerFullScreen() {
+      const docEl = document.documentElement;
+      const requestFS = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
+      if (requestFS && !document.fullscreenElement && !document.webkitFullscreenElement) {
+        requestFS.call(docEl).catch(() => {});
+      }
+    }
+
     function handleLogin() {
       const val = usernameInput.value.trim().toLowerCase();
       if (!val) {
@@ -4713,6 +5148,9 @@
         return;
       }
       currentLoggedInUser = val;
+
+      // تفعيل وضع ملء الشاشة فور أول تفاعل للمستخدم
+      triggerFullScreen();
 
       if (val === 'diajb0') {
         loginModal.classList.remove('active');
@@ -4725,6 +5163,8 @@
     }
 
     function startUniverseJourney() {
+      // تأكيد ملء الشاشة عند زر الانطلاق النهائي
+      triggerFullScreen();
       guidelinesModal.classList.remove('active');
 
       const earthIntro = document.getElementById('earthIntro');
@@ -4743,6 +5183,7 @@
         }
       }, 2500);
     }
+
 
     function showLoginError(msg) {
       loginFeedback.textContent = msg;
@@ -4921,7 +5362,12 @@
     setupAudioSources();
     renderStars();
     updateCenterDisplay();
+
+    // إيقاف التحديد ونسخ النصوص والقوائم المنبثقة بالكامل في كل الموقع
+    window.addEventListener('selectstart', (e) => e.preventDefault());
+    window.addEventListener('contextmenu', (e) => e.preventDefault());
   </script>
+
 
 </body>
 </html>
