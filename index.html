@@ -4259,6 +4259,10 @@
         }
         else if (obj.type === 'mars_interactive') {
           const mr = obj.radius * sceneScale;
+          obj._screenX = screenX;
+          obj._screenY = screenY;
+          obj._screenR = Math.max(34, mr * 1.6);
+
           ctx.save();
           ctx.beginPath();
           ctx.arc(screenX, screenY, mr * 1.25, 0, Math.PI * 2);
@@ -4292,6 +4296,7 @@
           ctx.fill();
           ctx.restore();
         }
+
         else if (obj.type === 'blackhole') {
           const r = obj.radius * sceneScale;
           ctx.save();
