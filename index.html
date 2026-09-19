@@ -847,9 +847,7 @@
     .vn-container {
       position: fixed;
       inset: 0;
-      background: 
-        radial-gradient(ellipse 120% 70% at 50% 15%, rgba(251, 191, 36, 0.28) 0%, transparent 60%),
-        radial-gradient(circle at 50% -10%, #78350f 0%, #1e1b4b 45%, #020617 90%);
+      background: radial-gradient(circle at 50% 10%, #1e1b4b 0%, #020617 90%);
       z-index: 1500;
       display: flex;
       flex-direction: column;
@@ -862,6 +860,23 @@
       transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
       overflow: hidden;
     }
+    /* أنماط خلفيات الكواكب */
+    .vn-container.mode-saturn {
+      background: 
+        radial-gradient(ellipse 120% 70% at 50% 15%, rgba(251, 191, 36, 0.28) 0%, transparent 60%),
+        radial-gradient(circle at 50% -10%, #78350f 0%, #1e1b4b 45%, #020617 90%);
+    }
+    .vn-container.mode-neptune {
+      background: 
+        radial-gradient(ellipse 120% 70% at 50% 15%, rgba(56, 189, 248, 0.35) 0%, transparent 65%),
+        radial-gradient(circle at 50% -10%, #0369a1 0%, #082f49 45%, #020617 90%);
+    }
+    .vn-container.mode-mars {
+      background: 
+        radial-gradient(ellipse 120% 70% at 50% 15%, rgba(239, 68, 68, 0.35) 0%, transparent 65%),
+        radial-gradient(circle at 50% -10%, #991b1b 0%, #450a0a 45%, #020617 90%);
+    }
+
     .vn-container.active {
       opacity: 1;
       pointer-events: auto;
@@ -899,6 +914,27 @@
       pointer-events: none;
       z-index: 2;
     }
+    /* شريط اسم الكوكب في الزاوية */
+    .vn-planet-badge {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 8px 18px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Amiri', serif;
+      font-size: 1.25rem;
+      color: #fff;
+      backdrop-filter: blur(12px);
+      z-index: 15;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+    .vn-badge-icon { font-size: 1.4rem; }
+
     .vn-close-btn {
       position: absolute;
       top: 24px;
@@ -917,6 +953,101 @@
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(251, 191, 36, 0.2);
       transition: all 0.25s ease;
     }
+
+    /* أشكال مجسمات نيبتون والمريخ */
+    .neptune-crowd {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    .neptune-citizen {
+      width: 80px;
+      height: 120px;
+      background: #0284c7;
+      border-radius: 45% 45% 30% 30%;
+      position: absolute;
+      opacity: 0.65;
+      filter: blur(0.5px);
+    }
+    .neptune-citizen.c1 { left: 10%; bottom: 10px; transform: scale(0.8); }
+    .neptune-citizen.c2 { right: 10%; bottom: 10px; transform: scale(0.85); }
+    .neptune-citizen.c3 { left: -15px; bottom: 0; transform: scale(0.7); }
+    .neptune-citizen.c4 { right: -15px; bottom: 0; transform: scale(0.75); }
+    .neptune-leader {
+      width: 130px;
+      height: 170px;
+      background: radial-gradient(circle at 50% 30%, #38bdf8, #0369a1);
+      border-radius: 50% 50% 35% 35%;
+      position: relative;
+      z-index: 3;
+      box-shadow: 0 0 35px rgba(56, 189, 248, 0.7);
+    }
+    .neptune-crown {
+      position: absolute;
+      top: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2.2rem;
+      filter: drop-shadow(0 0 10px #38bdf8);
+    }
+
+    /* مشهد المريخ مع الخال النائم */
+    .mars-scene-cast {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      position: relative;
+      width: 260px;
+      height: 220px;
+    }
+    .sleeping-uncle {
+      position: absolute;
+      right: -35px;
+      bottom: 20px;
+      width: 100px;
+      height: 130px;
+      background: #7f1d1d;
+      border-radius: 50% 50% 40% 40%;
+      opacity: 0.75;
+      transform: rotate(14deg) scale(0.85);
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .sleeping-eyes {
+      margin-top: 36px;
+      width: 60%;
+      display: flex;
+      justify-content: space-between;
+    }
+    .sleeping-eyes::before,
+    .sleeping-eyes::after {
+      content: '';
+      width: 18px;
+      height: 4px;
+      background: #000;
+      border-radius: 2px;
+    }
+    .sleep-zzz {
+      position: absolute;
+      top: -30px;
+      right: -10px;
+      font-family: 'Cinzel Decorative', sans-serif;
+      font-weight: 700;
+      color: #fca5a5;
+      font-size: 1.4rem;
+      animation: floatZzz 2.2s infinite ease-in;
+    }
+    @keyframes floatZzz {
+      0% { opacity: 0; transform: translateY(10px) scale(0.7); }
+      50% { opacity: 1; transform: translateY(-10px) scale(1.1); }
+      100% { opacity: 0; transform: translateY(-30px) scale(1.4); }
+    }
+
     .vn-close-btn:hover {
       background: rgba(239, 68, 68, 0.85);
       border-color: rgba(255, 255, 255, 0.4);
@@ -1581,21 +1712,46 @@
     </div>
   </div>
 
-  <!-- نافذة زحل السري (فيجول نوفل) -->
+  <!-- نافذة رسالة النجمة البلورية الذهبية -->
+  <div class="modal-overlay" id="crystalStarModal">
+    <div class="glass-card" style="text-align: center; max-width: 520px; border-color: rgba(251, 191, 36, 0.6); box-shadow: 0 0 45px rgba(251, 191, 36, 0.35);">
+      <div style="font-size: 3.2rem; color: var(--accent-gold); margin-bottom: 12px; filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.7));">
+        💠
+      </div>
+      <h3 style="font-size: 1.65rem; color: var(--accent-gold); margin-bottom: 14px;">نظام النجمة البلورية</h3>
+      <div style="background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 18px; padding: 18px; margin-bottom: 20px;">
+        <p style="font-size: 1.2rem; color: #fef08a; font-weight: bold; margin-bottom: 10px;">تم فك القفل المداري بنجاح</p>
+        <p style="font-family: 'Amiri', serif; font-size: 1.25rem; line-height: 1.9; color: #f1f5f9; margin-bottom: 10px;">
+          «ذابَ الدرع المتجمد ومات الحارس...<br>
+          طاقة الدفء تتدفق الآن باتجاه الكوكب الأزرق العاصف الثامن (نيبتون)»
+        </p>
+        <p style="font-size: 1.05rem; color: #38bdf8; font-weight: 500;">
+          مسار الملاحة مفتوح: اتبع شعاع الحرارة نحو العالم الجليدي المحرر.
+        </p>
+      </div>
+      <button class="btn-glow" id="destroyCrystalBtn" style="background: linear-gradient(135deg, #d97706, #fbbf24); color: #000; font-weight: bold;">
+        <span>تدمير الختم وتحرير نيبتون 🔥</span>
+      </button>
+    </div>
+  </div>
+
+
+  <!-- نافذة الكواكب والفيجول نوفل -->
   <div class="vn-container" id="vnContainer">
+    <!-- شريط اسم الكوكب في الزاوية -->
+    <div class="vn-planet-badge" id="vnPlanetBadge">
+      <span class="vn-badge-icon" id="vnBadgeIcon">🪐</span>
+      <span class="vn-badge-name" id="vnBadgeName">كوكب زحل</span>
+    </div>
+
     <button class="vn-close-btn" id="exitVnBtn">
       <i class="fa-solid fa-person-walking-arrow-right"></i> العودة للفضاء
     </button>
-    <div class="vn-scene">
-      <div class="vn-alien-sprite" id="vnAlienSprite">
-        <div class="alien-head">
-          <div class="alien-eye left"></div>
-          <div class="alien-eye right"></div>
-          <div class="alien-head-mouth"></div>
-        </div>
-        <div class="alien-body"></div>
-      </div>
+
+    <div class="vn-scene" id="vnSceneArea">
+      <div class="vn-alien-sprite" id="vnAlienSprite"></div>
     </div>
+
 
 
     <div class="vn-dialogue-wrapper">
@@ -2201,18 +2357,119 @@
     let vnInterval = null;
     let isVNActive = false;
 
-    // رصد النقر على كوكب زحل التفاعلي عبر الشاشة لفتح الفيجول نوفل
-    window.addEventListener('click', (e) => {
-      if (isDraggingScene || e.target.closest('.star-node') || e.target.closest('#adminStudioDrawer') || e.target.closest('.modal-overlay') || e.target.closest('#zoomControls') || e.target.closest('.vn-container')) return;
-      if (typeof celestialObjects === 'undefined') return;
-      const saturn = celestialObjects.find(o => o.type === 'saturn_interactive');
-      if (saturn && saturn._screenX) {
-        const dist = Math.hypot(e.clientX - saturn._screenX, e.clientY - saturn._screenY);
-        if (dist <= saturn._screenR) {
-          startSaturnVisualNovel();
+    // فحص وتفعيل فتح الكواكب التفاعلية والنجمة البلورية طبقاً للتسلسل
+    function handlePlanetInteraction(clientX, clientY) {
+      if (typeof celestialObjects === 'undefined') return false;
+
+      // 1. النجمة البلورية الذهبية
+      const crystal = celestialObjects.find(o => o.type === 'crystal_star');
+      if (crystal && crystal._screenX) {
+        const dist = Math.hypot(clientX - crystal._screenX, clientY - crystal._screenY);
+        if (dist <= crystal._screenR) {
+          playStarChime();
+          document.getElementById('crystalStarModal').classList.add('active');
+          return true;
         }
       }
+
+      // 2. كوكب زحل (المحطة الأولى)
+      const saturn = celestialObjects.find(o => o.type === 'saturn_interactive');
+      if (saturn && saturn._screenX) {
+        const dist = Math.hypot(clientX - saturn._screenX, clientY - saturn._screenY);
+        if (dist <= saturn._screenR) {
+          vnCurrentStory = 'saturn';
+          startSaturnVisualNovel();
+          return true;
+        }
+      }
+
+      // 3. كوكب نيبتون
+      const neptune = celestialObjects.find(o => o.type === 'neptune_interactive');
+      if (neptune && neptune._screenX) {
+        const dist = Math.hypot(clientX - neptune._screenX, clientY - neptune._screenY);
+        if (dist <= neptune._screenR) {
+          playStarChime();
+          if (!discoveredSecrets.crystalDestroyed) {
+            // لم يتم تدمير النجمة: فارغ تماماً
+            startLinearVN('mode-neptune', [
+              { speaker: "سومي", isAlien: false, text: "واه فاضي بس هدوء رهيب، حرجعله بعدين يمكن الكي احد." }
+            ], 'mono_neptune');
+          } else {
+            // تم تدمير الختم: سكان نيبتون والزعيم
+            startLinearVN('mode-neptune', neptuneDialogue, 'neptune');
+          }
+          return true;
+        }
+      }
+
+      // 4. كوكب المريخ
+      const mars = celestialObjects.find(o => o.type === 'mars_interactive');
+      if (mars && mars._screenX) {
+        const dist = Math.hypot(clientX - mars._screenX, clientY - mars._screenY);
+        if (dist <= mars._screenR) {
+          playStarChime();
+          if (!discoveredSecrets.neptune) {
+            // لم يتم إنقاذ نيبتون: الخال النائم فقط
+            startLinearVN('mode-mars', [
+              { speaker: "سماء (سومي)", isAlien: false, text: "اوه شكله خال الفضائي الي اشغل جدنا بفزعته واربعة وعشرين ساعة نايم، خلي ارجع بعدين." }
+            ], 'mono_mars');
+          } else {
+            // بعد إنقاذ نيبتون: الفضائي وسومي والخال
+            startLinearVN('mode-mars', marsDialogue, 'mars');
+          }
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    // زر تدمير النجمة البلورية وفتح قصة نيبتون
+    const destroyCrystalBtn = document.getElementById('destroyCrystalBtn');
+    if (destroyCrystalBtn) {
+      destroyCrystalBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.getElementById('crystalStarModal').classList.remove('active');
+        discoveredSecrets.crystalDestroyed = true;
+        persistSecrets();
+        playStarChime();
+        showToast("💥 انكسر ختم النجمة البلورية الذهبية! توجهي الآن إلى نيبتون المحرر ❄️");
+      });
+    }
+
+
+
+    // تفعيل النقر بالماوس
+    window.addEventListener('click', (e) => {
+      if (isDraggingScene || e.target.closest('.star-node') || e.target.closest('#adminStudioDrawer') || e.target.closest('.modal-overlay') || e.target.closest('#zoomControls') || e.target.closest('.vn-container')) return;
+      handlePlanetInteraction(e.clientX, e.clientY);
     });
+
+    // رصد لمس الكواكب فوري ودقيق بنهاية اللمسة وبدون تداخل مع سحب الخريطة
+    window.addEventListener('touchend', (e) => {
+      if (e.target.closest('.star-node') || e.target.closest('#adminStudioDrawer') || e.target.closest('.modal-overlay') || e.target.closest('#zoomControls') || e.target.closest('.vn-container')) return;
+      if (e.changedTouches && e.changedTouches.length === 1) {
+        const touch = e.changedTouches[0];
+        const tapDistance = Math.hypot(touch.clientX - (startDragX + sceneX), touch.clientY - (startDragY + sceneY));
+        if (tapDistance < 18) {
+          handlePlanetInteraction(touch.clientX, touch.clientY);
+        }
+      }
+    }, { passive: true });
+
+
+
+    // أحداث إغلاق نوافذ المريخ ونبتون
+    const marsModal = document.getElementById('marsModal');
+    const closeMarsBtn = document.getElementById('closeMarsBtn');
+    if (closeMarsBtn) closeMarsBtn.addEventListener('click', () => marsModal.classList.remove('active'));
+    if (marsModal) marsModal.addEventListener('click', (e) => { if (e.target === marsModal) marsModal.classList.remove('active'); });
+
+    const neptuneModal = document.getElementById('neptuneModal');
+    const closeNeptuneBtn = document.getElementById('closeNeptuneBtn');
+    if (closeNeptuneBtn) closeNeptuneBtn.addEventListener('click', () => neptuneModal.classList.remove('active'));
+    if (neptuneModal) neptuneModal.addEventListener('click', (e) => { if (e.target === neptuneModal) neptuneModal.classList.remove('active'); });
+
 
     function playVnBlip() {
       if (isMuted) return;
@@ -2233,17 +2490,88 @@
       } catch(e){}
     }
 
+    function updatePlanetBadge(icon, name, borderColor) {
+      const badgeIcon = document.getElementById('vnBadgeIcon');
+      const badgeName = document.getElementById('vnBadgeName');
+      const badge = document.getElementById('vnPlanetBadge');
+      if (badgeIcon) badgeIcon.textContent = icon;
+      if (badgeName) badgeName.textContent = name;
+      if (badge) badge.style.borderColor = borderColor;
+    }
+
+    function renderAlienSpriteHtml() {
+      return `
+        <div class="alien-head">
+          <div class="alien-eye left"></div>
+          <div class="alien-eye right"></div>
+          <div class="alien-head-mouth"></div>
+        </div>
+        <div class="alien-body"></div>
+      `;
+    }
+
     function startSaturnVisualNovel() {
       isVNActive = true;
       fadeAudio(ambientAudio, 0, 1000);
       if(isSpecialPlaying) fadeAudio(specialAudio, 0, 1000);
       
+      updatePlanetBadge("🪐", "سيد الحلقات: كوكب زحل", "rgba(251, 191, 36, 0.5)");
       const vnContainer = document.getElementById('vnContainer');
-      vnContainer.classList.add('active');
+      vnContainer.className = 'vn-container active mode-saturn';
       
+      const spriteEl = document.getElementById('vnAlienSprite');
+      spriteEl.innerHTML = renderAlienSpriteHtml();
+
       vnCurrentStep = 0;
       showVnAlienDialogue();
     }
+
+
+    // نصوص قصة كوكب نيبتون الكاملة (الزعيم آزورا وسومي)
+    const neptuneDialogue = [
+      { speaker: "سكان نيبتون (الزعيم آزورا)", isAlien: true, text: "ياهلا ببطلتنا العظيمة! نورتي نيبتون، ما نصدك عيوننا انج واكفة كبالنا ، هاي معجزة!" },
+      { speaker: "سومي", isAlien: false, text: "هلو عيني... بس عفواً، انتو منو؟ وشصاير هنا وليش الكل ديباوعلي هيج؟" },
+      { speaker: "سكان نيبتون", isAlien: true, text: "إحنا أهل نيبتون الجليدي ، جانت حياتنا منتهية لولا الشجاعة مالتج بآخر لحظة." },
+      { speaker: "سومي", isAlien: false, text: "شجاعة شنو وظرف طارئ شنو؟! ترة أني تيهت الطريق ومركبتي عطلت ونزلت يمكم بالصدفة، ما مسوية شي." },
+      { speaker: "سكان نيبتون", isAlien: true, text: "شكد بطلتنا متواضعة، اصلا هاي احد صفاتها المقدسة، النبوئة تحققت! درع \"الجليد الميت\" جان محاصر غلاف كوكبنا لآلاف السنين، وجنّا على وشك نموت من البرد والعتمة الأبدية." },
+      { speaker: "سومي", isAlien: false, text: "يبووييي، ألف سنة محبوسين؟! زين وآني شعندي بالموضوع؟ شوكت شفت هذا الدرع أصلاً؟" },
+      { speaker: "سكان نيبتون", isAlien: true, text: "إنتي ضربتي النجمة البلورية الذهبية اللي بمدار المجرة وفتحتِ بوابتها، وهذا الشي ذوّب الجليد ورجع الضوة لكوكبنااا ، اخيرا اكو امل للنجاة!" },
+      { speaker: "سومي", isAlien: false, text: "قصدكم ذيج النجمة اللي تلمع؟ اصلا شفتها بالصدفة ومافهمت شي منها وطلعت." },
+      { speaker: "سكان نيبتون", isAlien: true, text: "شلون؟! يعني فتحتي الختم الأسطوري بالصدفة وبدون تخطيط لحرب النجوم لمصير كوكبنا؟! " },
+      { speaker: "سومي", isAlien: false, text: "أي والله العظيم بالصدفة! كلت ادور بيها بلكي يطلعلي انترنت فضائي، كاتلنا التعفن الدماغي." },
+      { speaker: "سكان نيبتون", isAlien: true, text: "بس النبوءة مالتنا تكول \"لا يكسر الختم إلا محارب نقي القلب ، صافي الروح، بطل من ابطال المجرة\"" },
+      { speaker: "سومي", isAlien: false, text: "(احمرت خجلا) ه ه هو شسمه، شكرا بس ماسويت شي والله، الحمدلله كدرت اساعدكم." },
+      { speaker: "سكان نيبتون", isAlien: true, text: "بس الوحش \"زيلور\" اللي جان نايم بداخل النجمة... ما شفتي وانرعبتي من طاقته المظلمة ؟، النبوئة تكول اول ما ينفتح ختم النجم البلوري ينفجر الحارس ويموت بالفضاء." },
+      { speaker: "سومي", isAlien: false, text: "هااا، يعني ذاك الصوت العالي والصرخة مو عطل بالمحرك مالتي؟ التحكم خرب بالمركبة وركعت الشاشة واشتغلت." },
+      { speaker: "سكان نيبتون", isAlien: true, text: "كتلتي زيلور بضربة وحدة؟! إنتي مو مجرد منقذة، إنتي ملاك نازلة من السماء!!!" },
+      { speaker: "سومي", isAlien: false, text: "لا يمعودين فدوة كافي تكبرون الموضوع، اصلا اني فاهية يارب ارجع للارض بسلام، مو مال تسووني بطلة كواكب هسة." },
+      { speaker: "سكان نيبتون", isAlien: true, text: "والله دفيتي بيوتنا ونجيتي أطفالنا، جنا كل يوم ننتظر مجيئج ، راح نسويلج تمثال بنص العاصمة!" },
+      { speaker: "سومي", isAlien: false, text: "تمثال شنو يمعودين لا تفضحونا ، هسة بس دبرولي شوية اكسير لمركبتي ودلوني على طريق الارض بليزززز." }
+    ];
+
+    // نصوص قصة كوكب المريخ (الفضائي وسومي)
+    const marsDialogue = [
+      { speaker: "الفضائي", isAlien: true, text: "سومي؟ لحد هسا مارجعتي للارض؟ المهم نصي صوتك شوي، خالي نايم ، ولو كعد هسة وشافني وي بشري يضحك علية، انتو الفامب من كثر ما اختلطتو بالبشر صرتو تشبهونهم." },
+      { speaker: "سومي", isAlien: false, text: "هلاوز مرة ثانية ، هاهية لتخاف، راح أحجي علكيف ، بس مركبتي خربت وكلت بلكي احد يساعدني هنا لان جنت قريبة." },
+      { speaker: "الفضائي", isAlien: true, text: "دقيقة، عوفك من المركبة هسة... الأخبار كلها مكلوبة عليك، صدك السالفة اللي صارت بنيبتون مزح؟ معقولة إنتي اللي فتحتي النجمة البلورية؟" },
+      { speaker: "سومي", isAlien: false, text: "هيهيهيهيه أي ، ليش تستهين بية اصلا، بس تدري بالوضع، السالفة كلها صارت صدفة." },
+      { speaker: "الفضائي", isAlien: true, text: "ناههههه دريت بيك فاهية وكلت مستحيل سومي تهزم حارس النجم، بس عموماً... اشكرك على هالشي، سويتي شي جبير. أهل نيبتون جانوا ميتين برد ومحبوسين، حررتيهم وفرحتي المجرة كلها." },
+      { speaker: "سومي", isAlien: false, text: "ثانكسسسسس، والله كلش فرحت من شفتهم ارتاحوا ودفيت بيوتهم... خطيةةة يقهرون والله." },
+      { speaker: "الفضائي", isAlien: true, text: "احم احم حعترفلك بهاي هالمرة ، بس شنو هالمركبة يبوي، بعدج تفترين بنفس المركبة الأرضية اللي شفتها قبل؟ معقولة كطعتي بيها كل هاي المسافة من نيبتون لهنا؟" },
+      { speaker: "سومي", isAlien: false, text: "أي طبعاً، هاي هدية عيد ميلادي ، متعوب عليها وانصنعت بحب ، وكلش متينة ومريحة وأحلى هدية بالكون كله، وفريت بيها الكون كله هههههههخخخخخخ." },
+      { speaker: "الفضائي", isAlien: true, text: "هممممم تغيرت نظرتي عن ضياء شوي ، واهتمامه بيك غريب ومريض شوي انتبهي منه اكثر ، المهم المركبة تكدر تكمل بعد." },
+      { speaker: "سومي", isAlien: false, text: "بليز لتحجي عن دودي لانك متعرف المشاعر اصلا ، يفاجئني بهيج شغلات ، تخيل صنع هذا العالم كله علمودي؟ تخيل نقاشنا هذا ممكن لانه سوة كلشي بهالكون علمودي؟ شفت شلون البشر طيبين ومشاعرهم تجنن؟" },
+      { speaker: "الفضائي", isAlien: true, text: "همف بديت افهم شوي. بس هسة انتبهي... خالي كأنه حيصحى ، انقلعي لكوكبك ولاعاد تجين." },
+      { speaker: "سومي", isAlien: false, text: "مو صوجك ، مال هسا اكعد خالك وافضحك ، بس مشكلتي لطيفة اففف." },
+      { speaker: "الفضائي", isAlien: true, text: "بليز روحي بسرعة، و و ار ارريد اكول شي (احمر خجلا) كل عام وانتي بألف خير يابطلة المجرة." },
+      { speaker: "سومي", isAlien: false, text: "(صاحت بصوت عالي) عاااااااااا شكددددد كيتتتتتتت ، وأنت بألف خيييييررر ." },
+      { speaker: "الراوي", isAlien: true, text: "⚡ [وهنا يستيقظ خال الفضائي فجأة وينظر بغضب!] ⚡" },
+      { speaker: "سومي", isAlien: false, text: "عااااا عزةةةة هذا كعد (هربت بسرعة للمركبة وحلقت)" }
+    ];
+
+    let vnCurrentStory = 'saturn'; // 'saturn' | 'neptune' | 'mars' | 'mono'
+    let vnLinearList = [];
+    let vnLinearIndex = 0;
 
     function exitSaturnVisualNovel() {
       const vnContainer = document.getElementById('vnContainer');
@@ -2251,17 +2579,161 @@
 
       setTimeout(() => {
         isVNActive = false;
-        vnContainer.classList.remove('active');
-        vnContainer.classList.remove('leaving');
+        vnContainer.classList.remove('active', 'leaving', 'mode-saturn', 'mode-neptune', 'mode-mars');
         fadeAudio(ambientAudio, 0.6, 1500);
 
-        if (!discoveredSecrets.saturn) {
+        if (vnCurrentStory === 'saturn') {
           discoveredSecrets.saturn = true;
-          updateProgressStats();
-          showToast("🪐✨ تم إنهاء مغامرة كوكب زحل واكتشاف السر بنجاح!");
+          persistSecrets();
+          showToast("🪐✨ تم إنهاء مغامرة زحل! ظهرت النجمة البلورية الذهبية قرب مدار نيبتون...");
+        } else if (vnCurrentStory === 'neptune') {
+          discoveredSecrets.neptune = true;
+          persistSecrets();
+          alert("✨ لقد علمتِ مكان الارض بدقة من سكان نيبتون، ستذهبين بعد انهاء استكشاف المجرة ✨");
+        } else if (vnCurrentStory === 'mars') {
+          discoveredSecrets.mars = true;
+          persistSecrets();
+          showToast("🚀✨ هربتِ بسلام نحو الفضاء بعد تهنئة الفضائي اللطيفة!");
         }
       }, 620);
     }
+
+
+    // تشغيل حوار خطي متسلسل (لنيبتون والمريخ ومونولوج سومي)
+    function startLinearVN(modeClass, list, storyKey, spriteChar = '👽') {
+      isVNActive = true;
+      vnCurrentStory = storyKey;
+      vnLinearList = list;
+      vnLinearIndex = 0;
+
+      fadeAudio(ambientAudio, 0, 1000);
+      if(isSpecialPlaying) fadeAudio(specialAudio, 0, 1000);
+
+      const vnContainer = document.getElementById('vnContainer');
+      vnContainer.className = 'vn-container active ' + modeClass;
+      document.getElementById('vnChoices').style.display = 'none';
+
+      playLinearStep();
+    }
+
+    function playLinearStep() {
+      if (vnLinearIndex >= vnLinearList.length) {
+        exitSaturnVisualNovel();
+        return;
+      }
+      const item = vnLinearList[vnLinearIndex];
+      const spriteEl = document.getElementById('vnAlienSprite');
+
+      if (vnCurrentStory === 'neptune') {
+        updatePlanetBadge("🔵", "العملاق الجليدي: كوكب نيبتون", "rgba(56, 189, 248, 0.5)");
+        // مشهد سكان نيبتون الجماعي والزعيم آزورا المتوج
+        spriteEl.innerHTML = `
+          <div class="neptune-crowd">
+            <div class="neptune-citizen c3"></div>
+            <div class="neptune-citizen c1"></div>
+            <div class="neptune-leader">
+              <div class="neptune-crown">👑</div>
+              <div class="alien-eye left" style="background:#0f172a; top:42%;"></div>
+              <div class="alien-eye right" style="background:#0f172a; top:42%;"></div>
+              <div class="alien-head-mouth" style="border-color:#0f172a;"></div>
+            </div>
+            <div class="neptune-citizen c2"></div>
+            <div class="neptune-citizen c4"></div>
+          </div>
+        `;
+      } else if (vnCurrentStory === 'mars') {
+        updatePlanetBadge("🔴", "الكوكب الأحمر: المريخ", "rgba(239, 68, 68, 0.5)");
+        // مشهد الفضائي وبجانبه خاله النائم ورموز ZZZ
+        spriteEl.innerHTML = `
+          <div class="mars-scene-cast">
+            <div class="sleeping-uncle">
+              <div class="sleep-zzz">Zzz..</div>
+              <div class="sleeping-eyes"></div>
+              <div style="width:14px; height:8px; border-bottom:2px solid #000; border-radius:50%; margin-top:8px;"></div>
+            </div>
+            <div class="vn-alien-sprite" style="position:relative; z-index:3; transform:scale(0.92);">
+              ${renderAlienSpriteHtml()}
+            </div>
+          </div>
+        `;
+      } else if (vnCurrentStory === 'mono_neptune') {
+        updatePlanetBadge("🔵", "العملاق الجليدي: كوكب نيبتون", "rgba(56, 189, 248, 0.5)");
+        // كوكب نيبتون فارغ تماماً وهدوء جليدي دون أي كائن
+        spriteEl.innerHTML = '';
+      } else if (vnCurrentStory === 'mono_mars') {
+        updatePlanetBadge("🔴", "الكوكب الأحمر: المريخ", "rgba(239, 68, 68, 0.5)");
+        // كوكب المريخ في البداية: خال الفضائي فقط نائم بمفرده ولا يوجد الفضائي معه
+        spriteEl.innerHTML = `
+          <div class="mars-scene-cast" style="justify-content: center;">
+            <div class="sleeping-uncle" style="position: relative; right: auto; bottom: auto; transform: rotate(4deg) scale(1.1);">
+              <div class="sleep-zzz">Zzz..</div>
+              <div class="sleeping-eyes"></div>
+              <div style="width:14px; height:8px; border-bottom:2px solid #000; border-radius:50%; margin-top:8px;"></div>
+            </div>
+          </div>
+        `;
+      } else {
+        updatePlanetBadge("🌌", "مدار الفضاء الخارجي", "rgba(255, 255, 255, 0.3)");
+        spriteEl.innerHTML = '';
+      }
+
+
+
+      typeCustomVnText(item.speaker, item.text, item.isAlien, () => {
+        document.getElementById('vnNextIndicator').style.display = 'block';
+      });
+    }
+
+    function typeCustomVnText(speakerName, text, isAlien, onComplete) {
+      clearInterval(vnInterval);
+      const textEl = document.getElementById('vnText');
+      const nameEl = document.getElementById('vnName');
+      const spriteEl = document.getElementById('vnAlienSprite');
+      const nextInd = document.getElementById('vnNextIndicator');
+
+      textEl.textContent = '';
+      nextInd.style.display = 'none';
+      nameEl.textContent = speakerName;
+      nameEl.style.color = isAlien ? '#38bdf8' : '#f472b6';
+
+      if (isAlien) {
+        spriteEl.style.filter = 'drop-shadow(0 0 30px rgba(56, 189, 248, 0.6)) grayscale(0%) brightness(1.05)';
+        spriteEl.style.opacity = '1';
+        spriteEl.style.transform = 'translateY(-6px) scale(1.04)';
+      } else {
+        spriteEl.style.filter = 'drop-shadow(0 0 10px rgba(0,0,0,0.6)) grayscale(100%) brightness(0.4)';
+        spriteEl.style.opacity = '0.4';
+        spriteEl.style.transform = 'translateY(10px) scale(0.94)';
+      }
+
+      let i = 0;
+      vnIsTyping = true;
+
+      vnInterval = setInterval(() => {
+        if (i < text.length) {
+          textEl.textContent += text.charAt(i);
+          playVnBlip();
+          i++;
+        } else {
+          clearInterval(vnInterval);
+          vnIsTyping = false;
+          if (onComplete) onComplete();
+        }
+      }, 32);
+
+      document.querySelector('.vn-dialogue-box').onclick = () => {
+        if (vnIsTyping) {
+          clearInterval(vnInterval);
+          textEl.textContent = text;
+          vnIsTyping = false;
+          if (onComplete) onComplete();
+        } else {
+          vnLinearIndex++;
+          playLinearStep();
+        }
+      };
+    }
+
 
     function typeVnText(text, isAlien, onComplete) {
       clearInterval(vnInterval);
@@ -2304,7 +2776,7 @@
         }
       }, 35);
 
-      // للتمكين من النقر السريع (Skip)
+      // النقر للمتابعة مع تفعيل التدرج بالأحداث تلقائياً عند انتهاء الحوار
       document.querySelector('.vn-dialogue-box').onclick = () => {
         if (vnIsTyping) {
           clearInterval(vnInterval);
@@ -2313,16 +2785,19 @@
           if (onComplete) onComplete();
         } else {
           if (!isAlien) {
-            // الانتقال للخطوة التالية إذا كانت سماء هي المتحدثة وانتهى الكلام
             vnCurrentStep++;
             if (vnCurrentStep < saturnDialogue.length) {
               showVnAlienDialogue();
             } else {
+              // تسجيل إكمال زحل فوراً لفتح النجمة البلورية الذهبية
+              discoveredSecrets.saturn = true;
+              persistSecrets();
               exitSaturnVisualNovel();
             }
           }
         }
       };
+
     }
 
     function showVnAlienDialogue() {
@@ -2351,13 +2826,15 @@
 
     document.getElementById('exitVnBtn').addEventListener('click', exitSaturnVisualNovel);
 
-    // حساب نسبة الإنجاز المئوية وتحديث القائمة
-
+    // حساب نسبة الإنجاز المئوية وتحديث القائمة بدقة لجميع الأسرار
     function updateProgressStats() {
       const totalStars = appConfig.stars.length;
       const readStars = document.querySelectorAll('.star-node.is-read').length;
-      const totalSecrets = 1; // كوكب زحل (وستضاف غيرها)
-      const secretsFound = discoveredSecrets.saturn ? 1 : 0;
+      const totalSecrets = 4; // زحل + النجمة البلورية + نيبتون + المريخ
+      const secretsFound = (discoveredSecrets.saturn ? 1 : 0) + 
+                           (discoveredSecrets.crystalDestroyed ? 1 : 0) + 
+                           (discoveredSecrets.neptune ? 1 : 0) + 
+                           (discoveredSecrets.mars ? 1 : 0);
 
       const totalItems = totalStars + totalSecrets;
       const completedItems = readStars + secretsFound;
@@ -2373,6 +2850,8 @@
       if (starsText) starsText.textContent = `${readStars} / ${totalStars}`;
       if (secretsText) secretsText.textContent = `${secretsFound} / ${totalSecrets}`;
     }
+
+
 
     const progressModal = document.getElementById('progressModal');
     const progressToggleBtn = document.getElementById('progressToggleBtn');
@@ -2508,25 +2987,45 @@
     let comets = [];
     let pulsarAngle = 0;
 
-    // تتبع استكشاف الأسرار (زحل وأسرار أخرى)
-    let discoveredSecrets = { saturn: false };
+    // مسح وتصفير تقدم الأحداث تلقائياً عند أي رفرش لتبدأ التجربة دائماً من الصفر
+    try {
+      localStorage.removeItem('sky_secrets_state');
+    } catch(e){}
 
-    // مصفوفة الأجرام متضمنة الأجرام السبعة الجديدة في النطاق الموسّع
+    // تتبع استكشاف الأحداث والأسرار من الصفر دائماً أثناء الجلسة
+    let discoveredSecrets = { 
+      saturn: false, 
+      crystalDestroyed: false, 
+      neptune: false, 
+      mars: false 
+    };
+
+    function persistSecrets() {
+      // حفظ في حدود الجلسة الحالية فقط بدون تثبيت عبر الرفرش
+      updateProgressStats();
+    }
+
+
+
+    // مصفوفة الأجرام
     const celestialObjects = [
-      // 1. الضوء البروجي وشريط الدجاجة
       { type: 'zodiacal_light', x: 0, y: 0 },
       { type: 'cygnus_ribbon', x: 190, y: -130 },
-
-      // 2. كواكب المنظومة الشمسية
       { type: 'planet_simple', name: 'عطارد', x: -130, y: -90, radius: 9, color: '#94a3b8' },
       { type: 'planet_simple', name: 'الزهرة', x: 140, y: 110, radius: 14, color: '#fde047' },
-      { type: 'planet_simple', name: 'المريخ', x: -260, y: 90, radius: 11, color: '#ef4444' },
       { type: 'planet_simple', name: 'المشتري', x: 310, y: -180, radius: 24, color: '#d97706', bands: true },
       { type: 'planet_simple', name: 'أورانوس', x: -330, y: -210, radius: 16, color: '#67e8f9' },
-      { type: 'planet_simple', name: 'نبتون', x: 270, y: 260, radius: 15, color: '#3b82f6' },
 
-      // 3. كوكب زحل التفاعلي الكبير الواضح
-      { type: 'saturn_interactive', x: -240, y: -180, radius: 34 },
+      // الكواكب التفاعلية الكبيرة
+      { type: 'saturn_interactive', x: -240, y: -180, radius: 36 },
+      { type: 'mars_interactive', x: -160, y: 140, radius: 32 },
+      { type: 'neptune_interactive', x: 260, y: 220, radius: 34 },
+
+      // النجمة البلورية الذهبية: لا تظهر إلا بعد إنهاء زحل وقبل تدميرها
+      { type: 'crystal_star', x: 340, y: 180, radius: 24 },
+
+
+
 
       // 4. سدم هادئة
       { type: 'nebula', x: -210, y: -180, radius: 320, color: 'rgba(56, 189, 248, 0.07)' },
@@ -2762,12 +3261,138 @@
           ctx.restore();
         }
 
+        else if (obj.type === 'mars_interactive') {
+          // كوكب المريخ التفاعلي: نطاق لمس ملاصق لهيكل الكوكب ويكبر ويصغر معه بدقة
+          const mr = obj.radius * sceneScale;
+          obj._screenX = screenX;
+          obj._screenY = screenY;
+          obj._screenR = mr * 1.38;
+
+
+
+
+          ctx.save();
+          // هالة غازية حمراء محيطة
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, mr * 1.35, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(239, 68, 68, 0.12)';
+          ctx.fill();
+
+          // تدرج كروي واقعي لتضاريس المريخ
+          const mGrad = ctx.createRadialGradient(screenX - mr * 0.35, screenY - mr * 0.35, mr * 0.08, screenX, screenY, mr);
+          mGrad.addColorStop(0, '#fca5a5');
+          mGrad.addColorStop(0.3, '#ef4444');
+          mGrad.addColorStop(0.7, '#b91c1c');
+          mGrad.addColorStop(1, '#450a0a');
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, mr, 0, Math.PI * 2);
+          ctx.fillStyle = mGrad;
+          ctx.shadowBlur = 18 * sceneScale;
+          ctx.shadowColor = 'rgba(239, 68, 68, 0.5)';
+          ctx.fill();
+
+          // غطاء جليدي قطبي مميز للمريخ
+          ctx.beginPath();
+          ctx.arc(screenX, screenY - mr * 0.72, mr * 0.28, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+          ctx.fill();
+          ctx.restore();
+        }
+        else if (obj.type === 'neptune_interactive') {
+          // كوكب نبتون التفاعلي: نطاق لمس ملاصق لهيكل الكوكب وحلقته ويكبر ويصغر معه بدقة
+          const nr = obj.radius * sceneScale;
+          obj._screenX = screenX;
+          obj._screenY = screenY;
+          obj._screenR = nr * 1.38;
+
+
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, nr * 1.35, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(56, 189, 248, 0.15)';
+          ctx.fill();
+
+          const nGrad = ctx.createRadialGradient(screenX - nr * 0.35, screenY - nr * 0.35, nr * 0.08, screenX, screenY, nr);
+          nGrad.addColorStop(0, '#e0f2fe');
+          nGrad.addColorStop(0.25, '#38bdf8');
+          nGrad.addColorStop(0.65, '#0284c7');
+          nGrad.addColorStop(1, '#0c2340');
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, nr, 0, Math.PI * 2);
+          ctx.fillStyle = nGrad;
+          ctx.shadowBlur = 20 * sceneScale;
+          ctx.shadowColor = 'rgba(56, 189, 248, 0.5)';
+          ctx.fill();
+
+          ctx.save();
+          ctx.translate(screenX, screenY);
+          ctx.rotate(-0.3);
+          ctx.scale(2.2, 0.35);
+          ctx.beginPath();
+          ctx.arc(0, 0, nr * 1.6, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(186, 230, 253, 0.3)';
+          ctx.lineWidth = 2 * sceneScale;
+          ctx.stroke();
+          ctx.restore();
+          ctx.restore();
+        }
+        else if (obj.type === 'crystal_star') {
+          // رسم النجمة البلورية الذهبية
+          if (!discoveredSecrets.saturn || discoveredSecrets.crystalDestroyed) {
+            obj._screenX = null;
+            continue;
+          }
+          const cr = obj.radius * sceneScale;
+          obj._screenX = screenX;
+          obj._screenY = screenY;
+          obj._screenR = cr * 1.6;
+
+
+          ctx.save();
+          ctx.translate(screenX, screenY);
+          ctx.rotate(pulsarAngle * 1.5);
+
+          // وهج بلوري نابض
+          ctx.beginPath();
+          ctx.arc(0, 0, cr * 1.8, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(251, 191, 36, 0.22)';
+          ctx.fill();
+
+          // جوهرة بلورية ذهبية هندسية
+          ctx.beginPath();
+          ctx.moveTo(0, -cr * 1.4);
+          ctx.lineTo(cr * 1.1, 0);
+          ctx.lineTo(0, cr * 1.4);
+          ctx.lineTo(-cr * 1.1, 0);
+          ctx.closePath();
+          ctx.fillStyle = 'linear-gradient(135deg, #fef08a, #fbbf24)';
+          ctx.fillStyle = '#fbbf24';
+          ctx.shadowBlur = 25 * sceneScale;
+          ctx.shadowColor = '#fbbf24';
+          ctx.fill();
+
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 2 * sceneScale;
+          ctx.stroke();
+
+          // لمعان القلب
+          ctx.beginPath();
+          ctx.arc(0, 0, cr * 0.4, 0, Math.PI * 2);
+          ctx.fillStyle = '#ffffff';
+          ctx.fill();
+          ctx.restore();
+        }
+
         else if (obj.type === 'saturn_interactive') {
-          // كوكب زحل الكبير الواضح والقابل للنقر
+          // كوكب زحل التفاعلي: مطابق لقطر الحلقات ويتفاعل مع الزوم بدون شذوذ
           const sr = obj.radius * sceneScale;
           obj._screenX = screenX;
           obj._screenY = screenY;
-          obj._screenR = sr * 2.2;
+          obj._screenR = sr * 2.1;
+
+
+
 
           ctx.save();
           ctx.translate(screenX, screenY);
