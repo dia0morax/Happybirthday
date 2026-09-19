@@ -84,19 +84,20 @@
       display: block;
     }
 
-    /* حاوية الفضاء القابلة للتحريك الكامل - حرة وغير محدودة */
+    /* حاوية الفضاء القابلة للتحريك - متطابقة مع مركز الكانفاس 100% */
     #spaceScene {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
       z-index: 2;
       transform-origin: 0 0;
       will-change: transform;
       cursor: grab;
       overflow: visible;
     }
+
 
     #spaceScene:active {
       cursor: grabbing;
@@ -250,17 +251,18 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.5);
     }
 
-    /* شعار المركز المتألق SOMY */
+    /* شعار المركز المتألق SOMY مطابق لنقطة الصفر في الفضاء */
     #centerConstellation {
       position: absolute;
-      top: 50%;
-      left: 50%;
+      top: 0;
+      left: 0;
       transform: translate(-50%, -50%);
       text-align: center;
       z-index: 3;
       pointer-events: none;
       animation: floatCenter 6s ease-in-out infinite alternate;
     }
+
 
     .glow-title {
       font-family: 'Cinzel Decorative', cursive, sans-serif;
@@ -1597,9 +1599,11 @@
 
 
 
-  <!-- مشغلات الصوت الخفية -->
+  <!-- مشغلات الصوت الخفية مع خاصية اللوب الدائم -->
   <audio id="ambientAudio" loop preload="auto"></audio>
-  <audio id="specialAudio" preload="auto"></audio>
+  <audio id="specialAudio" loop preload="auto"></audio>
+  <audio id="saturnAudio" loop preload="auto" src="https://pub-9f5fd35fc91e4061a3dbda090b9d161f.r2.dev/dumbways.mp3"></audio>
+
 
   <!-- نافذة تسجيل الدخول الفاخرة (الخطوة الأولى) -->
   <div class="modal-overlay active" id="loginModal">
@@ -1700,11 +1704,17 @@
           <span>النجوم المقروءة:</span>
           <b id="starsProgressText">0 / 0</b>
         </div>
-        <div class="progress-detail-item">
-          <span>الأسرار المستكشفة:</span>
-          <b id="secretsProgressText">0 / 1</b>
+        <div class="progress-detail-item" style="align-items: center;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span>الأسرار المستكشفة:</span>
+            <button id="openHintsBtn" style="background: rgba(251, 191, 36, 0.15); border: 1px solid var(--accent-gold); color: var(--accent-gold); border-radius: 12px; padding: 2px 10px; font-size: 0.82rem; cursor: pointer; font-family: 'Tajawal', sans-serif;">
+              💡 تلميح
+            </button>
+          </div>
+          <b id="secretsProgressText">0 / 4</b>
         </div>
       </div>
+
 
       <div class="progress-hint-note">
         ✨ هذه نسبة إنهائكِ للتجربة.. هناك أشياء وأجرام سرية مخفية في الفضاء بانتظار اكتشافكِ!
@@ -1712,8 +1722,50 @@
     </div>
   </div>
 
+  <!-- نافذة تأكيد الدخول للكوكب -->
+  <div class="modal-overlay" id="planetConfirmModal">
+    <div class="glass-card" style="text-align: center; max-width: 440px;">
+      <div style="font-size: 3.5rem; margin-bottom: 12px;" id="planetConfirmIcon">🪐</div>
+      <h3 style="font-size: 1.6rem; color: #fff; margin-bottom: 14px;" id="planetConfirmTitle">هل تريدين الدخول؟</h3>
+      <p style="color: var(--text-muted); font-size: 1.05rem; margin-bottom: 24px;" id="planetConfirmText">
+        أنتِ الآن على وشك الهبوط في مدار الكوكب..
+      </p>
+      <div style="display: flex; gap: 12px; justify-content: center;">
+        <button class="btn-glow" id="confirmEnterPlanetBtn" style="flex: 1; padding: 12px 18px; font-size: 1rem;">
+          <span>ادخلي ✨</span>
+        </button>
+        <button class="btn-secondary" id="cancelEnterPlanetBtn" style="flex: 1; padding: 12px 18px; font-size: 1rem;">
+          كلا، عودي للفضاء
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- نافذة التلميحات الذكية للأسرار -->
+  <div class="modal-overlay" id="hintsModal">
+    <div class="glass-card" style="text-align: center; max-width: 490px; border-color: rgba(251, 191, 36, 0.4);">
+      <button class="modal-close-btn" id="closeHintsBtn">✕</button>
+      <div style="font-size: 3rem; color: var(--accent-gold); margin-bottom: 10px;">💡</div>
+      <h3 style="font-size: 1.65rem; color: var(--accent-gold); margin-bottom: 10px;">مرشد الأسرار الكونية</h3>
+      <div style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 14px; padding: 10px 14px; margin-bottom: 18px; color: #fca5a5; font-size: 0.95rem;">
+        ⚠️ هاه سوميتي محترفة ومحتطلب تلميحات.. واثق بيج! 😉
+      </div>
+      <div id="hintsContentBox" style="display: none; text-align: right; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 16px; margin-bottom: 18px; font-family: 'Amiri', serif; font-size: 1.15rem; line-height: 1.9; color: #f8fafc;">
+      </div>
+      <div style="display: flex; gap: 12px; justify-content: center;">
+        <button class="btn-glow" id="revealHintBtn" style="background: linear-gradient(135deg, #d97706, #fbbf24); color: #000; font-weight: bold; flex: 1;">
+          <span>أطلب التلميح 📜</span>
+        </button>
+        <button class="btn-secondary" id="dismissHintBtn" style="flex: 1;">
+          إغلاق التلميح
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- نافذة رسالة النجمة البلورية الذهبية -->
   <div class="modal-overlay" id="crystalStarModal">
+
     <div class="glass-card" style="text-align: center; max-width: 520px; border-color: rgba(251, 191, 36, 0.6); box-shadow: 0 0 45px rgba(251, 191, 36, 0.35);">
       <div style="font-size: 3.2rem; color: var(--accent-gold); margin-bottom: 12px; filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.7));">
         💠
@@ -2357,11 +2409,41 @@
     let vnInterval = null;
     let isVNActive = false;
 
-    // فحص وتفعيل فتح الكواكب التفاعلية والنجمة البلورية طبقاً للتسلسل
+    // نظام تأكيد الدخول للكواكب
+    let pendingPlanetAction = null;
+    const planetConfirmModal = document.getElementById('planetConfirmModal');
+    const planetConfirmIcon = document.getElementById('planetConfirmIcon');
+    const planetConfirmTitle = document.getElementById('planetConfirmTitle');
+    const planetConfirmText = document.getElementById('planetConfirmText');
+    const confirmEnterPlanetBtn = document.getElementById('confirmEnterPlanetBtn');
+    const cancelEnterPlanetBtn = document.getElementById('cancelEnterPlanetBtn');
+
+    function askToEnterPlanet(icon, planetName, onConfirm) {
+      pendingPlanetAction = onConfirm;
+      planetConfirmIcon.textContent = icon;
+      planetConfirmTitle.textContent = `هل تريدين الدخول إلى ${planetName}؟`;
+      planetConfirmText.textContent = `أنتِ الآن على مشارف ${planetName}، هل ترغبين بالهبوط وبدء المغامرة؟`;
+      planetConfirmModal.classList.add('active');
+    }
+
+    if (confirmEnterPlanetBtn) {
+      confirmEnterPlanetBtn.addEventListener('click', () => {
+        planetConfirmModal.classList.remove('active');
+        if (pendingPlanetAction) pendingPlanetAction();
+      });
+    }
+    if (cancelEnterPlanetBtn) {
+      cancelEnterPlanetBtn.addEventListener('click', () => {
+        planetConfirmModal.classList.remove('active');
+        pendingPlanetAction = null;
+      });
+    }
+
+    // فحص وتفعيل فتح الكواكب التفاعلية مع نافذة التأكيد
     function handlePlanetInteraction(clientX, clientY) {
       if (typeof celestialObjects === 'undefined') return false;
 
-      // 1. النجمة البلورية الذهبية
+      // 1. النجمة البلورية الذهبية (تفتح مباشرة)
       const crystal = celestialObjects.find(o => o.type === 'crystal_star');
       if (crystal && crystal._screenX) {
         const dist = Math.hypot(clientX - crystal._screenX, clientY - crystal._screenY);
@@ -2372,13 +2454,16 @@
         }
       }
 
-      // 2. كوكب زحل (المحطة الأولى)
+      // 2. كوكب زحل
       const saturn = celestialObjects.find(o => o.type === 'saturn_interactive');
       if (saturn && saturn._screenX) {
         const dist = Math.hypot(clientX - saturn._screenX, clientY - saturn._screenY);
         if (dist <= saturn._screenR) {
-          vnCurrentStory = 'saturn';
-          startSaturnVisualNovel();
+          playStarChime();
+          askToEnterPlanet("🪐", "كوكب زحل", () => {
+            vnCurrentStory = 'saturn';
+            startSaturnVisualNovel();
+          });
           return true;
         }
       }
@@ -2389,15 +2474,15 @@
         const dist = Math.hypot(clientX - neptune._screenX, clientY - neptune._screenY);
         if (dist <= neptune._screenR) {
           playStarChime();
-          if (!discoveredSecrets.crystalDestroyed) {
-            // لم يتم تدمير النجمة: فارغ تماماً
-            startLinearVN('mode-neptune', [
-              { speaker: "سومي", isAlien: false, text: "واه فاضي بس هدوء رهيب، حرجعله بعدين يمكن الكي احد." }
-            ], 'mono_neptune');
-          } else {
-            // تم تدمير الختم: سكان نيبتون والزعيم
-            startLinearVN('mode-neptune', neptuneDialogue, 'neptune');
-          }
+          askToEnterPlanet("🔵", "كوكب نيبتون", () => {
+            if (!discoveredSecrets.crystalDestroyed) {
+              startLinearVN('mode-neptune', [
+                { speaker: "سومي", isAlien: false, text: "واه فاضي بس هدوء رهيب، حرجعله بعدين يمكن الكي احد." }
+              ], 'mono_neptune');
+            } else {
+              startLinearVN('mode-neptune', neptuneDialogue, 'neptune');
+            }
+          });
           return true;
         }
       }
@@ -2408,21 +2493,60 @@
         const dist = Math.hypot(clientX - mars._screenX, clientY - mars._screenY);
         if (dist <= mars._screenR) {
           playStarChime();
-          if (!discoveredSecrets.neptune) {
-            // لم يتم إنقاذ نيبتون: الخال النائم فقط
-            startLinearVN('mode-mars', [
-              { speaker: "سماء (سومي)", isAlien: false, text: "اوه شكله خال الفضائي الي اشغل جدنا بفزعته واربعة وعشرين ساعة نايم، خلي ارجع بعدين." }
-            ], 'mono_mars');
-          } else {
-            // بعد إنقاذ نيبتون: الفضائي وسومي والخال
-            startLinearVN('mode-mars', marsDialogue, 'mars');
-          }
+          askToEnterPlanet("🔴", "كوكب المريخ", () => {
+            if (!discoveredSecrets.neptune) {
+              startLinearVN('mode-mars', [
+                { speaker: "سماء (سومي)", isAlien: false, text: "اوه شكله خال الفضائي الي اشغل جدنا بفزعته واربعة وعشرين ساعة نايم، خلي ارجع بعدين." }
+              ], 'mono_mars');
+            } else {
+              startLinearVN('mode-mars', marsDialogue, 'mars');
+            }
+          });
           return true;
         }
       }
 
       return false;
     }
+
+    // إدارة نافذة تلميحات الأسرار
+    const hintsModal = document.getElementById('hintsModal');
+    const openHintsBtn = document.getElementById('openHintsBtn');
+    const closeHintsBtn = document.getElementById('closeHintsBtn');
+    const dismissHintBtn = document.getElementById('dismissHintBtn');
+    const revealHintBtn = document.getElementById('revealHintBtn');
+    const hintsContentBox = document.getElementById('hintsContentBox');
+
+    function getSmartHintText() {
+      if (!discoveredSecrets.saturn) {
+        return "🪐 <b>الخطوة الأولى:</b> توجهي إلى كوكب زحل ذو الحلقات الذهبية المشعة وخوضي الحوار الكامل مع الفضائي لاكتشاف أول سر!";
+      } else if (!discoveredSecrets.crystalDestroyed) {
+        return "💠 <b>الخطوة الثانية:</b> بعد إنهاء زحل، ظهرت النجمة البلورية الذهبية المتوهجة في مدار كوكب نيبتون الأزرق.. ابحثي عنها ودَمّري الختم!";
+      } else if (!discoveredSecrets.neptune) {
+        return "🔵 <b>الخطوة الثالثة:</b> الختم كُسر الآن وتدفقت الحرارة.. اهبطي على كوكب نيبتون الأزرق لتحرير سكانه واللقاء بالزعيم آزورا!";
+      } else if (!discoveredSecrets.mars) {
+        return "🔴 <b>الخطوة الأخيرة:</b> تم إنقاذ نيبتون وانتشر الخبر بالمجرة! طيري إلى كوكب المريخ الأحمر لرؤية الفضائي وخاله وتلقي التهنئة الختامية!";
+      } else {
+        return "🎉 <b>عاش البطلة!</b> لقد أنجزتِ جميع أسرار المجرة الأربعة وحررتِ الكواكب بالكامل!";
+      }
+    }
+
+    if (openHintsBtn) {
+      openHintsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        hintsContentBox.style.display = 'none';
+        hintsModal.classList.add('active');
+      });
+    }
+    if (closeHintsBtn) closeHintsBtn.addEventListener('click', () => hintsModal.classList.remove('active'));
+    if (dismissHintBtn) dismissHintBtn.addEventListener('click', () => hintsModal.classList.remove('active'));
+    if (revealHintBtn) {
+      revealHintBtn.addEventListener('click', () => {
+        hintsContentBox.innerHTML = getSmartHintText();
+        hintsContentBox.style.display = 'block';
+      });
+    }
+
 
     // زر تدمير النجمة البلورية وفتح قصة نيبتون
     const destroyCrystalBtn = document.getElementById('destroyCrystalBtn');
@@ -2510,11 +2634,21 @@
       `;
     }
 
+    const saturnAudio = document.getElementById('saturnAudio');
+    if (saturnAudio) saturnAudio.loop = true;
+
     function startSaturnVisualNovel() {
       isVNActive = true;
-      fadeAudio(ambientAudio, 0, 1000);
-      if(isSpecialPlaying) fadeAudio(specialAudio, 0, 1000);
+      fadeAudio(ambientAudio, 0, 800);
+      if(isSpecialPlaying) fadeAudio(specialAudio, 0, 800);
       
+      // تشغيل موسيقى زحل المخصصة مع التكرار
+      if (saturnAudio) {
+        saturnAudio.currentTime = 0;
+        saturnAudio.volume = 0.85;
+        saturnAudio.play().catch(e => console.log(e));
+      }
+
       updatePlanetBadge("🪐", "سيد الحلقات: كوكب زحل", "rgba(251, 191, 36, 0.5)");
       const vnContainer = document.getElementById('vnContainer');
       vnContainer.className = 'vn-container active mode-saturn';
@@ -2525,6 +2659,7 @@
       vnCurrentStep = 0;
       showVnAlienDialogue();
     }
+
 
 
     // نصوص قصة كوكب نيبتون الكاملة (الزعيم آزورا وسومي)
@@ -2577,10 +2712,17 @@
       const vnContainer = document.getElementById('vnContainer');
       vnContainer.classList.add('leaving');
 
+      // إيقاف موسيقى زحل عند الخروج
+      if (saturnAudio) {
+        fadeAudio(saturnAudio, 0, 600);
+        setTimeout(() => { saturnAudio.pause(); saturnAudio.currentTime = 0; }, 650);
+      }
+
       setTimeout(() => {
         isVNActive = false;
         vnContainer.classList.remove('active', 'leaving', 'mode-saturn', 'mode-neptune', 'mode-mars');
         fadeAudio(ambientAudio, 0.6, 1500);
+
 
         if (vnCurrentStory === 'saturn') {
           discoveredSecrets.saturn = true;
@@ -3176,8 +3318,10 @@
 
       // 1. رسم الظواهر والأجرام الفلكية الكبرى
       for (let obj of celestialObjects) {
-        const screenX = cx + (obj.x * sceneScale) + (sceneX * 0.25);
-        const screenY = cy + (obj.y * sceneScale) + (sceneY * 0.25);
+        // مطابقة موضع الكواكب خلف النجوم مع موضع الكاميرا الفعلي للمجرة
+        const screenX = cx + ((obj.x * sceneScale) + sceneX);
+        const screenY = cy + ((obj.y * sceneScale) + sceneY);
+
 
         if (screenX < -800 || screenX > canvas.width + 800 || screenY < -800 || screenY > canvas.height + 800) continue;
 
