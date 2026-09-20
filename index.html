@@ -3381,19 +3381,10 @@
     }
 
 
-    // تهيئة قاعدة البيانات السحابية المركزية
-    let cloudDb = null;
-    try {
-      if (typeof firebase !== 'undefined') {
-        const firebaseConfig = {
-          databaseURL: "https://somy-space-gift-default-rtdb.firebaseio.com"
-        };
-        firebase.initializeApp(firebaseConfig);
-        cloudDb = firebase.database();
-      }
-    } catch(e) {}
+    // رابط المزامنة السحابية الفوري (REST API)
+    const CLOUD_SYNC_URL = "https://somy-space-gift-default-rtdb.firebaseio.com/somy_gift_records.json";
 
-    // حفظ وتخزين السجل سحابياً ومحلياً ليعبر كل متصفحات وأجهزة العالم
+    // حفظ وتخزين السجل سحابياً ومحلياً
     function saveSomyChoiceRecord(type, detail) {
       const now = new Date();
       const dateStr = now.toLocaleString('ar-IQ', { 
@@ -3402,22 +3393,24 @@
       });
       const record = { type, detail, date: dateStr, timestamp: Date.now() };
 
-      // 1. الحفظ المحلي الاحتياطي
+      // 1. الحفظ المحلي المباشر
       try {
         let history = JSON.parse(localStorage.getItem('sky_somy_gift_choices')) || [];
         history.unshift(record);
         localStorage.setItem('sky_somy_gift_choices', JSON.stringify(history));
       } catch(e){}
 
-      // 2. الرفع المباشر للسحابة المركزية لتراه من جهازك فوراً
-      if (cloudDb) {
-        try {
-          cloudDb.ref('somy_gift_records').push(record);
-        } catch(e){}
-      }
+      // 2. الإرسال السحابي المباشر عبر fetch السريع
+      try {
+        fetch(CLOUD_SYNC_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(record)
+        }).catch(() => {});
+      } catch(e){}
     }
 
-    // عرض اختيارات سومي السحابية في استوديو المطور (diajb0)
+    // عرض اختيارات سومي في استوديو المطور (diajb0)
     const openSomyChoicesBtn = document.getElementById('openSomyChoicesBtn');
     const somyAdminChoicesModal = document.getElementById('somyAdminChoicesModal');
     const closeSomyAdminChoicesBtn = document.getElementById('closeSomyAdminChoicesBtn');
@@ -3425,7 +3418,7 @@
 
     function renderChoicesList(history) {
       if (!history || history.length === 0) {
-        somyChoicesContainer.innerHTML = "<p style='color:#94a3b8;'>لم تقم سومي باختيار الهدية بعد حتى الآن.</p>";
+        somyChoicesContainer.innerHTML = "<p style='color:#94a3b8; text-align:center; padding:15px;'>لم يتم تسجيل أي اختيار للهدية حتى الآن.</p>";
         return;
       }
       let html = "";
@@ -3443,16 +3436,34 @@
 
     if (openSomyChoicesBtn) {
       openSomyChoicesBtn.addEventListener('click', () => {
-        somyChoicesContainer.innerHTML = "<p style='color: var(--accent-cyan);'>جاري جلب الاختيارات من السحابة...</p>";
+        somyChoicesContainer.innerHTML = "<p style='color: var(--accent-cyan); text-align:center;'>جاري قراءة البيانات...</p>";
         if (somyAdminChoicesModal) somyAdminChoicesModal.classList.add('active');
 
-        if (cloudDb) {
-          cloudDb.ref('somy_gift_records').once('value').then((snapshot) => {
-            const data = snapshot.val();
+        let isLoaded = false;
+
+        // مهلة أمان قصوى: ثانية ونصف، إن تأخر الإنترنت تُعرض البيانات المحلية فوراً ولا يعلق أبداً
+        const safetyTimeout = setTimeout(() => {
+          if (!isLoaded) {
+            isLoaded = true;
+            let localHistory = [];
+            try { localHistory = JSON.parse(localStorage.getItem('sky_somy_gift_choices')) || []; } catch(e){}
+            renderChoicesList(localHistory);
+          }
+        }, 1600);
+
+        // جلب البيانات من السحابة
+        fetch(CLOUD_SYNC_URL)
+          .then(res => res.json())
+          .then(data => {
+            if (isLoaded) return;
+            isLoaded = true;
+            clearTimeout(safetyTimeout);
+
             let cloudList = [];
-            if (data) {
+            if (data && typeof data === 'object') {
               cloudList = Object.values(data).reverse();
             }
+
             if (cloudList.length > 0) {
               renderChoicesList(cloudList);
             } else {
@@ -3460,16 +3471,15 @@
               try { localHistory = JSON.parse(localStorage.getItem('sky_somy_gift_choices')) || []; } catch(e){}
               renderChoicesList(localHistory);
             }
-          }).catch(() => {
+          })
+          .catch(() => {
+            if (isLoaded) return;
+            isLoaded = true;
+            clearTimeout(safetyTimeout);
             let localHistory = [];
             try { localHistory = JSON.parse(localStorage.getItem('sky_somy_gift_choices')) || []; } catch(e){}
             renderChoicesList(localHistory);
           });
-        } else {
-          let localHistory = [];
-          try { localHistory = JSON.parse(localStorage.getItem('sky_somy_gift_choices')) || []; } catch(e){}
-          renderChoicesList(localHistory);
-        }
       });
     }
 
@@ -3478,6 +3488,7 @@
         if (somyAdminChoicesModal) somyAdminChoicesModal.classList.remove('active');
       });
     }
+
 
 
 
