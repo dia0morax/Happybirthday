@@ -98,7 +98,7 @@
 
 
 
-    /* خلفية الكانفاس للنجوم 3D */
+    /* خلفية الكانفاس للنجوم 3D مع قفل إيماءات البحث والسحب */
     #universeCanvas {
       position: fixed;
       top: 0;
@@ -107,7 +107,12 @@
       height: 100vh;
       z-index: 1;
       display: block;
+      touch-action: none !important;
+      -webkit-touch-callout: none !important;
+      user-select: none !important;
+      -webkit-user-select: none !important;
     }
+
 
     /* حاوية الفضاء القابلة للتحريك - متطابقة مع مركز الكانفاس 100% */
     #spaceScene {
@@ -3545,14 +3550,13 @@
 
 
 
-    // تفعيل النقر بالماوس
+    // تفعيل النقر بالماوس مع منع الأحداث العالقة
     window.addEventListener('click', (e) => {
       if (isDraggingScene || e.target.closest('.star-node') || e.target.closest('#adminStudioDrawer') || e.target.closest('.modal-overlay') || e.target.closest('#zoomControls') || e.target.closest('.vn-container')) return;
       handlePlanetInteraction(e.clientX, e.clientY);
     });
 
-    // رصد لمس الكواكب فوري ودقيق بنهاية اللمسة وبدون تداخل مع سحب الخريطة
-    // تسجيل نقطة بداية ونهاية اللمس لمنع الدخول للكواكب أثناء سحب وتحريك الشاشة
+    // رصد لمس الكواكب بدقة وقفل اعتراض شريط بحث جوجل السفلي نهائياً
     let touchOriginScreenX = 0;
     let touchOriginScreenY = 0;
     let touchStartTime = 0;
@@ -3572,12 +3576,17 @@
         const moveDist = Math.hypot(touch.clientX - touchOriginScreenX, touch.clientY - touchOriginScreenY);
         const duration = performance.now() - touchStartTime;
 
-        // لا يُعتبر نقراً إلا إذا كان لمسة سريعة موضعية دون أي سحب للشاشة (أقل من 7 بكسل ومدة قصيرة)
-        if (moveDist < 7 && duration < 320) {
-          handlePlanetInteraction(touch.clientX, touch.clientY);
+        if (moveDist < 9 && duration < 380) {
+          // منع إيماءة Touch-to-Search السفلية للمتصفح إذا كانت اللمسة على كوكب
+          const hit = handlePlanetInteraction(touch.clientX, touch.clientY);
+          if (hit) {
+            if (e.cancelable) e.preventDefault();
+            e.stopPropagation();
+          }
         }
       }
-    }, { passive: true });
+    }, { passive: false });
+
 
 
 
