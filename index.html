@@ -3381,26 +3381,33 @@
     }
 
 
-    // رابط المزامنة السحابية الفوري (REST API)
-    const CLOUD_SYNC_URL = "https://somy-space-gift-default-rtdb.firebaseio.com/somy_gift_records.json";
+    // رابط قاعدة بيانات فايربيس السحابية المباشرة الخاصة بمشروعك
+    const CLOUD_SYNC_URL = "https://happy-birthday-aa1a6-default-rtdb.firebaseio.com/somy_gift_records.json";
 
-    // حفظ وتخزين السجل سحابياً ومحلياً
+
+    // حفظ وتخزين السجل سحابياً ومحلياً مع ضمان بنية البيانات وتفادي أي خطأ
     function saveSomyChoiceRecord(type, detail) {
       const now = new Date();
       const dateStr = now.toLocaleString('ar-IQ', { 
-        year: 'numeric', month: 'long', day: 'numeric', 
+        year: 'numeric', month: 'numeric', day: 'numeric', 
         hour: '2-digit', minute: '2-digit', second: '2-digit' 
       });
-      const record = { type, detail, date: dateStr, timestamp: Date.now() };
+      const record = { 
+        type: String(type || 'غير محدد'), 
+        detail: String(detail || 'لا توجد تفاصيل'), 
+        date: dateStr, 
+        timestamp: Date.now() 
+      };
 
-      // 1. الحفظ المحلي المباشر
+      // 1. الحفظ المحلي الاحتياطي
       try {
         let history = JSON.parse(localStorage.getItem('sky_somy_gift_choices')) || [];
+        if (!Array.isArray(history)) history = [];
         history.unshift(record);
         localStorage.setItem('sky_somy_gift_choices', JSON.stringify(history));
       } catch(e){}
 
-      // 2. الإرسال السحابي المباشر عبر fetch السريع
+      // 2. الإرسال السحابي المباشر عبر الإنترنت
       try {
         fetch(CLOUD_SYNC_URL, {
           method: 'POST',
@@ -3410,28 +3417,44 @@
       } catch(e){}
     }
 
-    // عرض اختيارات سومي في استوديو المطور (diajb0)
+    // عرض اختيارات سومي وحل مشكلة undefined بشكل جذري
     const openSomyChoicesBtn = document.getElementById('openSomyChoicesBtn');
     const somyAdminChoicesModal = document.getElementById('somyAdminChoicesModal');
     const closeSomyAdminChoicesBtn = document.getElementById('closeSomyAdminChoicesBtn');
     const somyChoicesContainer = document.getElementById('somyChoicesContainer');
 
     function renderChoicesList(history) {
-      if (!history || history.length === 0) {
+      if (!history || !Array.isArray(history) || history.length === 0) {
         somyChoicesContainer.innerHTML = "<p style='color:#94a3b8; text-align:center; padding:15px;'>لم يتم تسجيل أي اختيار للهدية حتى الآن.</p>";
         return;
       }
       let html = "";
-      history.forEach((h, idx) => {
+      let validCount = 0;
+      history.forEach((h) => {
+        if (!h) return;
+        // قراءة وتنسيق البيانات حتى لو كانت محفوظة بصيغة قديمة
+        const choiceType = typeof h === 'object' ? (h.type || h.choice || 'غير محدد') : String(h);
+        const choiceDetail = typeof h === 'object' ? (h.detail || h.val || '—') : '—';
+        const choiceDate = typeof h === 'object' ? (h.date || 'بتاريخ سابق') : 'بتاريخ سابق';
+
+        // تخطي السجلات الفارغة أو التالفة
+        if (choiceType === 'undefined' && choiceDetail === 'undefined') return;
+
+        validCount++;
         html += `
           <div style="border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 10px; margin-bottom: 10px;">
-            <b style="color: #38bdf8;">${idx + 1}. الاختيار:</b> ${h.type}<br>
-            <b style="color: #fbbf24;">التفاصيل:</b> ${h.detail}<br>
-            <b style="color: #f472b6;">التاريخ الدقيق:</b> <span dir="ltr">${h.date}</span>
+            <b style="color: #38bdf8;">${validCount}. الاختيار:</b> ${choiceType}<br>
+            <b style="color: #fbbf24;">التفاصيل:</b> ${choiceDetail}<br>
+            <b style="color: #f472b6;">التاريخ الدقيق:</b> <span dir="ltr">${choiceDate}</span>
           </div>
         `;
       });
-      somyChoicesContainer.innerHTML = html;
+
+      if (validCount === 0) {
+        somyChoicesContainer.innerHTML = "<p style='color:#94a3b8; text-align:center; padding:15px;'>لم يتم تسجيل أي اختيار صحيح حتى الآن.</p>";
+      } else {
+        somyChoicesContainer.innerHTML = html;
+      }
     }
 
     if (openSomyChoicesBtn) {
@@ -3441,7 +3464,6 @@
 
         let isLoaded = false;
 
-        // مهلة أمان قصوى: ثانية ونصف، إن تأخر الإنترنت تُعرض البيانات المحلية فوراً ولا يعلق أبداً
         const safetyTimeout = setTimeout(() => {
           if (!isLoaded) {
             isLoaded = true;
@@ -3449,9 +3471,8 @@
             try { localHistory = JSON.parse(localStorage.getItem('sky_somy_gift_choices')) || []; } catch(e){}
             renderChoicesList(localHistory);
           }
-        }, 1600);
+        }, 1800);
 
-        // جلب البيانات من السحابة
         fetch(CLOUD_SYNC_URL)
           .then(res => res.json())
           .then(data => {
@@ -3488,6 +3509,7 @@
         if (somyAdminChoicesModal) somyAdminChoicesModal.classList.remove('active');
       });
     }
+
 
 
 
