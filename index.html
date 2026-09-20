@@ -10,6 +10,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cinzel+Decorative:wght@700&family=Outfit:wght@300;400;600;700&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
   <!-- مكتبة الأيقونات الاحترافية FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- مكتبة Firebase السحابية لمشاركة اختيارات سومي بين كل الأجهزة -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
   <style>
 
     :root {
@@ -255,17 +259,17 @@
     .star-label {
       margin-top: 8px;
       padding: 3px 10px;
-      background: rgba(15, 23, 42, 0.75);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(10, 15, 30, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.18);
       border-radius: 14px;
       font-size: 11px;
       color: #e2e8f0;
       letter-spacing: 0.4px;
       white-space: nowrap;
       pointer-events: none;
-      backdrop-filter: blur(4px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.6);
     }
+
 
     /* شعار المركز المتألق SOMY مطابق لنقطة الصفر في الفضاء */
     #centerConstellation {
@@ -3377,50 +3381,95 @@
     }
 
 
-    // حفظ وتخزين السجل في ذاكرة المتصفح
+    // تهيئة قاعدة البيانات السحابية المركزية
+    let cloudDb = null;
+    try {
+      if (typeof firebase !== 'undefined') {
+        const firebaseConfig = {
+          databaseURL: "https://somy-space-gift-default-rtdb.firebaseio.com"
+        };
+        firebase.initializeApp(firebaseConfig);
+        cloudDb = firebase.database();
+      }
+    } catch(e) {}
+
+    // حفظ وتخزين السجل سحابياً ومحلياً ليعبر كل متصفحات وأجهزة العالم
     function saveSomyChoiceRecord(type, detail) {
       const now = new Date();
       const dateStr = now.toLocaleString('ar-IQ', { 
         year: 'numeric', month: 'long', day: 'numeric', 
         hour: '2-digit', minute: '2-digit', second: '2-digit' 
       });
-      const record = { type, detail, date: dateStr };
+      const record = { type, detail, date: dateStr, timestamp: Date.now() };
+
+      // 1. الحفظ المحلي الاحتياطي
       try {
         let history = JSON.parse(localStorage.getItem('sky_somy_gift_choices')) || [];
         history.unshift(record);
         localStorage.setItem('sky_somy_gift_choices', JSON.stringify(history));
       } catch(e){}
+
+      // 2. الرفع المباشر للسحابة المركزية لتراه من جهازك فوراً
+      if (cloudDb) {
+        try {
+          cloudDb.ref('somy_gift_records').push(record);
+        } catch(e){}
+      }
     }
 
-    // عرض اختيارات سومي في استوديو المطور (diajb0)
+    // عرض اختيارات سومي السحابية في استوديو المطور (diajb0)
     const openSomyChoicesBtn = document.getElementById('openSomyChoicesBtn');
     const somyAdminChoicesModal = document.getElementById('somyAdminChoicesModal');
     const closeSomyAdminChoicesBtn = document.getElementById('closeSomyAdminChoicesBtn');
     const somyChoicesContainer = document.getElementById('somyChoicesContainer');
 
+    function renderChoicesList(history) {
+      if (!history || history.length === 0) {
+        somyChoicesContainer.innerHTML = "<p style='color:#94a3b8;'>لم تقم سومي باختيار الهدية بعد حتى الآن.</p>";
+        return;
+      }
+      let html = "";
+      history.forEach((h, idx) => {
+        html += `
+          <div style="border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 10px; margin-bottom: 10px;">
+            <b style="color: #38bdf8;">${idx + 1}. الاختيار:</b> ${h.type}<br>
+            <b style="color: #fbbf24;">التفاصيل:</b> ${h.detail}<br>
+            <b style="color: #f472b6;">التاريخ الدقيق:</b> <span dir="ltr">${h.date}</span>
+          </div>
+        `;
+      });
+      somyChoicesContainer.innerHTML = html;
+    }
+
     if (openSomyChoicesBtn) {
       openSomyChoicesBtn.addEventListener('click', () => {
-        let history = [];
-        try {
-          history = JSON.parse(localStorage.getItem('sky_somy_gift_choices')) || [];
-        } catch(e){}
-
-        if (history.length === 0) {
-          somyChoicesContainer.innerHTML = "<p style='color:#94a3b8;'>لم تقم سومي باختيار الهدية بعد حتى الآن.</p>";
-        } else {
-          let html = "";
-          history.forEach((h, idx) => {
-            html += `
-              <div style="border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 10px; margin-bottom: 10px;">
-                <b style="color: #38bdf8;">${idx + 1}. الاختيار:</b> ${h.type}<br>
-                <b style="color: #fbbf24;">التفاصيل:</b> ${h.detail}<br>
-                <b style="color: #f472b6;">التاريخ الدقيق:</b> <span dir="ltr">${h.date}</span>
-              </div>
-            `;
-          });
-          somyChoicesContainer.innerHTML = html;
-        }
+        somyChoicesContainer.innerHTML = "<p style='color: var(--accent-cyan);'>جاري جلب الاختيارات من السحابة...</p>";
         if (somyAdminChoicesModal) somyAdminChoicesModal.classList.add('active');
+
+        if (cloudDb) {
+          cloudDb.ref('somy_gift_records').once('value').then((snapshot) => {
+            const data = snapshot.val();
+            let cloudList = [];
+            if (data) {
+              cloudList = Object.values(data).reverse();
+            }
+            if (cloudList.length > 0) {
+              renderChoicesList(cloudList);
+            } else {
+              let localHistory = [];
+              try { localHistory = JSON.parse(localStorage.getItem('sky_somy_gift_choices')) || []; } catch(e){}
+              renderChoicesList(localHistory);
+            }
+          }).catch(() => {
+            let localHistory = [];
+            try { localHistory = JSON.parse(localStorage.getItem('sky_somy_gift_choices')) || []; } catch(e){}
+            renderChoicesList(localHistory);
+          });
+        } else {
+          let localHistory = [];
+          try { localHistory = JSON.parse(localStorage.getItem('sky_somy_gift_choices')) || []; } catch(e){}
+          renderChoicesList(localHistory);
+        }
       });
     }
 
@@ -3429,6 +3478,7 @@
         if (somyAdminChoicesModal) somyAdminChoicesModal.classList.remove('active');
       });
     }
+
 
 
 
@@ -4478,20 +4528,21 @@
 
     function initCosmos() {
       bgStars = [];
-      // زيادة كثافة النجوم الخلفية وتوزيعها على المساحة الشاسعة الجديدة
-      const starCount = Math.floor((window.innerWidth * window.innerHeight) / 900) + 650;
+      // عدد نجوم متوازن وكثيف بصرياً بدون التسبب في انهيار ذاكرة المعالج
+      const starCount = Math.min(550, Math.floor((window.innerWidth * window.innerHeight) / 1800) + 360);
       for (let i = 0; i < starCount; i++) {
         bgStars.push({
           x: (Math.random() - 0.5) * SPACE_BOUND,
           y: (Math.random() - 0.5) * SPACE_BOUND,
           z: Math.random() * 2.8 + 0.6,
-          radius: Math.random() * 1.6 + 0.4,
+          radius: Math.random() * 1.5 + 0.5,
           color: Math.random() > 0.4 ? '#ffffff' : (Math.random() > 0.65 ? '#bae6fd' : '#fbcfe8'),
           alpha: Math.random() * 0.75 + 0.25,
           twinkleSpeed: Math.random() * 0.02 + 0.008,
           phase: Math.random() * Math.PI * 2
         });
       }
+
 
       cosmicDust = [];
       for (let i = 0; i < 65; i++) {
@@ -5750,32 +5801,28 @@
         ctx.fill();
       }
 
-      // 3. رسم نجوم الفضاء العميقة الموزعة بالتساوي 360 درجة
+      // 3. رسم نجوم الفضاء العميقة بخفة فائقة وبدون أي shadowBlur مجهد للـ GPU
+      ctx.shadowBlur = 0;
       for (let s of bgStars) {
         s.phase += s.twinkleSpeed;
-        const finalAlpha = Math.max(0.12, Math.min(1, s.alpha + Math.sin(s.phase) * 0.25));
+        const finalAlpha = Math.max(0.15, Math.min(1, s.alpha + Math.sin(s.phase) * 0.25));
 
         const drawX = cx + (s.x * sceneScale) + (sceneX / s.z);
         const drawY = cy + (s.y * sceneScale) + (sceneY / s.z);
 
         if (drawX < -20 || drawX > canvas.width + 20 || drawY < -20 || drawY > canvas.height + 20) continue;
 
-        const currentRadius = Math.max(0.35, s.radius * Math.sqrt(sceneScale));
+        const currentRadius = Math.max(0.4, s.radius * Math.sqrt(sceneScale));
 
         ctx.beginPath();
         ctx.arc(drawX, drawY, currentRadius, 0, Math.PI * 2);
         ctx.fillStyle = s.color;
         ctx.globalAlpha = finalAlpha;
-        if (currentRadius > 1.3) {
-          ctx.shadowBlur = 8 * sceneScale;
-          ctx.shadowColor = s.color;
-        } else {
-          ctx.shadowBlur = 0;
-        }
         ctx.fill();
       }
       ctx.globalAlpha = 1;
       ctx.shadowBlur = 0;
+
 
       // 4. رسم المذنبات والشهب بنظام تخفيف الأداء
       for (let c of comets) {
