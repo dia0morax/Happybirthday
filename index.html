@@ -86,12 +86,16 @@
       transition: transform 2.5s cubic-bezier(0.5, 0, 0.1, 1);
     }
     #earthIntro.zoom-out .earth-sphere {
-      transform: scale(8);
+      transform: scale(38) translateZ(0);
       opacity: 0;
+      transition: transform 2.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 2.2s ease-in;
     }
     #earthIntro.hidden {
-      display: none !important;
+      opacity: 0;
+      pointer-events: none;
+      display: none;
     }
+
 
 
     /* خلفية الكانفاس للنجوم 3D */
@@ -498,20 +502,22 @@
 
 
 
-    /* النوافذ المنبثقة (Glass Modal) */
+    /* النوافذ المنبثقة المستقرة تماماً مع وضع ملء الشاشة والشاشات المختلفة */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(3, 3, 12, 0.78);
-      backdrop-filter: blur(16px);
+      background: #02040a;
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 1000;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.4s ease;
+      transition: opacity 0.25s ease;
       padding: 16px;
+      contain: layout style;
+      transform: translateZ(0);
+      will-change: opacity;
     }
 
     .modal-overlay.active {
@@ -520,18 +526,19 @@
     }
 
     .glass-card {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%), rgba(10, 15, 30, 0.88);
-      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: #0b1120;
+      border: 1px solid rgba(56, 189, 248, 0.3);
       border-radius: 24px;
       width: 92%;
       max-width: 580px;
-      padding: 36px 30px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 40px rgba(56, 189, 248, 0.15);
+      padding: 34px 26px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.95);
       position: relative;
-      transform: translateY(20px) scale(0.96);
-      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: translateZ(0);
       color: #fff;
+      contain: paint;
     }
+
 
 
     .modal-overlay.active .glass-card {
@@ -1911,37 +1918,8 @@
   <button class="admin-floating-toggle" id="adminToggleBtn">⚙️ لوحة التعديل والتحكم</button>
   <div class="drag-hint" id="dragHint">✨ اضغط على أي نجمة ليظهر جويستيك تحريكها بسلاسة!</div>
 
-  <!-- ========================================================
-       [زر اختبار مؤقت: إنهاء التجربة 100% - احذف هذه الكتلة بالكامل بعد الاختبار]
-       ======================================================== -->
-  <button id="testComplete100Btn" onclick="(function(){
-    // تعليم جميع النجوم كمقروءة
-    if (typeof appConfig !== 'undefined' && appConfig.stars) {
-      appConfig.stars.forEach(s => {
-        if (typeof readStarsSet !== 'undefined') readStarsSet.add(String(s.id));
-      });
-      try { localStorage.setItem('sky_read_stars', JSON.stringify(Array.from(readStarsSet))); } catch(e){}
-    }
-    // تعليم جميع الأسرار الخمسة كمكتملة
-    if (typeof discoveredSecrets !== 'undefined') {
-      discoveredSecrets.saturn = true;
-      discoveredSecrets.crystalDestroyed = true;
-      discoveredSecrets.neptune = true;
-      discoveredSecrets.mars = true;
-      discoveredSecrets.kepler = true;
-    }
-    // تعليم كافة المشاهد والكواكب الـ 22 كمكتشفة
-    if (typeof CELESTIAL_MONOLOGUES !== 'undefined' && typeof visitedScenes !== 'undefined') {
-      Object.keys(CELESTIAL_MONOLOGUES).forEach(k => { visitedScenes[k] = true; });
-    }
-    // حفظ التقدم وتحديث العدادات وعرض شاشة الختام 100% فوراً
-    if (typeof persistSecrets === 'function') persistSecrets();
-    if (typeof showGrandCompletionModal === 'function') showGrandCompletionModal();
-    if (typeof showToast === 'function') showToast('⚡ تم إنهاء التجربة 100% لغرض الاختبار!');
-  })()" style="position: fixed; top: 20px; right: 20px; z-index: 9999; background: #dc2626; color: #fff; border: 2px solid #fca5a5; padding: 10px 16px; border-radius: 25px; font-weight: bold; font-family: 'Tajawal', sans-serif; cursor: pointer; box-shadow: 0 4px 20px rgba(220, 38, 38, 0.7); font-size: 0.95rem;">
-    ⚡ اختبار: إنهاء التجربة 100%
-  </button>
-  <!-- ======================================================== -->
+  <!-- تم مسح زر الاختبار -->
+
 
 
 
@@ -2060,8 +2038,9 @@
         </div>
         <div class="progress-detail-item">
           <span>الكواكب والمشاهد:</span>
-          <b id="scenesProgressText" style="color: var(--accent-cyan);">0 / 22</b>
+          <b id="scenesProgressText" style="color: var(--accent-cyan);">0 / 23</b>
         </div>
+
         <div class="progress-detail-item" style="align-items: center;">
           <div style="display: flex; align-items: center; gap: 8px;">
             <span>الأسرار الكبرى:</span>
@@ -4277,8 +4256,8 @@
                            (discoveredSecrets.mars ? 1 : 0) +
                            (discoveredSecrets.kepler ? 1 : 0);
 
-      // 2. الكواكب والمشاهد الـ 22
-      const totalScenes = Object.keys(CELESTIAL_MONOLOGUES).length;
+      // 2. الكواكب والمشاهد الـ 23 (22 مشهداً فضائياً + كوكب المريخ)
+      const totalScenes = 23;
       const scenesFound = Object.keys(visitedScenes).filter(k => k !== 'saturn' && k !== 'neptune').length;
 
       const totalItems = totalStars + totalSecrets + totalScenes;
@@ -4294,8 +4273,9 @@
       if (barFill) barFill.style.width = percent + '%';
       if (label) label.textContent = percent + '%';
       if (starsText) starsText.textContent = `${readStars} / ${totalStars}`;
-      if (scenesText) scenesText.textContent = `${scenesFound} / ${totalScenes}`;
+      if (scenesText) scenesText.textContent = `${scenesFound} / 23`;
       if (secretsText) secretsText.textContent = `${secretsFound} / ${totalSecrets}`;
+
 
       // إظهار نافذة التهنئة الكبرى فور اكتمال النسبة 100%
       if (percent >= 100 && !hasCelebrated100) {
@@ -4644,15 +4624,15 @@
       const cy = canvas.height / 2;
       pulsarAngle += 0.025;
 
-      // التحقق مما إذا كانت هناك أي نافذة أو شاشة منبثقة نشطة لإيقاف تحديث الكانفاس الثقيل فوراً
-      const anyModalActive = document.querySelector('.modal-overlay.active');
-      if (anyModalActive && anyModalActive.id === 'loginModal') {
-        // أثناء شاشة الدخول الأولى: رسم خلفية سوداء ساكنة وتوفير 100% من قدرة المعالج
+      // توفير طاقة المعالج فقط أثناء نافذة تسجيل الدخول الأولى وقبل بدء رحلة الفضاء
+      const loginModalEl = document.getElementById('loginModal');
+      if (loginModalEl && loginModalEl.classList.contains('active')) {
         ctx.fillStyle = '#03030c';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         requestAnimationFrame(animateUniverse);
         return;
       }
+
 
       // 1. رسم الأجرام والظواهر الظاهرة داخل مجال رؤية الشاشة فقط (Strict Culling)
       for (let obj of celestialObjects) {
@@ -6350,10 +6330,6 @@
       }
     }
 
-    // إعادة تثبيت الشاشة الكاملة فور نقر المستخدم على أي زر في الموقع
-    window.addEventListener('click', () => {
-      triggerFullScreen();
-    }, { passive: true });
 
 
     function handleLogin() {
@@ -6378,26 +6354,29 @@
     }
 
     function startUniverseJourney() {
-      // تأكيد ملء الشاشة عند زر الانطلاق النهائي
       triggerFullScreen();
       guidelinesModal.classList.remove('active');
 
       const earthIntro = document.getElementById('earthIntro');
-      setTimeout(() => {
-        earthIntro.classList.add('zoom-out');
-        startMusicExperience();
-      }, 100);
+      if (earthIntro) {
+        earthIntro.classList.remove('hidden');
+        setTimeout(() => {
+          earthIntro.classList.add('zoom-out');
+          startMusicExperience();
+        }, 50);
 
-      setTimeout(() => {
-        earthIntro.classList.add('hidden');
-        if (currentLoggedInUser === 'diajb0') {
-          enableAdminStudio();
-          showToast("مرحباً بك diajb0! فُتح لك استوديو التعديل الآن ✨");
-        } else {
-          showToast("مرحباً بكِ في سمائكِ الخاصة يا أميرتي.. استمتعي بالرحلة 🌌");
-        }
-      }, 2500);
+        setTimeout(() => {
+          earthIntro.classList.add('hidden');
+          if (currentLoggedInUser === 'diajb0') {
+            enableAdminStudio();
+            showToast("مرحباً بك diajb0! فُتح لك استوديو التعديل الآن ✨");
+          } else {
+            showToast("مرحباً بكِ في سمائكِ الخاصة يا أميرتي.. استمتعي بالرحلة 🌌");
+          }
+        }, 2400);
+      }
     }
+
 
 
     function showLoginError(msg) {
